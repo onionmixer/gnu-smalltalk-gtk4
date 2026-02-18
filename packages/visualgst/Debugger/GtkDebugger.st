@@ -141,18 +141,13 @@ GtkBrowsingTool subclass: GtkDebugger [
     createExecuteMenus [
 	<category: 'user interface'>
 
-        self accelGroup append: {{'F7'. '<Debugger>/StepInto'}}.
-        self accelGroup append: {{'F8'. '<Debugger>/StepOver'}}.
-        self accelGroup append: {{'<shift>F8'. '<Debugger>/StepOut'}}.
-        self accelGroup append: {{'F5'. '<Debugger>/Continue'}}.
-
-        ^{GTK.GtkMenuItem menuItem: 'Restart selected frame' connectTo: self selector: #restartSelectedFrame.
-          GTK.GtkMenuItem new.
-          GTK.GtkMenuItem menuItem: 'Step into next message send' accelPath: '<Debugger>/StepInto' connectTo: self selector: #stepInto.
-          GTK.GtkMenuItem menuItem: 'Step over next message send' accelPath: '<Debugger>/StepOver' connectTo: self selector: #stepOver.
-          GTK.GtkMenuItem menuItem: 'Step out current message' accelPath: '<Debugger>/StepOut' connectTo: self selector: #stepOut.
-          GTK.GtkMenuItem new.
-          GTK.GtkMenuItem menuItem: 'Continue' accelPath: '<Debugger>/Continue' connectTo: self selector: #continue}
+        ^{self menuItem: 'Restart selected frame' target: self selector: #restartSelectedFrame.
+          nil.
+          self menuItem: 'Step into next message send' target: self selector: #stepInto.
+          self menuItem: 'Step over next message send' target: self selector: #stepOver.
+          self menuItem: 'Step out current message' target: self selector: #stepOut.
+          nil.
+          self menuItem: 'Continue' target: self selector: #continue}
     ]
 
     createMenus [

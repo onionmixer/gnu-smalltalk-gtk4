@@ -61,9 +61,9 @@ GtkBrowsingTool subclass: GtkSUnit [
     createRunMenus [
         <category: 'user interface'>
 
-        ^{GTK.GtkMenuItem menuItem: 'Load tests' connectTo: self selector: #loadTests.
-	  GTK.GtkMenuItem menuItem: 'Run test' connectTo: self selector: #runTest.
-	  GTK.GtkMenuItem menuItem: 'Debug test' connectTo: self selector: #debugTest}
+        ^{self menuItem: 'Load tests' target: self selector: #loadTests.
+	  self menuItem: 'Run test' target: self selector: #runTest.
+	  self menuItem: 'Debug test' target: self selector: #debugTest}
     ]
 
     createMenus [
@@ -84,7 +84,8 @@ GtkBrowsingTool subclass: GtkSUnit [
 	super createToolbar.
 	self
 	    appendSeparator;
-            appendToolItem: ((GTK.GtkToolButton new: (GTK.GtkImage newFromFile: (GtkLauncher / 'Icons/go-run.png') file displayString) label: 'Run test')
+            appendToolItem: ((GTK.GtkButton new)
+                                setChild: (GTK.GtkImage newFromFile: (GtkLauncher / 'Icons/go-run.png') file displayString);
                                 connectSignal: 'clicked' to: self selector: #runTest userData: nil;
                                 setTooltipText: 'Run test';
                                 yourself)

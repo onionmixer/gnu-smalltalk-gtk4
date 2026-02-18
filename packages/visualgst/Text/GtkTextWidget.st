@@ -47,15 +47,14 @@ GtkConcreteWidget subclass: GtkTextWidget [
 
     connectToWhenPopupMenu: aMenu [
         <category: 'button event'>
-        popupMenu := aMenu.
-	textWidget
-	    connectSignal: 'populate-popup' to: self selector: #'popupMenuOn:menu:'
-    ]
 
-    popupMenuOn: aWidget menu: aGtkMenu [
-        <category: 'button event'>
-        aGtkMenu append: (GTK.GtkMenuItem new show; yourself).
-        popupMenu appendTo: aGtkMenu
+	| gmenu actionGroup |
+	popupMenu := aMenu.
+	actionGroup := GTK.GSimpleActionGroup new.
+	gmenu := GTK.GMenu new.
+	popupMenu appendTo: gmenu actionGroup: actionGroup prefix: 'ctx'.
+	textWidget insertActionGroup: 'ctx' group: actionGroup.
+	textWidget setExtraMenu: gmenu
     ]
 
     connectSignals [

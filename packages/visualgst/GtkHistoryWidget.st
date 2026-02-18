@@ -85,14 +85,23 @@ GtkConcreteWidget subclass: GtkHistoryWidget [
     onPress: gesture nPress: nPress x: x y: y [
         <category: 'button event'>
 
-        | menu |
-        menu := GTK.GtkMenu new.
-        menu appendMenuItems: {{'Inspect a class'. self. #inspectClass}.
-            {'Open in new tab'. self. #browseTabbedClass}.
-            "{'Open in new window'. self. #browseClass}"}.
-        menu attachToWidget: widget detacher: nil.
-        menu popup: nil parentMenuItem: nil func: nil data: nil button: 3 activateTime: 0.
-        menu show.
+        | gmenu actionGroup popover action |
+        actionGroup := GTK.GSimpleActionGroup new.
+        gmenu := GTK.GMenu new.
+        action := GTK.GSimpleAction new: 'inspect-class' parameterType: nil.
+        action connectSignal: 'activate' to: self selector: #inspectClass.
+        actionGroup insert: action.
+        gmenu append: 'Inspect a class' detailedAction: 'popup.inspect-class'.
+        action := GTK.GSimpleAction new: 'browse-tabbed-class' parameterType: nil.
+        action connectSignal: 'activate' to: self selector: #browseTabbedClass.
+        actionGroup insert: action.
+        gmenu append: 'Open in new tab' detailedAction: 'popup.browse-tabbed-class'.
+        popover := GTK.GtkPopoverMenu newFromModel: gmenu.
+        popover insertActionGroup: 'popup' group: actionGroup.
+        popover setParent: widget.
+        popover setHasArrow: false.
+        popover popup.
+        popover connectSignal: 'closed' to: popover selector: #'unparent'.
     ]
 
     targetObject [

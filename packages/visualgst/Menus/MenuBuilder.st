@@ -59,22 +59,23 @@ Object subclass: MenuBuilder [
     ]
 
     asPopupMenu [
+	"Build a GtkPopoverMenu for use as a context menu."
 
-        | menu |
-        menu := GTK.GtkMenu new.
-        self appendTo: menu.
-        ^ menu
+	| gmenu actionGroup popover |
+	actionGroup := GTK.GSimpleActionGroup new.
+	gmenu := GTK.GMenu new.
+	self buildMenuOn: gmenu actionGroup: actionGroup prefix: 'popup'.
+	popover := GTK.GtkPopoverMenu newFromModel: gmenu.
+	popover insertActionGroup: 'popup' group: actionGroup.
+	popover setHasArrow: false.
+	^ popover
     ]
 
     asMenuItems [
+	"Build GMenuItems for use in the menu bar. Target must be a GtkMainWindow."
 
-        ^ commands collect: [ :each | | item accelPath |
-            item := each buildMenuItem.
-            each accel isNil ifFalse: [
-                accelPath := target accelPath, '/', each class name.
-                target accelGroup append: {{each accel. accelPath}}.
-                item setAccelPath: accelPath ].
-            item ]
+	^ commands collect: [ :each |
+	    each buildMenuItemOn: target actionGroup prefix: 'win' ]
     ]
 
     asToolItems [
@@ -82,12 +83,26 @@ Object subclass: MenuBuilder [
         ^ commands collect: [ :each | self target appendToolItem: each buildToolItem ]
     ]
 
-    appendTo: aGtkMenu [
+    buildMenuOn: aGMenu actionGroup: anActionGroup prefix: aPrefix [
+	"Populate aGMenu with items from commands. Nil items become section breaks."
 
-        commands do: [ :each | | item |
-            item := each buildMenuItem.
-            each setState: item.
-            aGtkMenu append: item ]
+	| section |
+	section := GTK.GMenu new.
+	commands do: [ :each | | item |
+	    item := each buildMenuItemOn: anActionGroup prefix: aPrefix.
+	    item isNil
+		ifTrue: [
+		    aGMenu appendSection: nil section: section.
+		    section := GTK.GMenu new ]
+		ifFalse: [ section appendItem: item ] ].
+	section getNItems > 0 ifTrue: [
+	    aGMenu appendSection: nil section: section ]
+    ]
+
+    appendTo: aGMenu actionGroup: anActionGroup prefix: aPrefix [
+	"Append menu items to an existing GMenu."
+
+	self buildMenuOn: aGMenu actionGroup: anActionGroup prefix: aPrefix
     ]
 
     target [

@@ -519,8 +519,8 @@ GtkVisualGSTTool subclass: GtkLauncher [
 	<category: 'user interface'>
 
 	^ super createEditMenus, {
-            GTK.GtkMenuItem new.
-            GTK.GtkMenuItem menuItem: 'Clear Transcript' connectTo: self selector: #clearTranscriptWidget}
+            nil.
+            self menuItem: 'Clear Transcript' target: self selector: #clearTranscriptWidget}
     ]
 
     createNamespaceMenus [
@@ -550,17 +550,12 @@ GtkVisualGSTTool subclass: GtkLauncher [
     createFileMenus [
 	<category: 'user interface'>
 
-        self accelGroup append: 
-	    {{'<Control>O'. '<GtkLauncher>/File/Open'}.
-	    {'<Control><Shift>S'. '<GtkLauncher>/File/SaveAs'}.
-	    {'<Control>Q'. '<GtkLauncher>/File/Quit'}}.
-
-	^{GTK.GtkMenuItem menuItem: 'New workspace' connectTo: self selector: #newWorkspace.
-            GTK.GtkMenuItem new.
-	    GTK.GtkMenuItem menuItem: 'Open' accelPath: '<GtkLauncher>/File/Open' connectTo: self selector: #open.
-            GTK.GtkMenuItem menuItem: 'Save' connectTo: self selector: #save.
-            GTK.GtkMenuItem menuItem: 'Save as...' accelPath: '<GtkLauncher>/File/SaveAs' connectTo: self selector: #saveAs.
-            GTK.GtkMenuItem new}, super createFileMenus
+	^{self menuItem: 'New workspace' target: self selector: #newWorkspace.
+	    nil.
+	    self menuItem: 'Open' target: self selector: #open.
+	    self menuItem: 'Save' target: self selector: #save.
+	    self menuItem: 'Save as...' target: self selector: #saveAs.
+	    nil}, super createFileMenus
     ]
 
     createHistoryMenus [
@@ -579,7 +574,7 @@ GtkVisualGSTTool subclass: GtkLauncher [
 	<category: 'user interface'>
 
 	self
-	    appendToolItem: ((GTK.GtkToolButton newFromIconName: 'document-new-symbolic')
+	    appendToolItem: ((GTK.GtkButton newFromIconName: 'document-new-symbolic')
 				connectSignal: 'clicked' to: self selector: #newWorkspace;
 				setTooltipText: 'Create a new workspace';
 				yourself).
@@ -605,9 +600,7 @@ GtkVisualGSTTool subclass: GtkLauncher [
     createToolsMenus [
 	<category: 'user interface'>
 
-        self accelGroup append: {{'<Control>B'. '<GtkLauncher>/Tools/TabbedClassBrowser'}}.
-
-	^{GTK.GtkMenuItem menuItem: 'Browser' accelPath: '<GtkLauncher>/Tools/TabbedClassBrowser' connectTo: self selector: #newTabbedBrowser},
+	^{self menuItem: 'Browser' target: self selector: #newTabbedBrowser},
             super createToolsMenus.
     ]
 

@@ -38,7 +38,13 @@ Command subclass: MenuSeparator [
     buildMenuItem [
 	<category: 'build'>
 
-	^ GTK.GtkMenuItem new show; yourself
+	^ nil
+    ]
+
+    buildMenuItemOn: anActionGroup prefix: aPrefix [
+	<category: 'build'>
+
+	^ nil
     ]
 ]
 

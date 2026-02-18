@@ -689,8 +689,8 @@ GTK.GtkScrolledWindow class extend [
     withViewport: aGtkWidget [
 	<category: 'instance creation'>
 
-	^ (GTK.GtkScrolledWindow new: nil vadjustment: nil)
-	    addWithViewport: aGtkWidget;
+	^ GTK.GtkScrolledWindow new
+	    setChild: aGtkWidget;
 	    setPolicy: GTK.Gtk gtkPolicyAutomatic vscrollbarPolicy: GTK.Gtk gtkPolicyAutomatic;
 	    yourself
     ]

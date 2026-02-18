@@ -134,25 +134,34 @@ Object subclass: Command [
     buildMenuItem [
         <category: 'build'>
 
-        ^ (GTK.GtkMenuItem newWithLabel: self item)
-                show;
-                connectSignal: 'activate' to: self selector: #executeIfValid;
-                yourself
+	self subclassResponsibility
+    ]
+
+    buildMenuItemOn: anActionGroup prefix: aPrefix [
+	<category: 'build'>
+
+	| actionName action |
+	actionName := self class name asString asLowercase.
+	action := GTK.GSimpleAction new: actionName parameterType: nil.
+	action connectSignal: 'activate' to: self selector: #executeIfValid.
+	action setEnabled: self valid.
+	anActionGroup insert: action.
+	^ GTK.GMenuItem new: self item detailedAction: aPrefix, '.', actionName
     ]
 
     buildToolItem [
         <category: 'build'>
 
-	^ (GTK.GtkToolButton newFromIconName: self stockIcon label: self item)
+	^ (GTK.GtkButton newFromIconName: self stockIcon)
                                 connectSignal: 'clicked' to: self selector: #executeIfValid;
                                 setTooltipText: self tooltip;
                                 yourself
     ]
 
-    setState: aGtkMenuItem [
+    setState: aGSimpleAction [
         <category: 'build'>
 
-	aGtkMenuItem setSensitive: self valid
+	aGSimpleAction setEnabled: self valid
     ]
 ]
 

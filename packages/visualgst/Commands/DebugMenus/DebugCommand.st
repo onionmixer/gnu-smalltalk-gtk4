@@ -43,7 +43,8 @@ Command subclass: DebugCommand [
     buildToolItem [
         <category: 'build'>
 
-        ^ (GTK.GtkToolButton new: (GTK.GtkImage newFromFile: self iconPath) label: self item)
+        ^ (GTK.GtkButton new)
+                                setChild: (GTK.GtkImage newFromFile: self iconPath);
                                 connectSignal: 'clicked' to: self selector: #executeIfValid;
                                 setTooltipText: self tooltip;
                                 yourself

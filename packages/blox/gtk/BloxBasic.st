@@ -2322,7 +2322,7 @@ scrolled, like list boxes or text widgets.'>
 
     show [
 	<category: 'creation'>
-	self container: (GTK.GtkScrolledWindow new: nil vadjustment: nil).
+	self container: GTK.GtkScrolledWindow new.
 	self container setPolicy: GTK.Gtk gtkPolicyAutomatic
 	    vscrollbarPolicy: GTK.Gtk gtkPolicyAutomatic.
 	horizontal := vertical := true.

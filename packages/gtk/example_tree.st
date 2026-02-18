@@ -71,7 +71,7 @@ Object subclass: TreeExample [
 	window setChild: vbox.
 	frame := GtkFrame new: nil.
 	vbox append: frame.
-	scroll := GtkScrolledWindow new: nil vadjustment: nil.
+	scroll := GtkScrolledWindow new.
 	frame setChild: scroll.
 	scroll setPolicy: Gtk gtkPolicyAutomatic
 	    vscrollbarPolicy: Gtk gtkPolicyAutomatic.

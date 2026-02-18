@@ -95,18 +95,11 @@ THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.'
     createFileMenus [
         <category: 'user interface'>
 
-        | menu |
-        self accelGroup append:
-            {{'<Control>W'. '<GtkVisualGSTTool>/File/Close'}.
-             {'<Control>Q'. '<GtkVisualGSTTool>/File/Quit'}}.
-
-        menu := OrderedCollection withAll: {
-            GTK.GtkMenuItem menuItem: 'Save image' connectTo: self selector: #saveImage.
-            GTK.GtkMenuItem menuItem: 'Save image as...' connectTo: self selector: #saveImageAs.
-            GTK.GtkMenuItem new}.
-            menu add: (GTK.GtkMenuItem menuItem: 'Close' accelPath: '<GtkVisualGSTTool>/File/Close' connectTo: self selector: #close).
-        menu add: (GTK.GtkMenuItem menuItem: 'Quit' accelPath: '<GtkVisualGSTTool>/File/Quit' connectTo: self selector: #quit).
-        ^menu
+        ^{self menuItem: 'Save image' target: self selector: #saveImage.
+	    self menuItem: 'Save image as...' target: self selector: #saveImageAs.
+	    nil.
+	    self menuItem: 'Close' target: self selector: #close.
+	    self menuItem: 'Quit' target: self selector: #quit}
     ]
 
     exitOnClose [
@@ -215,10 +208,10 @@ THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.'
     createHelpMenus [
         <category: 'user interface'>
 
-        ^{GTK.GtkMenuItem menuItem: 'Help Contents' connectTo: self selector: #helpContents.
-            GTK.GtkMenuItem new.
-            GTK.GtkMenuItem menuItem: self aboutTitle connectTo: self selector: #showAboutDialog.
-            GTK.GtkMenuItem menuItem: 'About GNU Smalltalk' connectTo: self selector: #aboutGst}
+        ^{self menuItem: 'Help Contents' target: self selector: #helpContents.
+	    nil.
+	    self menuItem: self aboutTitle target: self selector: #showAboutDialog.
+	    self menuItem: 'About GNU Smalltalk' target: self selector: #aboutGst}
     ]
 
     createMenus [

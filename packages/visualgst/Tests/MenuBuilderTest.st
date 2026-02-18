@@ -60,12 +60,18 @@ MenuBuilder subclass: TestMenuBuilderA [
 
 TestCase subclass: MenuBuilderTest [
 
-    | accelGroup |
+    | accelGroup actionGroup |
 
     accelGroup [
         <category: 'accessing'>
 
-        ^ accelGroup ifNil: [ accelGroup := GTK.GtkAccelGroup new ]
+        ^ accelGroup ifNil: [ accelGroup := GTK.GtkShortcutController new ]
+    ]
+
+    actionGroup [
+        <category: 'accessing'>
+
+        ^ actionGroup ifNil: [ actionGroup := GTK.GSimpleActionGroup new ]
     ]
 
     accelPath [
@@ -77,10 +83,11 @@ TestCase subclass: MenuBuilderTest [
     testMenuBuilder [
 	<category: 'testing'>
 
-	| menu result |
+	| menu |
 	menu := TestMenuBuilderA browserBuildOn: self.
-	result := #('FakeA' '' 'FakeB').
-	1 to: result size do: [ :i |
-	    self assert: (menu at: i) getLabel = (result at: i) ]
+	self assert: menu size = 3.
+	self assert: (menu at: 1) isNil not.
+	self assert: (menu at: 2) isNil.
+	self assert: (menu at: 3) isNil not
     ]
 ]

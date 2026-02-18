@@ -34,7 +34,7 @@
 ======================================================================"
 
 Smalltalk.Object subclass: GtkMainWindow [
-    | window container menuBar toolBar centralWidget statusBar accelGroup |
+    | window container menuBar toolBar centralWidget statusBar statusLabel accelGroup actionGroup menuModel actionCounter |
 
     GtkMainWindow class >> open	[
 	<category: 'user interface'>
@@ -78,25 +78,40 @@ Smalltalk.Object subclass: GtkMainWindow [
     accelGroup [
 	<category: 'accessing'>
 
-	^ accelGroup ifNil: [ accelGroup := GTK.GtkAccelGroup new ]
+	^ accelGroup ifNil: [ accelGroup := GTK.GtkShortcutController new ]
+    ]
+
+    actionGroup [
+	<category: 'accessing'>
+
+	^ actionGroup ifNil: [
+	    actionGroup := GTK.GSimpleActionGroup new.
+	    window insertActionGroup: 'win' group: actionGroup.
+	    actionGroup ]
+    ]
+
+    menuModel [
+	<category: 'accessing'>
+
+	^ menuModel ifNil: [ menuModel := GTK.GMenu new ]
     ]
 
     menuBar [
 	<category: 'accessing'>
 
-	^ menuBar ifNil: [ menuBar := GTK.GtkMenuBar new ]
-    ]
-
-    menuBar: aGtkMenuBar [
-	<category: 'accessing'>
-
-	menuBar := aGtkMenuBar
+	^ menuBar ifNil: [ menuBar := GTK.GtkPopoverMenuBar newFromModel: self menuModel ]
     ]
 
     statusBar [
 	<category: 'accessing'>
 
-	^ statusBar ifNil: [ statusBar := GTK.GtkStatusbar new ] 
+	^ statusBar ifNil: [
+	    statusLabel := GTK.GtkLabel new: ''.
+	    statusLabel setHalign: GTK.Gtk gtkAlignStart.
+	    statusLabel setHexpand: true.
+	    statusBar := GTK.GtkBox new: GTK.Gtk gtkOrientationHorizontal spacing: 0.
+	    statusBar append: statusLabel.
+	    statusBar ]
     ]
 
     statusBar: aGtkStatusBar [
@@ -120,7 +135,7 @@ Smalltalk.Object subclass: GtkMainWindow [
     toolBar [
 	<category: 'accessing'>
 
-	^ toolBar ifNil: [ toolBar := GTK.GtkToolbar new ]
+	^ toolBar ifNil: [ toolBar := GTK.GtkBox new: GTK.Gtk gtkOrientationHorizontal spacing: 2 ]
     ]
 
     toolBar: aGtkToolBar [
@@ -164,7 +179,7 @@ that are specific to this version of GNU Smalltalk.';
 	<category: 'intialization'>
 	
 	window := GTK.GtkWindow	new: GTK.Gtk gtkWindowToplevel.
-	window addAccelGroup: self accelGroup.
+	window addController: self accelGroup.
         self
             title: self windowTitle;
             createMenus;
@@ -211,18 +226,39 @@ that are specific to this version of GNU Smalltalk.';
         ^ true
     ]
 
-    addMenuItem: aString [
+    nextActionName [
 	<category: 'menubar'>
 
-	self menuBar append: (GTK.GtkMenuItem newWithLabel: aString)
+	actionCounter := (actionCounter ifNil: [0]) + 1.
+	^ 'a', actionCounter printString
     ]
 
-    addMenuItem: aString withSubmenu: aGtkMenuItemArray [
+    menuItem: aLabel target: aTarget selector: aSelector [
 	<category: 'menubar'>
 
-	self menuBar append:
-	    ((GTK.GtkMenuItem newWithLabel: aString)
-		setSubmenu: (self createNewMenuEntry: aGtkMenuItemArray))
+	| actionName action |
+	actionName := self nextActionName.
+	action := GTK.GSimpleAction new: actionName parameterType: nil.
+	action connectSignal: 'activate' to: aTarget selector: aSelector.
+	self actionGroup insert: action.
+	^ GTK.GMenuItem new: aLabel detailedAction: 'win.', actionName
+    ]
+
+    addMenuItem: aString withSubmenu: aGMenuItemArray [
+	<category: 'menubar'>
+
+	| submenu section |
+	submenu := GTK.GMenu new.
+	section := GTK.GMenu new.
+	aGMenuItemArray do: [ :each |
+	    each isNil
+		ifTrue: [
+		    submenu appendSection: nil section: section.
+		    section := GTK.GMenu new ]
+		ifFalse: [ section appendItem: each ] ].
+	section getNItems > 0 ifTrue: [
+	    submenu appendSection: nil section: section ].
+	self menuModel appendSubmenu: aString submenu: submenu
     ]
 
     createMainMenu: anArray [
@@ -232,41 +268,29 @@ that are specific to this version of GNU Smalltalk.';
 	    self addMenuItem: each first withSubmenu: (self perform: each second) ]
     ]
 
-    createNewMenuEntry: anArray [
-        <category: 'menubar'>
-
-        | menu |
-        menu := (GTK.GtkMenu new)
-                    setAccelGroup: self accelGroup;
-                    yourself.
-        anArray do: [ :each |
-            menu append: each ].
-        ^ menu
-    ]
-
     statusMessage: aString [
 	<category: 'statusbar'>
 
-	self statusBar
-	    push: 0 text: aString
+	self statusBar.
+	statusLabel setText: aString
     ]
 
     appendSeparator [
 	<category: 'toolbar'>
 
-	self appendToolItem: GTK.GtkSeparatorToolItem new
+	self toolBar append: (GTK.GtkSeparator new: GTK.Gtk gtkOrientationVertical)
     ]
 
-    appendToolItem: aGtkToolItem [
+    appendToolItem: aGtkWidget [
 	<category: 'toolbar'>
 
-	self toolBar insert: aGtkToolItem pos: -1
+	self toolBar append: aGtkWidget
     ]
 
     appendWidget: aGtkWidget [
 	<category: 'toolbar'>
 
-	self appendToolItem: ((GTK.GtkToolItem new) setChild: aGtkWidget)
+	self toolBar append: aGtkWidget
     ]
 
     resize: aPoint [

@@ -38,7 +38,7 @@ Command subclass: ToolbarSeparator [
     buildToolItem [
         <category: 'build'>
 
-        ^ GTK.GtkSeparatorToolItem new show;
+        ^ (GTK.GtkSeparator new: GTK.Gtk gtkOrientationVertical) show;
 		yourself
     ]
 ]

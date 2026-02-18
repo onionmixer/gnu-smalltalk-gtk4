@@ -75,36 +75,28 @@ GtkConcreteWidget subclass: GtkSUnitResult [
 	    self model appendItem: {each displayString. each} ]
     ]
 
-    popupMenuOn: aGtkWidget menu: aGtkMenu [
-	<category: 'events'>
-	| menuitem symbol |
-
-        symbol := self selectedMethodSymbol.
-        menuitem := GTK.GtkMenuItem newWithLabel: 'Run test'.
-        menuitem
-            show;
-            connectSignal: 'activate' to: self selector: #debugTest userData: nil.
-        aGtkMenu append: menuitem.
-	"TODO: show test"
-        menuitem := GTK.GtkMenuItem new.
-        menuitem show.
-        aGtkMenu append: menuitem.
-        menuitem := GTK.GtkMenuItem newWithLabel: 'Browse implementors'.
-        menuitem
-            setSensitive: symbol notNil;
-            show;
-            connectSignal: 'activate' to: self selector: #browseImplementors userData: nil.
-        aGtkMenu append: menuitem.
-    ]
-
     onPress: gesture nPress: nPress x: x y: y [
 	<category: 'events'>
-	| menu |
-        menu := GTK.GtkMenu new.
-	self popupMenuOn: resultTree menu: menu.
-        menu attachToWidget: resultTree detacher: nil.
-        menu show.
-        menu popup: nil parentMenuItem: nil func: nil data: nil button: 3 activateTime: 0.
+
+	| gmenu actionGroup popover action symbol |
+	actionGroup := GTK.GSimpleActionGroup new.
+	gmenu := GTK.GMenu new.
+	action := GTK.GSimpleAction new: 'debug-test' parameterType: nil.
+	action connectSignal: 'activate' to: self selector: #debugTest.
+	actionGroup insert: action.
+	gmenu append: 'Run test' detailedAction: 'popup.debug-test'.
+	symbol := self selectedMethodSymbol.
+	action := GTK.GSimpleAction new: 'browse-implementors' parameterType: nil.
+	action connectSignal: 'activate' to: self selector: #browseImplementors.
+	action setEnabled: symbol notNil.
+	actionGroup insert: action.
+	gmenu append: 'Browse implementors' detailedAction: 'popup.browse-implementors'.
+	popover := GTK.GtkPopoverMenu newFromModel: gmenu.
+	popover insertActionGroup: 'popup' group: actionGroup.
+	popover setParent: resultTree.
+	popover setHasArrow: false.
+	popover popup.
+	popover connectSignal: 'closed' to: popover selector: #'unparent'.
     ]
 
     debugTest [

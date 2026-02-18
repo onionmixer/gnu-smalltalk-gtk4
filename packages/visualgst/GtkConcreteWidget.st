@@ -129,11 +129,11 @@ Object subclass: GtkConcreteWidget [
     onPress: gesture nPress: nPress x: x y: y [
         <category: 'button event'>
 
-        | menu |
-        menu := popupMenu asPopupMenu.
-        menu attachToWidget: self treeView detacher: nil.
-        menu popup: nil parentMenuItem: nil func: nil data: nil button: 3 activateTime: 0.
-        menu show.
+        | popover |
+        popover := popupMenu asPopupMenu.
+        popover setParent: self treeView.
+        popover popup.
+        popover connectSignal: 'closed' to: popover selector: #'unparent'.
     ]
 
     connectToWhenPopupMenu: aMenuBuilder [
