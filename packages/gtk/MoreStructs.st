@@ -117,3 +117,20 @@ GLib.GObject variableWordSubclass: #GtkStringObject
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Gtk'!
+
+
+"GTK4 menu classes: fix class hierarchy from auto-generated Structs.st.
+ GtkPopoverMenu inherits from GtkPopover (to get popup, setHasArrow: etc).
+ GtkPopoverMenuBar inherits from GtkWidget."
+
+GtkPopover variableWordSubclass: #GtkPopoverMenu
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Gtk'!
+
+GtkWidget variableWordSubclass: #GtkPopoverMenuBar
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Gtk'!

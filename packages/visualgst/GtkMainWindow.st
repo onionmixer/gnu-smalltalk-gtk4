@@ -296,7 +296,7 @@ that are specific to this version of GNU Smalltalk.';
     resize: aPoint [
 	<category: 'user interface'>
 
-	window resize: aPoint x height: aPoint y
+	window setDefaultSize: aPoint x height: aPoint y
     ]
 
     show [

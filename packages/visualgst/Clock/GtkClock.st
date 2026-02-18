@@ -190,7 +190,7 @@ Smalltalk.Object subclass: GtkClock [
     resize: aPoint [
 	<category: 'user interface'>
 
-	window resize: aPoint x height: aPoint y
+	window setDefaultSize: aPoint x height: aPoint y
     ]
 
     show [

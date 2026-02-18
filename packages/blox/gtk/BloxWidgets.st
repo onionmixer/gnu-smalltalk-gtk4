@@ -3205,7 +3205,7 @@ elements.'>
 
 
 BForm subclass: BWindow [
-    | isMapped callback x y width height container uiBox uiManager |
+    | isMapped callback x y width height container uiBox |
     
     <comment: 'I am the boss. Nothing else could be viewed or interacted with if
 it wasn''t for me... )):->'>
@@ -3347,28 +3347,23 @@ it wasn''t for me... )):->'>
     ]
 
     uiManager [
+	"Legacy — no longer used. GtkUIManager removed in GTK4."
+
 	<category: 'accessing'>
-	uiManager isNil ifTrue: [uiManager := GTK.GtkUIManager new].
-	^uiManager
+	^nil
     ]
 
     cacheWindowSize [
-	"save the window position from gtk"
+	"save the window size from gtk.
+	 GTK4: window position is managed by the compositor, only size is tracked."
 
 	<category: 'private'>
-	| px py |
-	px := CIntType gcNew.
-	py := CIntType gcNew.
-	self container getPosition: px rootY: py.
-	x := px value.
-	y := py value.
-	self isMapped 
-	    ifTrue: [self container getSize: px height: py]
-	    ifFalse: [self container getDefaultSize: px height: py].
-	width := px value.
-	height := py value.
-	self isMapped 
-	    ifTrue: [self container setDefaultSize: width height: height]
+	| pw ph |
+	pw := CIntType gcNew.
+	ph := CIntType gcNew.
+	self container getDefaultSize: pw height: ph.
+	width := pw value.
+	height := ph value
     ]
 
     container [
@@ -3455,7 +3450,7 @@ it wasn''t for me... )):->'>
 	    ifTrue: [^self].
 	self isMapped 
 	    ifFalse: [self container setDefaultSize: xSize height: ySize]
-	    ifTrue: [self container resize: xSize height: ySize].
+	    ifTrue: [self container setDefaultSize: xSize height: ySize].
 	x := xPos.
 	y := yPos.
 	width := xSize.
@@ -4204,9 +4199,10 @@ common dialog boxes, such as choose-a-file and choose-a-color.'>
 	| uiBox label separator |
 	super create.
 	uiBox := self toplevel uiBox.
-	buttonBox := GTK.GtkButtonBox new: GTK.Gtk gtkOrientationHorizontal.
-	buttonBox setSpacing: 5.
-	buttonBox setLayout: GTK.Gtk gtkButtonboxEnd.
+	buttonBox := (GTK.GtkBox new: GTK.Gtk gtkOrientationHorizontal spacing: 5)
+	    setHomogeneous: true;
+	    setHalign: GTK.Gtk gtkAlignEnd;
+	    yourself.
 	uiBox append: buttonBox.
 	buttonBox show.
 	separator := GTK.GtkSeparator new: GTK.Gtk gtkOrientationHorizontal.
@@ -4215,7 +4211,7 @@ common dialog boxes, such as choose-a-file and choose-a-color.'>
 
 	"Put the GtkPlacer at the end of the list of the end-packed widgets,
 	 which puts it above our GtkSeparator and GtkButtonBox."
-	uiBox reorderChild: self toplevel connected position: -1.
+	uiBox reorderChildAfter: self toplevel connected sibling: separator.
 	initInfo isNil ifTrue: [^self].
 	label := GTK.GtkLabel new: initInfo key.
 	label setAlignment: 0 yalign: 0.
@@ -4278,9 +4274,10 @@ common dialog boxes, such as choose-a-file and choose-a-color.'>
 
 
 BMenuObject subclass: BMenuBar [
-    | actionGroup uiManager |
-    
-    <comment: 'I am the Menu Bar, the top widget in a full menu structure.'>
+    | actionGroup menuModel menuBarWidget actionCounter |
+
+    <comment: 'I am the Menu Bar, the top widget in a full menu structure.
+     Uses GTK4 GMenu model, GSimpleActionGroup, and GtkPopoverMenuBar.'>
     <category: 'Graphics-Windows'>
 
     add: aMenu [
@@ -4295,69 +4292,71 @@ BMenuObject subclass: BMenuBar [
 	"Remove aMenu from the menu bar"
 
 	<category: 'accessing'>
-	self 
-	    tclEval: 'catch { %1 delete %2 }'
-	    with: self connected
-	    with: aMenu connected
     ]
 
-    uiManager [
-	<category: 'private'>
-	uiManager isNil ifTrue: [self create].
-	^uiManager
-    ]
-
-    create [
-	<category: 'private'>
-	uiManager := self parent isNil 
-		    ifTrue: [GTK.GtkUIManager new]
-		    ifFalse: [self toplevel uiManager].
-	self uiManager 
-	    addUi: self uiManager newMergeId
-	    path: '/'
-	    name: self name
-	    action: self name
-	    type: GTK.Gtk gtkUiManagerMenubar
-	    top: false.
-	self parent isNil ifFalse: [self parent menu: self].
-	actionGroup := GTK.GtkActionGroup new: 'MenuActions'.
-	self uiManager insertActionGroup: actionGroup pos: 0
-    ]
-
-    exists [
-	<category: 'private'>
-	^uiManager notNil
-    ]
-
-    name [
-	"answer the name"
+    menuModel [
+	"Answer the GMenu model for the menu bar"
 
 	<category: 'private'>
-	^'MainMenu'
-    ]
-
-    path [
-	"answer the menu path"
-
-	<category: 'private'>
-	^'/MainMenu'
+	menuModel isNil ifTrue: [self create].
+	^menuModel
     ]
 
     actionGroup [
-	"answer an actiongroup that menu entries should go in"
+	"Answer the GSimpleActionGroup for menu actions"
 
 	<category: 'private'>
 	actionGroup isNil ifTrue: [self create].
 	^actionGroup
+    ]
+
+    nextActionName [
+	"Generate a unique action name"
+
+	<category: 'private'>
+	actionCounter := (actionCounter ifNil: [0]) + 1.
+	^'act', actionCounter printString
+    ]
+
+    create [
+	<category: 'private'>
+	menuModel := GTK.GMenu new.
+	actionGroup := GTK.GSimpleActionGroup new.
+	actionCounter := 0.
+	self parent isNil ifFalse: [
+	    self toplevel container insertActionGroup: 'blox' group: actionGroup.
+	    self parent menu: self ]
+    ]
+
+    connected [
+	"Answer the GtkPopoverMenuBar widget"
+
+	<category: 'private'>
+	menuBarWidget isNil ifTrue: [
+	    menuBarWidget := GTK.GtkPopoverMenuBar newFromModel: self menuModel ].
+	^menuBarWidget
+    ]
+
+    addSubmenuWithLabel: aLabel model: aGMenu [
+	"Add a submenu directly to the menubar model"
+
+	<category: 'private'>
+	menuModel appendSubmenu: aLabel submenu: aGMenu
+    ]
+
+    exists [
+	<category: 'private'>
+	^menuModel notNil
     ]
 ]
 
 
 
 BMenuObject subclass: BMenu [
-    | connected label |
-    
-    <comment: 'I am a Menu that is part of a menu bar.'>
+    | menuModel currentSection label created |
+
+    <comment: 'I am a Menu that is part of a menu bar.
+     Uses GTK4 GMenu model with sections for separators.'>
     <category: 'Graphics-Windows'>
 
     BMenu class >> new: parent label: label [
@@ -4373,24 +4372,14 @@ BMenuObject subclass: BMenu [
     ]
 
     label [
-	"Answer the value of the label option for the widget.
-	 
-	 Specifies a string to be displayed inside the widget. The way in which the
-	 string is displayed depends on the particular widget and may be determined
-	 by other options, such as anchor. For windows, this is the title of the window."
+	"Answer the value of the label option for the widget."
 
 	<category: 'accessing'>
 	^label
     ]
 
     label: value [
-	"Set the value of the label option for the widget.
-	 
-	 Specifies a string to be displayed inside the widget. The way in which the
-	 string is displayed depends on the particular widget and may be determined
-	 by other options, such as anchor. For windows, this is the title of the window."
-
-	"TODO: save the merge id we used, remove the ui, and re-add the ui with the new label"
+	"Set the value of the label option for the widget."
 
 	<category: 'accessing'>
 	label := value
@@ -4400,7 +4389,8 @@ BMenuObject subclass: BMenu [
 	"Add a separator item at the end of the menu"
 
 	<category: 'callback registration'>
-	^self addMenuItemFor: #() notifying: self	"self is dummy"
+	self exists ifFalse: [self create].
+	self flushSection
     ]
 
     addMenuItemFor: anArray notifying: receiver [
@@ -4411,17 +4401,9 @@ BMenuObject subclass: BMenu [
 	 the selector sent to receiver, and the third one (if present)
 	 is passed to the selector."
 
-	"Receiver will be sent the callback messages.  anArray
-	 is something that responds to at: and size.  Possible types are:
-	 #()		insert a seperator line
-	 #(name)	        create a menu item with name, but no callback
-	 #(name symbol)     create a menu item with the given name and
-	 no parameter callback.
-	 #(name symbol arg) create a menu item with the given name and
-	 one parameter callback."
-
 	<category: 'callback registration'>
 	| item |
+	anArray size = 0 ifTrue: [^self addLine].
 	item := self newMenuItemFor: anArray notifying: receiver.
 	self exists ifFalse: [self create].
 	item create
@@ -4441,7 +4423,9 @@ BMenuObject subclass: BMenu [
 	"Empty the menu widget; that is, remove all the children"
 
 	<category: 'callback registration'>
-	self tclEval: self connected , ' delete 0 end'.
+	menuModel removeAll.
+	currentSection := GTK.GMenu new.
+	menuModel appendSection: nil section: currentSection.
 	children := OrderedCollection new.
 	childrensUnderline := nil
     ]
@@ -4462,78 +4446,61 @@ BMenuObject subclass: BMenu [
     ]
 
     actionGroup [
-	"answer the menu action group"
+	"Answer the action group from the menu bar"
 
 	<category: 'private'>
 	^self parent actionGroup
     ]
 
-    name [
-	"answer the name the menu should get"
+    menuModel [
+	"Answer the GMenu model for this submenu"
 
 	<category: 'private'>
-	^self label , 'Menu'
+	^menuModel
     ]
 
-    menuLabel [
-	"answer the label the menu should get"
+    currentSection [
+	"Answer the current GMenu section where items are added"
 
 	<category: 'private'>
-	^'_' , self label
+	^currentSection
     ]
 
-    path [
-	"answer the path for the menu"
+    flushSection [
+	"Start a new section (creates a visual separator)"
 
 	<category: 'private'>
-	^self parent path , '/' , self name
+	currentSection := GTK.GMenu new.
+	menuModel appendSection: nil section: currentSection
     ]
 
-    uiManager [
-	"answer the ui manager"
+    addSubmenuWithLabel: aLabel model: aGMenu [
+	"Add a nested submenu to the current section"
 
 	<category: 'private'>
-	^self parent uiManager
-    ]
-
-    connected [
-	<category: 'private'>
-	connected isNil ifTrue: [connected := self uiManager getWidget: self path].
-	^connected
+	currentSection appendSubmenu: aLabel submenu: aGMenu
     ]
 
     create [
 	<category: 'private'>
-	| s menu u |
-	self actionGroup addAction: (GTK.GtkAction 
-		    new: self name
-		    label: self menuLabel
-		    tooltip: nil
-		    stockId: nil).
-	self uiManager 
-	    addUi: self uiManager newMergeId
-	    path: self parent path
-	    name: self name
-	    action: self name
-	    type: GTK.Gtk gtkUiManagerMenu
-	    top: false.
-	self childrenDo: [:each | each create]
-    ]
-
-    onDestroy: object data: data [
-	<category: 'private'>
-	self destroyed
+	menuModel := GTK.GMenu new.
+	currentSection := GTK.GMenu new.
+	menuModel appendSection: nil section: currentSection.
+	created := true.
+	self childrenDo: [:each | each create].
+	self parent addSubmenuWithLabel: self label model: menuModel
     ]
 
     exists [
 	<category: 'private'>
-	^self connected notNil
+	^created == true
     ]
 
     initialize: parentWidget [
 	<category: 'private'>
 	super initialize: parentWidget.
-	label := ''
+	label := ''.
+	created := false
     ]
 
     newMenuItemFor: pair notifying: receiver [
@@ -4541,16 +4508,16 @@ BMenuObject subclass: BMenu [
 	| item size |
 	size := pair size.
 	pair size = 0 ifTrue: [^BMenuItem new: self].
-	(size >= 2 and: [pair last isArray]) 
-	    ifTrue: 
+	(size >= 2 and: [pair last isArray])
+	    ifTrue:
 		[size := size - 1.
 		item := BMenu new: self label: (pair at: 1).
-		pair last 
+		pair last
 		    do: [:each | item add: (item newMenuItemFor: each notifying: receiver)]]
 	    ifFalse: [item := BMenuItem new: self label: (pair at: 1)].
 	size = 1 ifTrue: [^item].
 	size = 2 ifTrue: [^item callback: receiver message: (pair at: 2)].
-	^item 
+	^item
 	    callback: receiver
 	    message: (pair at: 2)
 	    argument: (pair at: 3)
@@ -4560,10 +4527,11 @@ BMenuObject subclass: BMenu [
 
 
 BMenu subclass: BPopupMenu [
-    | attachedWidget |
-    
+    | attachedWidget popoverMenu |
+
     <comment: 'I am a class that provides the ability to show popup menus when the
-right button (Button 3) is clicked on another window.'>
+right button (Button 3) is clicked on another window.
+Uses GTK4 GtkPopoverMenu for popup display.'>
     <category: 'Graphics-Windows'>
 
     PopupMenuBar := nil.
@@ -4584,9 +4552,6 @@ right button (Button 3) is clicked on another window.'>
     ]
 
     initialize: parentWindow [
-	"TODO: refactor so that 'self parent' is parentWindow.  Start by
-	 writing (and using!) a menuBar method in BMenu and overriding it here."
-
 	<category: 'private'>
 	self class popupMenuBar exists ifFalse: [self class popupMenuBar create].
 	super initialize: self class popupMenuBar.
@@ -4598,7 +4563,15 @@ right button (Button 3) is clicked on another window.'>
     create [
 	<category: 'private'>
 	| gesture |
-	super create.
+	"Initialize the menu model and sections (from BMenu) but do NOT
+	 append as submenu to PopupMenuBar — this is a standalone popup."
+	menuModel := GTK.GMenu new.
+	currentSection := GTK.GMenu new.
+	menuModel appendSection: nil section: currentSection.
+	created := true.
+	self childrenDo: [:each | each create].
+	"Install action group on the attached widget for action resolution"
+	attachedWidget connected insertActionGroup: 'blox' group: self actionGroup.
 	gesture := GTK.GtkGestureClick new.
 	gesture setButton: 3.
 	gesture connectSignal: 'pressed' to: self selector: #'onPopup:nPress:x:y:'.
@@ -4608,42 +4581,42 @@ right button (Button 3) is clicked on another window.'>
     destroyed [
 	<category: 'private'>
 	super destroyed.
+	popoverMenu isNil ifFalse: [popoverMenu unparent].
+	popoverMenu := nil.
 	attachedWidget := nil
+    ]
+
+    ensurePopoverMenu [
+	"Create or update the GtkPopoverMenu for this popup"
+
+	<category: 'private'>
+	popoverMenu isNil ifTrue: [
+	    popoverMenu := GTK.GtkPopoverMenu newFromModel: self menuModel.
+	    popoverMenu setParent: attachedWidget connected.
+	    popoverMenu setHasArrow: false ].
+	^popoverMenu
     ]
 
     onPopup: gesture nPress: nPress x: x y: y [
 	<category: 'private'>
-	self connected getSubmenu
-	    popup: nil
-	    parentMenuItem: nil
-	    func: nil
-	    data: nil
-	    button: 3
-	    activateTime: 0.
+	self ensurePopoverMenu popup
     ]
 
     popup [
 	"Generate a synthetic menu popup event"
 
 	<category: 'widget protocol'>
-	self connected getSubmenu 
-	    popup: attachedWidget connected
-	    parentMenuItem: nil
-	    func: nil
-	    data: nil
-	    button: 0
-	    activateTime: GTK.Gtk getCurrentEventTime
+	self ensurePopoverMenu popup
     ]
 ]
 
 
 
 BMenuObject subclass: BMenuItem [
-    | index |
-    
+    | actionName |
+
     <comment: 'I am the tiny and humble Menu Item, a single command choice in the
-menu structure. But if it wasn''t for me, nothing could be done...
-eh eh eh!!'>
+menu structure. Uses GTK4 GSimpleAction and GMenu model items.'>
     <category: 'Graphics-Windows'>
 
     BMenuItem class >> new: parent [
@@ -4662,110 +4635,58 @@ eh eh eh!!'>
     ]
 
     label [
-	"Answer the value of the label option for the widget.
-	 
-	 Specifies a string to be displayed inside the widget. The way in which the
-	 string is displayed depends on the particular widget and may be determined
-	 by other options, such as anchor. For windows, this is the title of the window."
+	"Answer the value of the label option for the widget."
 
 	<category: 'accessing'>
 	^self properties at: #label
     ]
 
     label: value [
-	"Set the value of the label option for the widget.
-	 
-	 Specifies a string to be displayed inside the widget. The way in which the
-	 string is displayed depends on the particular widget and may be determined
-	 by other options, such as anchor. For windows, this is the title of the window."
+	"Set the value of the label option for the widget."
 
 	<category: 'accessing'>
-	(self properties at: #label) isNil 
+	(self properties at: #label) isNil
 	    ifTrue: [^self error: 'no label for separator lines'].
-	self parent exists 
-	    ifTrue: 
-		[self 
-		    tclEval: self container , ' entryconfigure ' , self connected , ' -label ' 
-			    , value asTkString].
 	self properties at: #label put: value
     ]
 
     actionGroup [
-	"answer the menu action group"
+	"Answer the action group from the parent menu"
 
 	<category: 'private'>
 	^self parent actionGroup
     ]
 
-    uiManager [
-	<category: 'private'>
-	^self parent uiManager
-    ]
-
-    name [
-	"answer the name of the item"
-
-	<category: 'private'>
-	^self label
-    ]
-
-    menuLabel [
-	"answer the gtk label"
-
-	<category: 'private'>
-	^'_' , self name
-    ]
-
-    path [
-	"answer the gtk uiManager path"
-
-	<category: 'private'>
-	^self parent path , '/' , self name
-    ]
-
     create [
 	<category: 'private'>
-	| s u mergeid action |
-	self name isNil 
-	    ifTrue: 
-		[mergeid := self uiManager newMergeId.
-		self properties at: #label put: 'separator' , (mergeid printString: 10).
-		self uiManager 
-		    addUi: mergeid
-		    path: self parent path
-		    name: self name
-		    action: nil
-		    type: GTK.Gtk gtkUiManagerSeparator
-		    top: false]
-	    ifFalse: 
-		[action := GTK.GtkAction 
-			    new: self name
-			    label: self menuLabel
-			    tooltip: 'FIXME'
-			    stockId: nil.
-
-		"FIXME, when to use icon names?  E.g. 'document-open-symbolic'."
-		action 
-		    connectSignal: 'activate'
-		    to: self
-		    selector: #activated:data:
-		    userData: nil.
-
-		"FIXME when to trigger accelerators"
-		"self actionGroup addActionWithAccel: foo accelerator: '<control>O'."
-		self actionGroup addAction: action.
-		self uiManager 
-		    addUi: self uiManager newMergeId
-		    path: self parent path
-		    name: self name
-		    action: self name
-		    type: GTK.Gtk gtkUiManagerMenuitem
-		    top: false]
+	| action |
+	self label isNil
+	    ifTrue: [
+		"Separator — start a new section in the parent"
+		self parent flushSection ]
+	    ifFalse: [
+		"Regular menu item — create action and add to menu model"
+		actionName := self menuBar nextActionName.
+		action := GTK.GSimpleAction new: actionName parameterType: nil.
+		action connectSignal: 'activate' to: self selector: #'activated:param:'.
+		self actionGroup insert: action.
+		self parent currentSection
+		    append: self label detailedAction: 'blox.', actionName ]
     ]
 
-    activated: action data: userData [
+    activated: action param: param [
 	<category: 'private'>
 	self invokeCallback
+    ]
+
+    menuBar [
+	"Walk up to the BMenuBar to get action name counters"
+
+	<category: 'private'>
+	| p |
+	p := self parent.
+	[p isKindOf: BMenuBar] whileFalse: [p := p parent].
+	^p
     ]
 
     initialize: parentWidget [
@@ -4778,7 +4699,6 @@ eh eh eh!!'>
 
     initialize: parentWidget label: label [
 	<category: 'private'>
-	| s |
 	super initialize: parentWidget.
 	self properties at: #label put: label.
 	parent exists ifTrue: [self create]
@@ -4789,9 +4709,9 @@ eh eh eh!!'>
 
 BMenuItem subclass: BCheckMenuItem [
     | status |
-    
+
     <comment: 'I am a menu item which can be toggled between two states, marked
-and unmarked.'>
+and unmarked. State is tracked in Smalltalk.'>
     <category: 'Graphics-Windows'>
 
     BCheckMenuItem class >> new: parent [
@@ -4800,10 +4720,10 @@ and unmarked.'>
     ]
 
     invokeCallback [
-	"Generate a synthetic callback"
+	"Generate a synthetic callback, toggling the value"
 
 	<category: 'accessing'>
-	self properties removeKey: #value ifAbsent: [].
+	self properties at: #value put: self value not.
 	self callback isNil ifFalse: [self callback send]
     ]
 
@@ -4820,42 +4740,12 @@ and unmarked.'>
 
 	<category: 'accessing'>
 	self properties at: #value put: aBoolean.
-	self tclEval: 'set ' , self variable , self valueString.
 	self callback isNil ifFalse: [self callback send]
     ]
 
     create [
 	<category: 'private'>
-	super create.
-	self 
-	    tclEval: '%1 entryconfigure %2 -onvalue 1 -offvalue 0 -variable %3'
-	    with: self container
-	    with: self connected
-	    with: self variable
-    ]
-
-    destroyed [
-	"Private - The receiver has been destroyed, clear the corresponding
-	 Tcl variable to avoid memory leaks."
-
-	<category: 'private'>
-	self tclEval: 'unset ' , self variable.
-	super destroyed
-    ]
-
-    valueString [
-	<category: 'private'>
-	^self value ifTrue: [' 1'] ifFalse: [' 0']
-    ]
-
-    variable [
-	<category: 'private'>
-	^'var' , self connected , self container copyWithout: $.
-    ]
-
-    widgetType [
-	<category: 'private'>
-	^'checkbutton'
+	super create
     ]
 ]
 

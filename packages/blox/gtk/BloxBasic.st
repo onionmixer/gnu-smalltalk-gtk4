@@ -1733,25 +1733,19 @@ menus. I provide more common methods and geometry management'>
     bringToTop [
 	"Raise the receiver so that it is above all of its siblings in the
 	 widgets' z-order; the receiver will not be obscured by any siblings and
-	 will obscure any siblings that overlap it."
+	 will obscure any siblings that overlap it.
+	 GTK4: Widget z-ordering is managed by the compositor; no-op."
 
 	<category: 'widget protocol'>
-	| w |
-	w := self connected getWindow.
-	w isNil ifTrue: [w := self container getWindow].
-	w isNil ifFalse: [^w raise]
     ]
 
     sendToBack [
 	"Lower the receiver so that it is below all of its siblings in the
 	 widgets' z-order; the receiver will be obscured by any siblings that
-	 overlap it and will not obscure any siblings."
+	 overlap it and will not obscure any siblings.
+	 GTK4: Widget z-ordering is managed by the compositor; no-op."
 
 	<category: 'widget protocol'>
-	| w |
-	w := self connected getWindow.
-	w isNil ifTrue: [w := self container getWindow].
-	w isNil ifFalse: [^w lower]
     ]
 
     isActive [
@@ -2612,18 +2606,11 @@ Blox subclass: BMenuObject [
     ]
 
     connected [
-	<category: 'private'>
-	^self uiManager getWidget: self path
-    ]
+	"Answer the GTK widget for this menu object.
+	 Subclasses override to provide the appropriate widget."
 
-    uiManager [
 	<category: 'private'>
-	self subclassResponsibility
-    ]
-
-    path [
-	<category: 'private'>
-	self subclassResponsibility
+	^nil
     ]
 
     underline: label [
