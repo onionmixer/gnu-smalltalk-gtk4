@@ -44,9 +44,10 @@ Object subclass: HelloWorldExample [
 	data displayNl
     ]
 
-    destroy: object data: data [
+    closeRequest [
 	<category: 'event handling'>
-	Gtk mainQuit
+	Gtk mainQuit.
+	^ false
     ]
 
     open [
@@ -68,11 +69,7 @@ Object subclass: HelloWorldExample [
 	    to: self
 	    selector: #clicked:data:
 	    userData: 'Hello, world!'.
-	w 
-	    connectSignal: 'destroy'
-	    to: self
-	    selector: #destroy:data:
-	    userData: nil.
+	w connectSignal: 'close-request' to: self selector: #closeRequest.
 	w show
     ]
 ]

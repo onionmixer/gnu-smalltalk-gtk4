@@ -94,9 +94,10 @@ Object subclass: TicTacToe [
 	self play: data
     ]
 
-    destroy: object data: data [
+    closeRequest [
 	<category: 'event handling'>
-	Gtk mainQuit
+	Gtk mainQuit.
+	^ false
     ]
 
     message: aString [
@@ -118,11 +119,7 @@ Object subclass: TicTacToe [
 	| button vbox hbox |
 	window := GtkWindow new.
 	window setTitle: 'Tic-tac-toe'.
-	window 
-	    connectSignal: 'destroy'
-	    to: self
-	    selector: #destroy:data:
-	    userData: nil.
+	window connectSignal: 'close-request' to: self selector: #closeRequest.
 	vbox := GtkBox new: Gtk gtkOrientationVertical spacing: 0.
 	window setChild: vbox.
 	buttons := Array new: 9.

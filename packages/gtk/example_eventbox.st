@@ -45,20 +45,17 @@ Object subclass: EventBoxExample [
 	window destroy
     ]
 
-    destroy: object data: data [
+    closeRequest [
 	<category: 'event handling'>
-	Gtk mainQuit
+	Gtk mainQuit.
+	^ false
     ]
 
     open [
 	<category: 'layout'>
 	| label gesture |
 	window := GtkWindow new.
-	window
-	    connectSignal: 'destroy'
-	    to: self
-	    selector: #destroy:data:
-	    userData: nil.
+	window connectSignal: 'close-request' to: self selector: #closeRequest.
 	window setTitle: 'Event Box'.
 	label := GtkLabel new: 'Click here to quit, quit, quit, quit, quit'.
 	label setSizeRequest: 110 height: 20.

@@ -55,14 +55,10 @@ Object subclass: EntryExample [
 	entry perform: selector with: object getActive
     ]
 
-    destroy: object data: data [
+    closeRequest [
 	<category: 'event handling'>
-	Gtk mainQuit
-    ]
-
-    delete: object data: data [
-	<category: 'event handling'>
-	window destroy
+	Gtk mainQuit.
+	^ false
     ]
 
     open [
@@ -71,16 +67,7 @@ Object subclass: EntryExample [
 	window := GtkWindow new.
 	window setSizeRequest: 200 height: 100.
 	window setTitle: 'GTK Entry'.
-	window 
-	    connectSignal: 'destroy'
-	    to: self
-	    selector: #destroy:data:
-	    userData: nil.
-	window
-	    connectSignal: 'close-request'
-	    to: self
-	    selector: #delete:data:
-	    userData: nil.
+	window connectSignal: 'close-request' to: self selector: #closeRequest.
 	vbox := GtkBox new: Gtk gtkOrientationVertical spacing: 0.
 	window setChild: vbox.
 	vbox show.

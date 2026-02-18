@@ -39,9 +39,10 @@ Object subclass: ArrowExample [
     <category: nil>
     <comment: nil>
 
-    destroy: object data: data [
+    closeRequest [
 	<category: 'event handling'>
-	Gtk mainQuit
+	Gtk mainQuit.
+	^ false
     ]
 
     open [
@@ -49,11 +50,7 @@ Object subclass: ArrowExample [
 	| window button box |
 	window := GtkWindow new.
 	window setTitle: 'Arrow Buttons'.
-	window 
-	    connectSignal: 'destroy'
-	    to: self
-	    selector: #destroy:data:
-	    userData: nil.
+	window connectSignal: 'close-request' to: self selector: #closeRequest.
 	box := GtkBox new: Gtk gtkOrientationHorizontal spacing: 0.
 	window setChild: box.
 	button := GtkButton createArrowButton: 'pan-up-symbolic'.

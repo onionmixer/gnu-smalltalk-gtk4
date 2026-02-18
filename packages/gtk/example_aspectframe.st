@@ -39,20 +39,17 @@ Object subclass: AspectFrameExample [
     <category: nil>
     <comment: nil>
 
-    destroy: object data: data [
+    closeRequest [
 	<category: 'event handling'>
-	Gtk mainQuit
+	Gtk mainQuit.
+	^ false
     ]
 
     open [
 	<category: 'layout'>
 	| window aspectFrame drawingArea |
 	window := GtkWindow new.
-	window 
-	    connectSignal: 'destroy'
-	    to: self
-	    selector: #destroy:data:
-	    userData: nil.
+	window connectSignal: 'close-request' to: self selector: #closeRequest.
 	window setTitle: 'Aspect Frame'.
 	aspectFrame := GtkAspectFrame
 		    new: '2x1'

@@ -21,9 +21,10 @@ Object subclass: TreeExample [
 	window destroy
     ]
 
-    destroy: aSender [
+    closeRequest [
 	<category: 'event handling'>
-	Gtk mainQuit
+	Gtk mainQuit.
+	^ false
     ]
 
     selectionChangedCallback: aSender [
@@ -62,11 +63,7 @@ Object subclass: TreeExample [
 	| vbox frame scroll col rend typs |
 	window := GtkWindow new.
 	window setTitle: 'Tree Example'.
-	window 
-	    connectSignal: 'destroy'
-	    to: self
-	    selector: #destroy:
-	    userData: nil.
+	window connectSignal: 'close-request' to: self selector: #closeRequest.
 	vbox := GtkBox new: Gtk gtkOrientationVertical spacing: 9.
 	window setChild: vbox.
 	frame := GtkFrame new: nil.

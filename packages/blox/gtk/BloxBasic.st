@@ -111,15 +111,14 @@ Object subclass: BEventTarget [
 	 by aSelector to anObject."
 
 	<category: 'intercepting events'>
+	| focusCtrl |
 	aSelector numArgs = 0 ifFalse: [^self invalidArgsError: '0'].
-	self 
-	    connectSignal: 'focus-in-event'
-	    to: 
-		[:widget :ev :data | 
-		data key perform: data value.
-		false]
-	    selector: #value:value:value:
-	    userData: anObject -> aSelector asSymbol
+	focusCtrl := GTK.GtkEventControllerFocus new.
+	focusCtrl connectSignal: 'enter'
+	    to: [:controller | anObject perform: aSelector]
+	    selector: #value:
+	    userData: nil.
+	self connected addController: focusCtrl
     ]
 
     onFocusLeaveEventSend: aSelector to: anObject [
@@ -127,15 +126,14 @@ Object subclass: BEventTarget [
 	 by aSelector to anObject."
 
 	<category: 'intercepting events'>
+	| focusCtrl |
 	aSelector numArgs = 0 ifFalse: [^self invalidArgsError: '0'].
-	self 
-	    connectSignal: 'focus-out-event'
-	    to: 
-		[:widget :ev :data | 
-		data key perform: data value.
-		false]
-	    selector: #value:value:value:
-	    userData: anObject -> aSelector asSymbol
+	focusCtrl := GTK.GtkEventControllerFocus new.
+	focusCtrl connectSignal: 'leave'
+	    to: [:controller | anObject perform: aSelector]
+	    selector: #value:
+	    userData: nil.
+	self connected addController: focusCtrl
     ]
 
     onKeyEvent: key send: aSelector to: anObject [

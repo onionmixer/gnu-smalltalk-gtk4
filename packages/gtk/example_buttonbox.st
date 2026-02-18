@@ -39,9 +39,10 @@ Object subclass: ButtonBoxExample [
     <category: nil>
     <comment: nil>
 
-    destroy: object data: data [
+    closeRequest [
 	<category: 'event handling'>
-	Gtk mainQuit
+	Gtk mainQuit.
+	^ false
     ]
 
     open [
@@ -49,11 +50,7 @@ Object subclass: ButtonBoxExample [
 	| window mainVBox hbox vbox frameHorz frameVert |
 	window := GtkWindow new.
 	window setTitle: 'Button Boxes'.
-	window 
-	    connectSignal: 'destroy'
-	    to: self
-	    selector: #destroy:data:
-	    userData: nil.
+	window connectSignal: 'close-request' to: self selector: #closeRequest.
 	mainVBox := GtkBox new: Gtk gtkOrientationVertical spacing: 0.
 	window setChild: mainVBox.
 	frameHorz := GtkFrame new: 'Horizontal Button Boxes'.
