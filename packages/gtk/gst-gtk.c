@@ -223,6 +223,41 @@ adjustment_get_page_size (GtkAdjustment *adj)
   return (int) gtk_adjustment_get_page_size (adj);
 }
 
+/* GtkDrawingArea draw function bridge.
+   GTK4 removed the 'draw' signal.  Instead, gtk_drawing_area_set_draw_func()
+   accepts a C callback.  This bridge installs a custom GObject signal
+   'gst-draw' on GtkDrawingArea and sets a draw function that emits it,
+   so Smalltalk code can connect to 'gst-draw' using the normal signal
+   mechanism.  Signal signature: (GtkDrawingArea, cairo_t*) -> gboolean.  */
+
+static guint gst_draw_signal_id = 0;
+
+static void
+gst_drawing_area_draw_func (GtkDrawingArea *area, cairo_t *cr,
+                            int width, int height, gpointer user_data)
+{
+  gboolean result = FALSE;
+  g_signal_emit (area, gst_draw_signal_id, 0, cr, &result);
+}
+
+void
+gst_gtk_drawing_area_connect_draw (GtkDrawingArea *area)
+{
+  if (gst_draw_signal_id == 0)
+    {
+      gst_draw_signal_id =
+        g_signal_new ("gst-draw",
+                      GTK_TYPE_DRAWING_AREA,
+                      G_SIGNAL_RUN_LAST,
+                      0, NULL, NULL,
+                      NULL, /* default marshaller */
+                      G_TYPE_BOOLEAN, 1,
+                      G_TYPE_POINTER); /* cairo_t* */
+    }
+  gtk_drawing_area_set_draw_func (area, gst_drawing_area_draw_func,
+                                  NULL, NULL);
+}
+
 /* Initialization.  */
 
 static int initialized = 0;
@@ -256,6 +291,7 @@ gst_initModule (proxy)
   _gtk_vm_proxy->defineCFunc ("gstGtkTreeStoreSetOOP", tree_store_set_oop);
   _gtk_vm_proxy->defineCFunc ("gstGtkWidgetGetAllocation", widget_get_allocation);
   _gtk_vm_proxy->defineCFunc ("gstGtkDialogGetVBox", dialog_get_vbox);
+  _gtk_vm_proxy->defineCFunc ("gstGtkDrawingAreaConnectDraw", gst_gtk_drawing_area_connect_draw);
 
   _gtk_vm_proxy->defineCFunc ("gtk_placer_get_type", gtk_placer_get_type);
   _gtk_vm_proxy->defineCFunc ("gtk_placer_new", gtk_placer_new);

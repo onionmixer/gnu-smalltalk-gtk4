@@ -61,10 +61,9 @@ GtkConcreteWidget subclass: GtkVariableTrackerWidget [
     buildListView [
 	<category: 'user interface'>
 
-        widget := GtkScrollTreeWidget createListWithModel: {{GtkColumnTextType title: 'Variable'}. {GtkColumnTextType title: 'Value'}}.
+        widget := GtkScrollListWidget4 createListWithModel: {{GtkColumnTextType title: 'Variable'}. {GtkColumnTextType title: 'Value'}}.
         widget connectToWhenPopupMenu: (WorkspaceVariableMenus on: self).
-        widget treeView getSelection setMode: GTK.Gtk gtkSelectionBrowse.
-        (model := GtkListModel on: widget treeView getModel)
+        (model := widget model)
                                         contentsBlock: [ :each | {each asString. (object instVarNamed: each) displayString} ].
         ^ widget mainWidget
     ]
@@ -86,13 +85,13 @@ GtkConcreteWidget subclass: GtkVariableTrackerWidget [
     hasSelectedValue [
         <category: 'smalltalk event'>
 
-        ^widget treeView hasSelectedValue
+        ^widget hasSelectedValue
     ]
 
     selectedValue [
         <category: 'smalltalk event'>
 
-        ^widget treeView selection
+        ^widget selection
     ]
 
     inspectIt: anObject [
@@ -105,7 +104,7 @@ GtkConcreteWidget subclass: GtkVariableTrackerWidget [
 	<category: 'event'>
 
 	| ivar |
-	widget treeView hasSelectedValue ifFalse: [ ^ self ].
+	widget hasSelectedValue ifFalse: [ ^ self ].
 	ivar := self selectedValue.
 	model remove: ivar.
 	object class removeInstVarName: ivar.

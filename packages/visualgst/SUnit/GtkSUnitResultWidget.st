@@ -45,25 +45,20 @@ GtkConcreteWidget subclass: GtkSUnitResult [
         <category: 'user interface'>
 
 	| gesture |
-        resultTree := GTK.GtkTreeView newWithTextColumn: self model title: 'Results'.
+        resultTree := GtkScrollListWidget4 createListWithModel: {{GtkColumnTextType title: 'Results'}}.
+	(model := resultTree model)
+	    contentsBlock: [ :each | {each displayString} ].
 	gesture := GTK.GtkGestureClick new.
 	gesture setButton: 3.
 	gesture connectSignal: 'pressed' to: self selector: #'onPress:nPress:x:y:'.
-	resultTree addController: gesture.
-        ^ GTK.GtkScrolledWindow withChild: resultTree
-    ]
-
-    model [
-        <category: 'model'>
-
-        ^ model ifNil: [
-            model := GTK.GtkTreeStore new: 2 varargs: {GTK.GValue gTypeString. GLib.GType oopType} ]
+	resultTree treeView addController: gesture.
+        ^ resultTree mainWidget
     ]
 
     clearModel [
 	<category: 'model'>
 
-	self model clear
+	model clear
     ]
 
     results: aSet [
@@ -72,7 +67,7 @@ GtkConcreteWidget subclass: GtkSUnitResult [
 	self clearModel.
 	results := aSet.
 	results do: [ :each |
-	    self model appendItem: {each displayString. each} ]
+	    model append: each ]
     ]
 
     onPress: gesture nPress: nPress x: x y: y [
@@ -93,7 +88,7 @@ GtkConcreteWidget subclass: GtkSUnitResult [
 	gmenu append: 'Browse implementors' detailedAction: 'popup.browse-implementors'.
 	popover := GTK.GtkPopoverMenu newFromModel: gmenu.
 	popover insertActionGroup: 'popup' group: actionGroup.
-	popover setParent: resultTree.
+	popover setParent: resultTree treeView.
 	popover setHasArrow: false.
 	popover popup.
 	popover connectSignal: 'closed' to: popover selector: #'unparent'.
@@ -101,7 +96,7 @@ GtkConcreteWidget subclass: GtkSUnitResult [
 
     debugTest [
 	<category: 'event'>
-	
+
         DebugTestCommand executeOn: self
     ]
 
@@ -117,7 +112,7 @@ GtkConcreteWidget subclass: GtkSUnitResult [
             ^MethodState on: self selectedResult with: (self selectedResult class lookupSelector: self selectedResult selector) ].
         ^BrowserState new
     ]
-	
+
     selectedMethodSymbol [
         <category: 'accessing'>
 
@@ -134,9 +129,8 @@ GtkConcreteWidget subclass: GtkSUnitResult [
     selectedResult [
         <category: 'accessing'>
 
-	| iter |
-        (iter := resultTree selectedIter) ifNil: [ self error: 'Nothing is selected' ].
-        ^ self model getOop: iter column: 1
+        resultTree hasSelectedItem ifFalse: [ self error: 'Nothing is selected' ].
+        ^ resultTree selection
     ]
 
     browseImplementors [

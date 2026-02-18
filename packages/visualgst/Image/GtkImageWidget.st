@@ -69,13 +69,12 @@ GtkConcreteWidget subclass: GtkImageWidget [
     buildClassAndMethodList [
         <category: 'user interface'>
 
-        imageTree := (GTK.GtkTreeView createListWithModel: {{GtkColumnTextType title: 'Methods and Classes'}}).
-        imageTree setSearchEntry: searchEntry.
-        [ (model := GtkListModel on: imageTree getModel)
+        imageTree := GtkScrollListWidget4 createListWithModel: {{GtkColumnTextType title: 'Methods and Classes'}}.
+        [ (model := imageTree model)
 					item: (image := GtkImage new);
                                         contentsBlock: [ :each | {each displayString} ];
 					refresh ] fork.
-        ^ GTK.GtkScrolledWindow withChild: imageTree
+        ^ imageTree mainWidget
     ]
 
     whenSelectionChangedSend: aSelector to: anObject [
@@ -122,7 +121,7 @@ GtkConcreteWidget subclass: GtkImageWidget [
 	<category: 'accessing'>
 
         self hasSelection ifFalse: [ ^ self error: 'Nothing is selected' ].
-        ^ imageTree selection
+	^ imageTree selection
     ]
 
     matchSelector: aSymbol [

@@ -164,6 +164,7 @@
   <filein>Category/Class.st</filein>
   <filein>GtkConcreteWidget.st</filein>
   <filein>GtkScrollTreeWidget.st</filein>
+  <filein>GtkScrollListWidget4.st</filein>
   <filein>GtkSimpleListWidget.st</filein>
   <filein>GtkEntryWidget.st</filein>
   <filein>GtkSidebarWidget.st</filein>
@@ -174,6 +175,7 @@
   <filein>Model/GtkColumnPixbufType.st</filein>
   <filein>Model/GtkColumnOOPType.st</filein>
   <filein>GtkListModel.st</filein>
+  <filein>GtkListModel4.st</filein>
   <filein>GtkTreeModel.st</filein>
   <filein>Text/GtkTextWidget.st</filein>
   <filein>GtkPackageBuilderWidget.st</filein>
@@ -393,6 +395,7 @@
   <file>Category/Class.st</file>
   <file>GtkConcreteWidget.st</file>
   <file>GtkScrollTreeWidget.st</file>
+  <file>GtkScrollListWidget4.st</file>
   <file>GtkSimpleListWidget.st</file>
   <file>GtkEntryWidget.st</file>
   <file>GtkSidebarWidget.st</file>
@@ -403,6 +406,7 @@
   <file>Model/GtkColumnPixbufType.st</file>
   <file>Model/GtkColumnOOPType.st</file>
   <file>GtkListModel.st</file>
+  <file>GtkListModel4.st</file>
   <file>GtkTreeModel.st</file>
   <file>Text/GtkTextWidget.st</file>
   <file>GtkPackageBuilderWidget.st</file>

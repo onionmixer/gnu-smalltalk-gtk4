@@ -45,11 +45,10 @@ GtkConcreteWidget subclass: GtkImageResultsWidget [
     buildTreeView [
         <category: 'user interface'>
 
-        resultTree := GTK.GtkTreeView createListWithModel: {{GtkColumnTextType title: 'Methods and Classes'}}.
-        resultTree getSelection setMode: GTK.Gtk gtkSelectionBrowse.
-        (model := GtkListModel on: resultTree getModel)
+        resultTree := GtkScrollListWidget4 createListWithModel: {{GtkColumnTextType title: 'Methods and Classes'}}.
+        (model := resultTree model)
                                         contentsBlock: [ :each | {each asString} ].
-        ^ GTK.GtkScrolledWindow withChild: resultTree
+        ^ resultTree mainWidget
     ]
 
     whenSelectionChangedSend: aSelector to: anObject [

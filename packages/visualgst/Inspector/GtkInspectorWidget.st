@@ -86,9 +86,9 @@ GtkConcreteWidget subclass: GtkInspectorWidget [
     buildTreeWidget [
 	<category: 'user interface'>
 
-        inspectorTree := GtkScrollTreeWidget createListWithModel: {{GtkColumnTextType title: 'Variables'}}.
+        inspectorTree := GtkScrollListWidget4 createListWithModel: {{GtkColumnTextType title: 'Variables'}}.
         inspectorTree connectToWhenPopupMenu: (InspectorMenus on: self).
-        (model := GtkListModel on: inspectorTree treeView getModel)
+        (model := inspectorTree model)
                                         contentsBlock: [ :each | {each displayString} ].
         ^ inspectorTree mainWidget
     ]
@@ -118,14 +118,14 @@ GtkConcreteWidget subclass: GtkInspectorWidget [
     whenSelectionChangedSend: aSelector to: anObject [
         <category: 'events'>
 
-        inspectorTree treeView getSelection
+        inspectorTree getSelection
             connectSignal: 'changed' to: anObject selector: aSelector userData: nil
     ]
 
     hasSelectedValue [
         <category: 'testing'>
 
-        ^ inspectorTree treeView hasSelectedItem 
+        ^ inspectorTree hasSelectedItem
     ]
 
     onVariableChanged [
@@ -139,7 +139,7 @@ GtkConcreteWidget subclass: GtkInspectorWidget [
 	<category: 'item selection'>
 
         self hasSelectedValue ifFalse: [ self error: 'Nothing is selected' ].
-        ^ inspectorTree treeView selection
+        ^ inspectorTree selection
     ]
 
     targetObject [

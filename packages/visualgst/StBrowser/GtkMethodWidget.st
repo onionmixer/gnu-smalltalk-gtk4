@@ -106,7 +106,7 @@ GtkConcreteWidget subclass: GtkMethodWidget [
     ]
 
     gtkModel [
-	^ methodTree treeView getModel
+	^ methodTree model
     ]
 
     emptyModel [
@@ -131,12 +131,11 @@ GtkConcreteWidget subclass: GtkMethodWidget [
 
     buildTreeView [
         <category: 'user interface'>
-    
-	methodTree := GtkScrollTreeWidget createListWithModel: {{GtkColumnPixbufType visible. GtkColumnTextType title: 'Methods'}}.
+
+	methodTree := GtkScrollListWidget4 createListWithModel: {{GtkColumnTextType title: 'Methods'}}.
         methodTree connectToWhenPopupMenu: (MethodMenus on: self).
-	methodTree treeView getSelection setMode: GTK.Gtk gtkSelectionBrowse.
-	(model := GtkListModel on: methodTree treeView getModel)
-					contentsBlock: [ :each | {each methodViewIcon. each selector asString} ].
+	(model := methodTree model)
+					contentsBlock: [ :each | {each selector asString} ].
 	^ methodTree mainWidget
     ]
 
@@ -151,7 +150,7 @@ GtkConcreteWidget subclass: GtkMethodWidget [
     whenSelectionChangedSend: aSelector to: anObject [
 	<category: 'events'>
 
-	methodTree treeView getSelection
+	methodTree getSelection
 	    connectSignal: 'changed' to: anObject selector: aSelector
     ]
 
@@ -190,7 +189,7 @@ GtkConcreteWidget subclass: GtkMethodWidget [
     hasSelectedMethod [
 	<category: 'testing'>
 
-	^ methodTree treeView hasSelectedItem
+	^ methodTree hasSelectedItem
     ]
 
     ifNoSelection: aBlock [
@@ -209,13 +208,13 @@ GtkConcreteWidget subclass: GtkMethodWidget [
 	<category: 'accessing'>
 
 	self ifNoSelection: [ self error: 'nothing is selected' ].
-        ^ methodTree treeView selection 
+        ^ methodTree selection
     ]
 
     selectAMethod: aSymbol [
         <category: 'item selection'>
 
-	methodTree treeView select: (self classOrMeta methodDictionary at: aSymbol)
+	methodTree select: (self classOrMeta methodDictionary at: aSymbol)
     ]
 
     sourceCode [

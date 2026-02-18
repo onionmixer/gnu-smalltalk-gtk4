@@ -98,10 +98,11 @@ GtkMainWindow subclass: Tetris [
     buildCentralWidget [
 	<category: 'user interface'>
 
-	^ canvasWidget := GTK.GtkDrawingArea new
+	canvasWidget := GTK.GtkDrawingArea new.
+	canvasWidget
 	    setSizeRequest: 400 height: 700;
-	    connectSignal: 'draw' to: self selector: #'draw:context:';
-	    yourself
+	    connectDrawTo: self selector: #'draw:context:'.
+	^ canvasWidget
     ]
 
     clearArea: aGtkAllocation [

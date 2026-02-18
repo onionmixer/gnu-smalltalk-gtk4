@@ -95,7 +95,7 @@ Object subclass: GtkEntryDialog [
 	    append: labelWidget;
 	    append: entryWidget;
 	    show.
-	aGtkDialog getVBox append: hbox
+	aGtkDialog getContentArea append: hbox
     ]
 ]
 

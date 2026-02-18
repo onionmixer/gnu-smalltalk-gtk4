@@ -34,7 +34,7 @@
 ======================================================================"
 
 Smalltalk.Object subclass: GtkClock [
-    | canvas hour minute process radius second window x y |
+    | canvas drawingArea hour minute process radius second window x y |
 
     GtkClock class >> open [
 	<category: 'user interface'>
@@ -170,9 +170,11 @@ Smalltalk.Object subclass: GtkClock [
     initialize [
 	<category: 'intialization'>
 
+	drawingArea := GTK.GtkDrawingArea new.
+	drawingArea connectDrawTo: self selector: #'draw:context:'.
 	window := GTK.GtkWindow new.
 	window
-	    connectSignal: 'draw' to: self selector: #'draw:context:';
+	    setChild: drawingArea;
 	    connectSignal: 'close-request' to: self selector: #'delete:';
 	    setDecorated: false.
 	radius := 100
@@ -196,6 +198,6 @@ Smalltalk.Object subclass: GtkClock [
 
 	delay := Delay forSeconds: 1.
 	window show.
-	process := [ [ true ] whileTrue: [ window queueDraw. delay wait ] ] fork
+	process := [ [ true ] whileTrue: [ drawingArea queueDraw. delay wait ] ] fork
     ]
 ]

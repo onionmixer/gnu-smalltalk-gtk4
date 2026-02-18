@@ -105,11 +105,10 @@ GtkConcreteWidget subclass: GtkCategoryWidget [
 
     buildTreeView [
         <category: 'user interface'>
-    
-	categoryTree := GtkScrollTreeWidget createListWithModel: {{GtkColumnTextType title: 'Method categories'}}.
-	categoryTree treeView getSelection setMode: GTK.Gtk gtkSelectionBrowse.
+
+	categoryTree := GtkScrollListWidget4 createListWithModel: {{GtkColumnTextType title: 'Method categories'}}.
 	categoryTree connectToWhenPopupMenu: (CategoryMenus on: self).
-        (model := GtkListModel on: categoryTree treeView getModel)
+        (model := categoryTree model)
                                         contentsBlock: [ :each | {each displayString} ].
 	^ categoryTree mainWidget
     ]
@@ -117,20 +116,20 @@ GtkConcreteWidget subclass: GtkCategoryWidget [
     unselectAll [
 	<category: 'selection'>
 
-	categoryTree treeView getSelection unselectAll
+	categoryTree unselectAll
     ]
 
     whenSelectionChangedSend: aSelector to: anObject [
 	<category: 'events'>
 
-	categoryTree treeView getSelection
+	categoryTree getSelection
 	    connectSignal: 'changed' to: anObject selector: aSelector
     ]
 
     state [
         <category: 'testing'>
 
-        ^ self hasSelectedCategory 
+        ^ self hasSelectedCategory
 			ifFalse: [ ClassState with: self classOrMeta ]
 			ifTrue: [ CategoryState with: self classOrMeta->self selectedCategory ]
     ]
@@ -138,29 +137,20 @@ GtkConcreteWidget subclass: GtkCategoryWidget [
     hasSelectedCategory [
 	<category: 'testing'>
 
-	^ categoryTree treeView hasSelectedItem
+	^ categoryTree hasSelectedItem
     ]
 
     selectedCategory [
 	<category: 'accessing'>
 
 	self hasSelectedCategory ifFalse: [ self error: 'nothing is selected' ].
-	^ categoryTree treeView selection
+	^ categoryTree selection
     ]
 
     selectACategory: aString [
         <category: 'item selection'>
 
-	categoryTree treeView select: aString
-    ]
-
-    findIterInACategory: aString [
-        <category: 'item selection'>
-
-        | result |
-        result := model findIterInACategory: aString.
-        categoryTree treeView scrollToCell: (model gtkModel getPath: result) column: nil useAlign: false rowAlign: 0.5 colAlign: 0.5.
-        ^ result
+	categoryTree select: aString
     ]
 
     viewedCategoryWidget [

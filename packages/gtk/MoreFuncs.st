@@ -228,6 +228,163 @@ GTK.GtkNotebook extend [
 
 Eval [
     GtkTreeStore superclass: GtkTreeModel.
-    GtkListStore superclass: GtkTreeModel
+    GtkListStore superclass: GtkTreeModel.
+
+    "Fix GTK4 list widget class hierarchy."
+    GtkSignalListItemFactory superclass: GtkListItemFactory
+]
+
+
+"GTK4 list widget convenience wrappers.
+ The auto-generated bindings put these as Gtk class methods;
+ these wrappers provide proper instance/class method APIs."
+
+GtkStringList class extend [
+
+    new: anArrayOfStrings [
+	"Create a new GtkStringList. Pass nil or a null-terminated array."
+	<category: 'instance creation'>
+	^ Gtk stringListNew: anArrayOfStrings
+    ]
+
+    new [
+	"Create an empty GtkStringList."
+	<category: 'instance creation'>
+	^ Gtk stringListNew: nil
+    ]
+
+]
+
+GtkStringList extend [
+
+    append: aString [
+	<category: 'accessing'>
+	Gtk stringListAppend: self string: aString
+    ]
+
+    remove: aPosition [
+	<category: 'accessing'>
+	Gtk stringListRemove: self position: aPosition
+    ]
+
+    splice: position nRemovals: nRemovals additions: additions [
+	<category: 'accessing'>
+	Gtk stringListSplice: self position: position nRemovals: nRemovals additions: additions
+    ]
+
+    getNItems [
+	<category: 'accessing'>
+	^ GList modelGetNItems: self
+    ]
+
+    getItem: position [
+	"Return the GtkStringObject at position."
+	<category: 'accessing'>
+	^ GList modelGetItem: self position: position
+    ]
+
+]
+
+GtkStringObject class extend [
+
+    new: aString [
+	<category: 'instance creation'>
+	^ Gtk stringObjectNew: aString
+    ]
+
+]
+
+GtkStringObject extend [
+
+    getString [
+	<category: 'accessing'>
+	<cCall: 'gtk_string_object_get_string' returning: #string
+	args: #( #self )>
+    ]
+
+]
+
+GtkSingleSelection class extend [
+
+    new: aGListModel [
+	<category: 'instance creation'>
+	^ Gtk singleSelectionNew: aGListModel
+    ]
+
+]
+
+GtkSingleSelection extend [
+
+    getSelected [
+	<category: 'accessing'>
+	^ Gtk singleSelectionGetSelected: self
+    ]
+
+    setSelected: position [
+	<category: 'accessing'>
+	Gtk singleSelectionSetSelected: self position: position
+    ]
+
+    getSelectedItem [
+	<category: 'accessing'>
+	^ Gtk singleSelectionGetSelectedItem: self
+    ]
+
+    getModel [
+	<category: 'accessing'>
+	^ Gtk singleSelectionGetModel: self
+    ]
+
+    setModel: aGListModel [
+	<category: 'accessing'>
+	Gtk singleSelectionSetModel: self model: aGListModel
+    ]
+
+    getAutoselect [
+	<category: 'accessing'>
+	^ Gtk singleSelectionGetAutoselect: self
+    ]
+
+    setAutoselect: aBoolean [
+	<category: 'accessing'>
+	Gtk singleSelectionSetAutoselect: self autoselect: aBoolean
+    ]
+
+    getCanUnselect [
+	<category: 'accessing'>
+	^ Gtk singleSelectionGetCanUnselect: self
+    ]
+
+    setCanUnselect: aBoolean [
+	<category: 'accessing'>
+	Gtk singleSelectionSetCanUnselect: self canUnselect: aBoolean
+    ]
+
+]
+
+"GtkDrawingArea draw function bridge for GTK4.
+ GTK4 removed the 'draw' signal. Use connectDrawTo:selector: to
+ install a draw function and connect to the custom 'gst-draw' signal."
+
+GtkDrawingArea extend [
+
+    connectDrawSignal [
+	"Install the GTK4 draw function bridge. This registers a custom
+	 'gst-draw' GObject signal and sets a C draw function that emits it.
+	 Connect to 'gst-draw' using normal connectSignal:to:selector: after
+	 calling this method."
+	<category: 'drawing'>
+	<cCall: 'gstGtkDrawingAreaConnectDraw' returning: #void args: #(#self)>
+    ]
+
+    connectDrawTo: anObject selector: aSelector [
+	"Convenience method: install draw function bridge and connect
+	 the 'gst-draw' signal in one step."
+	<category: 'drawing'>
+
+	self connectDrawSignal.
+	self connectSignal: 'gst-draw' to: anObject selector: aSelector.
+    ]
+
 ]
 

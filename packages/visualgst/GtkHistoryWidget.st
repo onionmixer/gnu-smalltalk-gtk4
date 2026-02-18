@@ -60,16 +60,15 @@ GtkConcreteWidget subclass: GtkHistoryWidget [
 	<category: 'user interface'>
 
 	| gesture |
-        widget := GTK.GtkTreeView createListWithModel: {{GtkColumnTextType title: 'History'}}.
+        widget := GtkScrollListWidget4 createListWithModel: {{GtkColumnTextType title: 'History'}}.
 	gesture := GTK.GtkGestureClick new.
 	gesture setButton: 3.
 	gesture connectSignal: 'pressed' to: self selector: #'onPress:nPress:x:y:'.
-	widget addController: gesture.
-        widget getSelection setMode: GTK.Gtk gtkSelectionBrowse.
+	widget treeView addController: gesture.
         widget getSelection connectSignal: 'changed' to: self selector: #onSelectionChanged.
-        (model := GtkListModel on: widget getModel)
+        (model := widget model)
                                         contentsBlock: [ :each | {each name displayString} ].
-        ^ GTK.GtkScrolledWindow withChild: widget
+        ^ widget mainWidget
     ]
 
     refresh: historyStack [
@@ -98,7 +97,7 @@ GtkConcreteWidget subclass: GtkHistoryWidget [
         gmenu append: 'Open in new tab' detailedAction: 'popup.browse-tabbed-class'.
         popover := GTK.GtkPopoverMenu newFromModel: gmenu.
         popover insertActionGroup: 'popup' group: actionGroup.
-        popover setParent: widget.
+        popover setParent: widget treeView.
         popover setHasArrow: false.
         popover popup.
         popover connectSignal: 'closed' to: popover selector: #'unparent'.

@@ -74,11 +74,10 @@ GtkConcreteWidget subclass: GtkContextWidget [
 
     buildTreeView [
         <category: 'user interface'>
-    
-        contextTree := GtkScrollTreeWidget createListWithModel: {{GtkColumnTextType title: 'Contexts'}}.
+
+        contextTree := GtkScrollListWidget4 createListWithModel: {{GtkColumnTextType title: 'Contexts'}}.
         contextTree connectToWhenPopupMenu: (ContextMenus on: self).
-        contextTree treeView getSelection setMode: GTK.Gtk gtkSelectionBrowse.
-        (model := GtkListModel on: contextTree treeView getModel)
+        (model := contextTree model)
                                         contentsBlock: [ :each | {each printString} ].
         ^ contextTree mainWidget
     ]
@@ -86,7 +85,7 @@ GtkConcreteWidget subclass: GtkContextWidget [
     whenSelectionChangedSend: aSelector to: anObject [
 	<category: 'events'>
 
-	contextTree treeView getSelection
+	contextTree getSelection
 	    connectSignal: 'changed' to: anObject selector: aSelector userData: nil
     ]
 
@@ -99,35 +98,34 @@ GtkConcreteWidget subclass: GtkContextWidget [
     selectLastContext [
         <category: 'item selection'>
 
-	contextTree treeView selectLastItem
+	contextTree selectLastItem
     ]
 
     selectFirstContext [
         <category: 'item selection'>
 
-	contextTree treeView selectFirstItem
+	contextTree selectFirstItem
     ]
 
     hasSelectedContext [
 	<category: 'testing'>
 
-	^ contextTree treeView hasSelectedItem
+	^ contextTree hasSelectedItem
     ]
 
     selectedContext [
 	<category: 'accessing'>
 
-
 	self hasSelectedContext ifFalse: [ self error: 'Nothing is selected' ].
-        ^ contextTree treeView selection
+        ^ contextTree selection
     ]
 
     state [
         <category: 'actions'>
 
         "TODO: add ContextState."
-        contextTree treeView hasSelectedItem ifTrue: [
-            ^MethodState with: contextTree treeView selection method method ].
+        contextTree hasSelectedItem ifTrue: [
+            ^MethodState with: contextTree selection method method ].
         ^BrowserState new
     ]
 

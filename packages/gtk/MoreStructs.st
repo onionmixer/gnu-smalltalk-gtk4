@@ -83,3 +83,37 @@ CStruct subclass: GdkRGBA [
 "GTK4: GdkEvent* structs are opaque objects accessed through getter
  functions (gdk_event_get_position, gdk_button_event_get_button, etc.).
  The old CStruct declarations have been removed."
+
+
+"GTK4 list widget classes missing from auto-generated Structs.st.
+ These are needed for the GtkListView/GtkColumnView based list widgets."
+
+GLib.GObject variableWordSubclass: #GListModel
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'GLib'!
+
+GLib.GObject variableWordSubclass: #GListStore
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'GLib'!
+
+GLib.GObject variableWordSubclass: #GtkSingleSelection
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Gtk'!
+
+GLib.GObject variableWordSubclass: #GtkStringList
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Gtk'!
+
+GLib.GObject variableWordSubclass: #GtkStringObject
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Gtk'!
