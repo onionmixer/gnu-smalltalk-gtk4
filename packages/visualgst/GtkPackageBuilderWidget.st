@@ -64,55 +64,19 @@ GtkConcreteWidget subclass: GtkPackageBuilderWidget [
     buildPackageNameEntry [
         <category: 'user interface'>
 
-        | completion model |
-        completion := GTK.GtkEntryCompletion new.
-        completion 
-            setModel: (model := GTK.GtkListStore createModelWith: {{GtkColumnTextType title: ''}});
-            setTextColumn: 0.
-	Smalltalk.PackageLoader root do: [ :each | model appendItem: {each name} ].
-	^ packName := (GtkEntryWidget labeled: 'Package name :')
-						completion: completion;
-                                                yourself
-    ]
-
-    buildNamespaceCompletion: model [
-
-	self buildNamespaceCompletion: Smalltalk on: model
-    ]
-
-    buildNamespaceCompletion: aNamespace on: model [
-
-	model appendItem: {aNamespace name asString}.
-	aNamespace subspaces do: [ :each |
-	    self buildNamespaceCompletion: each on: model ]
+	^ packName := GtkEntryWidget labeled: 'Package name :'
     ]
 
     buildNamespaceEntry [
         <category: 'user interface'>
 
-	| completion model |
-	completion := GTK.GtkEntryCompletion new.
-	completion 
-	    setModel: (model := GTK.GtkListStore createModelWith: {{GtkColumnTextType title: ''}});
-	    setTextColumn: 0.
-	self buildNamespaceCompletion: model.
-	^ namespace := (GtkEntryWidget labeled: 'Namespace :')
-						completion: completion;
-						yourself
+	^ namespace := GtkEntryWidget labeled: 'Namespace :'
     ]
 
     buildPackageEntry [
         <category: 'user interface'>
 
-        | completion model |
-        completion := GTK.GtkEntryCompletion new.
-        completion
-            setModel: (model := GTK.GtkListStore createModelWith: {{GtkColumnTextType title: ''}});
-            setTextColumn: 0.
-	Smalltalk.PackageLoader root do: [ :each | model appendItem: {each name} ].
-        ^ prereq := (GtkEntryWidget labeled: 'Package :')
-                                                completion: completion;
-                                                yourself
+	^ prereq := GtkEntryWidget labeled: 'Package :'
     ]
 
     buildPrereqEntry [
@@ -157,29 +121,10 @@ GtkConcreteWidget subclass: GtkPackageBuilderWidget [
 	^ test := GtkEntryWidget labeled: 'Tests :'
     ]
 
-    buildClassCategoryCompletion: model [
-
-	| set |
-	set := Set new.
-	Class allSubclassesDo: [ :each |
-	    (set includes: each category)
-		ifFalse: [
-		    set add: each category.
-		    model appendItem: {each category} ] ]
-    ]
-
     buildClassCategoryEntry [
         <category: 'user interface'>
 
-        | completion model |
-        completion := GTK.GtkEntryCompletion new.
-        completion
-            setModel: (model := GTK.GtkListStore createModelWith: {{GtkColumnTextType title: ''}});
-            setTextColumn: 0.
-        self buildClassCategoryCompletion: model.
-        ^ packName := (GtkEntryWidget labeled: 'Class category :')
-                                                completion: completion;
-                                                yourself
+	^ classCategory := GtkEntryWidget labeled: 'Class category :'
     ]
 
     buildClassCategory [

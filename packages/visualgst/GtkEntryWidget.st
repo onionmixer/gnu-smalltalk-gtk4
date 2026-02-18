@@ -63,11 +63,6 @@ GtkConcreteWidget subclass: GtkEntryWidget [
 			yourself
     ]
 
-    completion: aGtkEntryCompletion [
-
-	entry setCompletion: aGtkEntryCompletion
-    ]
-
     text [
 
 	^ entry getText

@@ -34,7 +34,7 @@
 ======================================================================"
 
 Object subclass: GtkEntryDialog [
-    | dialog labelWidget entryWidget hasPressedOk buttons defaultButton |
+    | window entryWidget okBlock |
 
     GtkEntryDialog class >> title: aTitle text: aDescription [
 	<category: 'instance creation'>
@@ -44,31 +44,21 @@ Object subclass: GtkEntryDialog [
 	    yourself
     ]
 
-    beOkCancel [
-        buttons := #( ('Ok' #gtkResponseOk) ('Cancel' #gtkResponseCancel))
-    ]
-
-    beYesNo [
-        buttons := #( ('Yes' #gtkResponseYes) ('No' #gtkResponseNo))
-    ]
-
     title: aTitle text: aDescription [
 	<category: 'initialization'>
 
-	hasPressedOk := false.
-	dialog := GTK.GtkDialog newWithButtons: aTitle parent: nil flags: 0 varargs: {nil}.
-	self buildCentralWidget: aDescription on: dialog.
-	"dialog showModalOnAnswer: [ :dlg :res |
-		res = GTK.Gtk gtkResponseYes ifTrue: [ hasPressedOk := true ].
-		dlg destroy ]"
+	window := GTK.GtkWindow new.
+	window setTitle: aTitle.
+	window setModal: true.
+	window setDefaultSize: 400 height: -1.
+	self buildCentralWidget: aDescription.
     ]
 
     hasPressedOk: aBlock [
 	<category: 'testing'>
 
-        dialog showModalOnAnswer: [ :dlg :res |
-                res = defaultButton ifTrue: [ aBlock value ].
-                dlg destroy ]
+	okBlock := aBlock.
+	window show
     ]
 
     result [
@@ -77,25 +67,52 @@ Object subclass: GtkEntryDialog [
 	^ entryWidget getText
     ]
 
-    buildCentralWidget: aString on: aGtkDialog [
+    onOk [
+	<category: 'callbacks'>
+
+	okBlock ifNotNil: [ okBlock value ].
+	window destroy
+    ]
+
+    onCancel [
+	<category: 'callbacks'>
+
+	window destroy
+    ]
+
+    buildCentralWidget: aString [
 	<category: 'user interface'>
 
-	| hbox |
-        buttons isNil ifTrue: [ self beOkCancel ].
-        buttons do: [ :each |
-	    aGtkDialog addButton: each first responseId: (GTK.Gtk perform: each second) ].
-
-        defaultButton := GTK.Gtk perform: buttons first second.
-        aGtkDialog setDefaultResponse: defaultButton.
-	hbox := (GTK.GtkBox new: GTK.Gtk gtkOrientationHorizontal spacing: 0) setHomogeneous: true; yourself.
-	labelWidget := GTK.GtkLabel new: aString.
-	entryWidget := GTK.GtkEntry new.
-        entryWidget setActivatesDefault: true.
+	| vbox hbox buttonBox okButton cancelButton |
+	hbox := (GTK.GtkBox new: GTK.Gtk gtkOrientationHorizontal spacing: 6)
+		    setHomogeneous: true;
+		    yourself.
 	hbox
-	    append: labelWidget;
-	    append: entryWidget;
-	    show.
-	aGtkDialog getContentArea append: hbox
+	    append: (GTK.GtkLabel new: aString);
+	    append: (entryWidget := GTK.GtkEntry new).
+
+	okButton := GTK.GtkButton newWithLabel: 'Ok'.
+	okButton connectSignal: 'clicked' to: self selector: #onOk.
+	cancelButton := GTK.GtkButton newWithLabel: 'Cancel'.
+	cancelButton connectSignal: 'clicked' to: self selector: #onCancel.
+
+	buttonBox := (GTK.GtkBox new: GTK.Gtk gtkOrientationHorizontal spacing: 6)
+			setHomogeneous: true;
+			setHalign: GTK.Gtk gtkAlignEnd;
+			yourself.
+	buttonBox
+	    append: cancelButton;
+	    append: okButton.
+
+	vbox := GTK.GtkBox new: GTK.Gtk gtkOrientationVertical spacing: 12.
+	vbox setMarginTop: 12.
+	vbox setMarginBottom: 12.
+	vbox setMarginStart: 12.
+	vbox setMarginEnd: 12.
+	vbox
+	    append: hbox;
+	    append: buttonBox.
+	window setChild: vbox
     ]
 ]
 
