@@ -258,6 +258,68 @@ gst_gtk_drawing_area_connect_draw (GtkDrawingArea *area)
                                   NULL, NULL);
 }
 
+/* GtkTreeListModel bridge.
+   GtkTreeListModel requires a C function pointer callback to create child
+   models.  This bridge registers a custom GObject signal 'gst-create-children'
+   on GtkTreeListModel and uses a C callback that emits it, so Smalltalk code
+   can return a GListModel (or nil for leaf nodes) from a signal handler.
+   Signal signature: (GtkTreeListModel, gint id) -> gpointer (GListModel* or NULL).
+   The callback extracts the integer ID from the GtkStringObject item.  */
+
+typedef struct {
+  GtkTreeListModel *model;
+} GstTreeListBridge;
+
+static guint gst_create_children_signal_id = 0;
+
+static GListModel *
+gst_tree_list_create_func (gpointer item, gpointer user_data)
+{
+  GstTreeListBridge *bridge = (GstTreeListBridge *) user_data;
+  const char *id_str;
+  int id;
+  gpointer result = NULL;
+
+  id_str = gtk_string_object_get_string (GTK_STRING_OBJECT (item));
+  id = atoi (id_str);
+  g_signal_emit (bridge->model, gst_create_children_signal_id, 0, id, &result);
+  return result ? G_LIST_MODEL (result) : NULL;
+}
+
+static void
+gst_tree_list_bridge_free (gpointer data)
+{
+  g_free (data);
+}
+
+GtkTreeListModel *
+gst_gtk_tree_list_model_new (GListModel *root,
+                             int passthrough,
+                             int autoexpand)
+{
+  GstTreeListBridge *bridge;
+  GtkTreeListModel *model;
+
+  if (gst_create_children_signal_id == 0)
+    {
+      gst_create_children_signal_id =
+        g_signal_new ("gst-create-children",
+                      gtk_tree_list_model_get_type (),
+                      G_SIGNAL_RUN_LAST,
+                      0, NULL, NULL,
+                      NULL, /* default marshaller */
+                      G_TYPE_POINTER, 1,
+                      G_TYPE_INT);
+    }
+
+  bridge = g_new0 (GstTreeListBridge, 1);
+  model = gtk_tree_list_model_new (root, passthrough, autoexpand,
+                                   gst_tree_list_create_func, bridge,
+                                   gst_tree_list_bridge_free);
+  bridge->model = model;
+  return model;
+}
+
 /* Initialization.  */
 
 /* GTK4: GdkScreen and gdk_get_default_root_window() removed.
@@ -357,6 +419,7 @@ gst_initModule (proxy)
   _gtk_vm_proxy->defineCFunc ("gstGtkScreenGetGeometry", screen_get_geometry);
   _gtk_vm_proxy->defineCFunc ("gstGtkScreenGetMonitorWidthMm", screen_get_monitor_width_mm);
   _gtk_vm_proxy->defineCFunc ("gstGtkScreenGetMonitorHeightMm", screen_get_monitor_height_mm);
+  _gtk_vm_proxy->defineCFunc ("gstGtkTreeListModelNew", gst_gtk_tree_list_model_new);
 
   _gtk_vm_proxy->defineCFunc ("gtk_placer_get_type", gtk_placer_get_type);
   _gtk_vm_proxy->defineCFunc ("gtk_placer_new", gtk_placer_new);

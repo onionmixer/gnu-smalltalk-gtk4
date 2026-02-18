@@ -104,7 +104,7 @@ GtkConcreteWidget subclass: GtkCategorizedClassWidget [
             category: aString;
             namespace: aNamespace.
 	model refresh.
-	classesTree treeView expandAll
+	classesTree expandAll
     ]
 
     appendClass: aClass to: anArray [
@@ -136,10 +136,10 @@ GtkConcreteWidget subclass: GtkCategorizedClassWidget [
     buildTreeView [
 	<category: 'user interface'>
    
-        classesTree := GtkScrollTreeWidget createTreeWithModel: {{GtkColumnTextType title: 'Classes'}}.
+        classesTree := GtkScrollTreeWidget4 createTreeWithModel: {{GtkColumnTextType title: 'Classes'}}.
         classesTree connectToWhenPopupMenu: (ClassMenus on: self).
-        classesTree treeView getSelection setMode: self selectionMode.
-        (model := GtkTreeModel on: classesTree treeView getModel)
+        classesTree getSelection setMode: self selectionMode.
+        (model := classesTree model)
 					item: self root;
 					childrenBlock: [ :each | | col | 
 							    col := SortedCollection sortBlock: [ :a :b | a asClass name <= b asClass name ]. 
@@ -152,14 +152,14 @@ GtkConcreteWidget subclass: GtkCategorizedClassWidget [
     whenSelectionChangedSend: aSelector to: anObject [
 	<category: 'events'>
 
-	classesTree treeView getSelection
+	classesTree getSelection
 	    connectSignal: 'changed' to: anObject selector: aSelector
     ]
 
     selectionMode: aSelectionMode [
 	<category: 'user interface'>
 
-	classesTree treeView getSelection setMode: aSelectionMode.
+	classesTree getSelection setMode: aSelectionMode.
     ]
 
     selectedNamespace [
@@ -177,7 +177,7 @@ GtkConcreteWidget subclass: GtkCategorizedClassWidget [
     hasSelectedClass [
 	<category: 'testing'>
 
-	^ classesTree treeView hasSelectedItem
+	^ classesTree hasSelectedItem
     ]
 
     state [
@@ -194,13 +194,13 @@ GtkConcreteWidget subclass: GtkCategorizedClassWidget [
 	<category: 'accessing'>
 
 	self hasSelectedClass ifFalse: [ self error: 'nothing is selected' ].
-	^ classesTree treeView selection asClass
+	^ classesTree selection asClass
     ]
 
     selectAClass: aClass [
 	<category: 'item selection'>
 
-	classesTree treeView select: aClass
+	classesTree select: aClass
     ]
 
     addToModel: aClass [

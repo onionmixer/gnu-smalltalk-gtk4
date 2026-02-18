@@ -134,3 +134,25 @@ GtkWidget variableWordSubclass: #GtkPopoverMenuBar
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Gtk'!
+
+
+"GTK4 tree widget classes missing from auto-generated Structs.st.
+ These are needed for the GtkTreeListModel-based tree widgets."
+
+GLib.GObject variableWordSubclass: #GtkTreeListModel
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Gtk'!
+
+GLib.GObject variableWordSubclass: #GtkTreeListRow
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Gtk'!
+
+GtkWidget variableWordSubclass: #GtkTreeExpander
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Gtk'!

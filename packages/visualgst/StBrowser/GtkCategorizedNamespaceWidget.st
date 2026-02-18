@@ -61,14 +61,13 @@ GtkConcreteWidget subclass: GtkCategorizedNamespaceWidget [
     buildTreeView [
         <category: 'user interface'>
 
-	namespaceTree := GtkScrollTreeWidget createTreeWithModel: {{GtkColumnPixbufType visible. GtkColumnTextType title: 'Namespaces'}}.
+	namespaceTree := GtkScrollTreeWidget4 createTreeWithModel: {{GtkColumnPixbufType visible. GtkColumnTextType title: 'Namespaces'}}.
 	namespaceTree connectToWhenPopupMenu: (NamespaceMenus on: self).
-	namespaceTree treeView getSelection setMode: GTK.Gtk gtkSelectionBrowse.
-	(model := GtkTreeModel on: namespaceTree treeView getModel)
+	namespaceTree getSelection setMode: GTK.Gtk gtkSelectionBrowse.
+	(model := namespaceTree model)
                                         item: FakeNamespace;
                                         childrenBlock: [ :each | self addToModel: each ];
                                         contentsBlock: [ :each | {each icon. each name asString} ];
-                                        connectSignal: 'row-has-child-toggled' to: self selector: #'childToggled:path:iter:';
                                         refresh.
 	^ namespaceTree mainWidget
     ]
@@ -76,7 +75,7 @@ GtkConcreteWidget subclass: GtkCategorizedNamespaceWidget [
     whenSelectionChangedSend: aSelector to: anObject [
         <category: 'events'>
 
-        namespaceTree treeView getSelection
+        namespaceTree getSelection
             connectSignal: 'changed' to: anObject selector: aSelector
     ]
 
@@ -84,29 +83,29 @@ GtkConcreteWidget subclass: GtkCategorizedNamespaceWidget [
         <category: 'item selection'>
 
 	(self hasSelectedNamespace and: [ self selectedNamespace == aNamespace ]) ifTrue: [ ^ self ].
-	(namespaceTree treeView)
-			    expandAll;
-			    select: aNamespace
+	namespaceTree
+	    expandAll;
+	    select: aNamespace
     ]
 
     hasSelectedNamespace [
         <category: 'testing'>
 
-        ^ namespaceTree treeView hasSelectedItem
+        ^ namespaceTree hasSelectedItem
     ]
 
     selectedNamespace [
         <category: 'accessing'>
 
 	self hasSelectedNamespace ifFalse: [ self error: 'nothing is selected' ].
-	^ namespaceTree treeView selection namespace
+	^ namespaceTree selection namespace
     ]
 
     selectedCategory [
         <category: 'accessing'>
 
         self hasSelectedNamespace ifFalse: [ self error: 'nothing is selected' ].
-        ^ namespaceTree treeView selection category
+        ^ namespaceTree selection category
     ]
 
     state [
@@ -119,12 +118,8 @@ GtkConcreteWidget subclass: GtkCategorizedNamespaceWidget [
     ]
 
     childToggled: model path: path iter: iter [
+	"GTK4: row expansion is handled by GtkTreeExpander. No-op."
 	<category: 'signals'>
-
-	namespaceTree treeView collapseRow: path.
-	((model at: iter) at: 3) isNamespace ifTrue: [
-	    ((model at: iter) at: 3) subspaces isEmpty ifFalse: [
-		namespaceTree treeView expandRow: path openAll: false ] ]
     ]
 
     addEvent: anEvent [

@@ -101,9 +101,9 @@ GtkConcreteWidget subclass: GtkClassHierarchyWidget [
     buildTreeView [
 	<category: 'user interface'>
    
-        classesTree := GTK.GtkTreeView createTreeWithModel: {{GtkColumnTextType title: 'Classes'}}.
+        classesTree := GtkScrollTreeWidget4 createTreeWithModel: {{GtkColumnTextType title: 'Classes'}}.
         classesTree getSelection setMode: GTK.Gtk gtkSelectionBrowse.
-        (model := GtkTreeModel on: classesTree getModel)
+        (model := classesTree model)
                                         item: #root;
                                         childrenBlock: [ :each |
 					    dic at: each ifAbsent: [ | col |
@@ -111,7 +111,7 @@ GtkConcreteWidget subclass: GtkClassHierarchyWidget [
 							col addAll: (each subclasses select: [ :behavior | behavior isClass ]).
                                             col ] ];
                                         contentsBlock: [ :each | {each asClass name asString, ' '} ].
-        ^ GTK.GtkScrolledWindow withChild: classesTree 
+        ^ classesTree mainWidget
     ]
 
     whenSelectionChangedSend: aSelector to: anObject [

@@ -177,6 +177,8 @@
   <filein>GtkListModel.st</filein>
   <filein>GtkListModel4.st</filein>
   <filein>GtkTreeModel.st</filein>
+  <filein>GtkTreeModel4.st</filein>
+  <filein>GtkScrollTreeWidget4.st</filein>
   <filein>Text/GtkTextWidget.st</filein>
   <filein>GtkPackageBuilderWidget.st</filein>
   <filein>GtkMainWindow.st</filein>
@@ -408,6 +410,8 @@
   <file>GtkListModel.st</file>
   <file>GtkListModel4.st</file>
   <file>GtkTreeModel.st</file>
+  <file>GtkTreeModel4.st</file>
+  <file>GtkScrollTreeWidget4.st</file>
   <file>Text/GtkTextWidget.st</file>
   <file>GtkPackageBuilderWidget.st</file>
   <file>GtkMainWindow.st</file>

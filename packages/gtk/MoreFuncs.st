@@ -304,6 +304,17 @@ GtkStringObject extend [
 
 ]
 
+Gtk class extend [
+
+    stringObjectGetString: aStringObject [
+	"Get the string from a GtkStringObject (accepts bare CObject)."
+	<category: 'C call-outs'>
+	<cCall: 'gtk_string_object_get_string' returning: #string
+	args: #( #cObject )>
+    ]
+
+]
+
 GtkSingleSelection class extend [
 
     new: aGListModel [
@@ -423,6 +434,148 @@ GtkDrawingArea extend [
 
 	self connectDrawSignal.
 	self connectSignal: 'gst-draw' to: anObject selector: aSelector.
+    ]
+
+]
+
+
+"GtkTreeListModel bridge wrappers.
+ GtkTreeListModel requires a C function pointer callback. The C bridge
+ registers a custom 'gst-create-children' signal on GtkTreeListModel.
+ Use connectCreateChildren:selector: to connect a Smalltalk handler."
+
+GtkTreeListModel class extend [
+
+    newWithRoot: aGListModel passthrough: passthrough autoexpand: autoexpand [
+	"Create a GtkTreeListModel using the C bridge that emits
+	 'gst-create-children' signal for child model creation."
+	<category: 'instance creation'>
+	<cCall: 'gstGtkTreeListModelNew' returning: #{GtkTreeListModel}
+	args: #(#cObject #boolean #boolean)>
+    ]
+
+]
+
+GtkTreeListModel extend [
+
+    getModel [
+	<category: 'accessing'>
+	^ Gtk treeListModelGetModel: self
+    ]
+
+    setAutoexpand: aBoolean [
+	<category: 'accessing'>
+	Gtk treeListModelSetAutoexpand: self autoexpand: aBoolean
+    ]
+
+    getAutoexpand [
+	<category: 'accessing'>
+	^ Gtk treeListModelGetAutoexpand: self
+    ]
+
+    getRow: position [
+	<category: 'accessing'>
+	^ Gtk treeListModelGetRow: self position: position
+    ]
+
+    getChildRow: position [
+	<category: 'accessing'>
+	^ Gtk treeListModelGetChildRow: self position: position
+    ]
+
+    connectCreateChildren: anObject selector: aSelector [
+	"Connect a Smalltalk handler for child model creation.
+	 Handler signature: model:id: → GListModel or nil."
+	<category: 'signals'>
+	self connectSignal: 'gst-create-children' to: anObject selector: aSelector
+    ]
+
+]
+
+GtkTreeListRow extend [
+
+    getItem [
+	<category: 'accessing'>
+	^ Gtk treeListRowGetItem: self
+    ]
+
+    setExpanded: aBoolean [
+	<category: 'accessing'>
+	Gtk treeListRowSetExpanded: self expanded: aBoolean
+    ]
+
+    getExpanded [
+	<category: 'accessing'>
+	^ Gtk treeListRowGetExpanded: self
+    ]
+
+    isExpandable [
+	<category: 'testing'>
+	^ Gtk treeListRowIsExpandable: self
+    ]
+
+    getPosition [
+	<category: 'accessing'>
+	^ Gtk treeListRowGetPosition: self
+    ]
+
+    getDepth [
+	<category: 'accessing'>
+	^ Gtk treeListRowGetDepth: self
+    ]
+
+    getChildren [
+	<category: 'accessing'>
+	^ Gtk treeListRowGetChildren: self
+    ]
+
+    getParent [
+	<category: 'accessing'>
+	^ Gtk treeListRowGetParent: self
+    ]
+
+    getChildRow: position [
+	<category: 'accessing'>
+	^ Gtk treeListRowGetChildRow: self position: position
+    ]
+
+]
+
+GtkTreeExpander extend [
+
+    setChild: aWidget [
+	<category: 'accessing'>
+	Gtk treeExpanderSetChild: self child: aWidget
+    ]
+
+    getChild [
+	<category: 'accessing'>
+	^ Gtk treeExpanderGetChild: self
+    ]
+
+    setListRow: aTreeListRow [
+	<category: 'accessing'>
+	Gtk treeExpanderSetListRow: self listRow: aTreeListRow
+    ]
+
+    getListRow [
+	<category: 'accessing'>
+	^ Gtk treeExpanderGetListRow: self
+    ]
+
+    getItem [
+	<category: 'accessing'>
+	^ Gtk treeExpanderGetItem: self
+    ]
+
+    setIndentForIcon: aBoolean [
+	<category: 'accessing'>
+	Gtk treeExpanderSetIndentForIcon: self indentForIcon: aBoolean
+    ]
+
+    getIndentForIcon [
+	<category: 'accessing'>
+	^ Gtk treeExpanderGetIndentForIcon: self
     ]
 
 ]

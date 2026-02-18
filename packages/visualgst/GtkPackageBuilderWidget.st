@@ -240,7 +240,7 @@ GtkConcreteWidget subclass: GtkPackageBuilderWidget [
 
     addPrereq [
 
-	prereqList getModel appendItem: {prereq text}
+	prereqList model append: prereq text
     ]
 
     addCategory [
