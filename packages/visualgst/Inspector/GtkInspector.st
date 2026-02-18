@@ -43,7 +43,7 @@ GtkBrowsingTool subclass: GtkInspector [
 	^ (self new)
 	    initialize;
 	    object: anObject;
-	    showAll;
+	    show;
 	    postInitialize;
 	    yourself
     ]
@@ -93,7 +93,7 @@ GtkBrowsingTool subclass: GtkInspector [
 	^ notebookWidget
 	    appendPage: trWidget tabLabel: (GTK.GtkLabel new: 'Basic');
 	    appendPage: wkWidget tabLabel: (GTK.GtkLabel new: 'Methods');
-	    showAll;
+	    show;
 	    setCurrentPage: 0;
 	    yourself
     ]

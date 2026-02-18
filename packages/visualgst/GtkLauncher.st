@@ -64,7 +64,7 @@ GtkVisualGSTTool subclass: GtkLauncher [
 
         ^ (uniqueInstance :=  self basicNew)
             initialize;
-            showAll;
+            show;
             postInitialize;
 	    resize: 1024@600;
             yourself
@@ -146,7 +146,7 @@ GtkVisualGSTTool subclass: GtkLauncher [
 	<category: 'tools events'>
 
 	| widget |
-	widget := self buildWorkspaceWidget showAll.
+	widget := self buildWorkspaceWidget show.
 	widget postInitialize.
 	outputs addWidget: widget labeled: aString.
         outputs showLastPage.
@@ -328,7 +328,7 @@ GtkVisualGSTTool subclass: GtkLauncher [
         browsers currentWidget postInitialize.
         browsers currentWidget selectANamespace: Smalltalk.
         browsers currentWidget selectAClass: Object.
-	outputs hideAll
+	outputs hide
     ]
 
     postInitialize [
@@ -342,8 +342,10 @@ GtkVisualGSTTool subclass: GtkLauncher [
 	leftSidebar postInitialize.
 	topSidebar postInitialize.
 	rightSidebar postInitialize.
-	window
-	    connectSignal: 'key-press-event' to: self selector:  #'keyPressedOn:keyEvent:'
+	| keyCtrl |
+	keyCtrl := GTK.GtkEventControllerKey new.
+	keyCtrl connectSignal: 'key-pressed' to: self selector: #'keyPressedOn:keyval:keycode:state:'.
+	window addController: keyCtrl
     ]
 
     buildNotebookWorkspaceWidget [
@@ -478,7 +480,7 @@ GtkVisualGSTTool subclass: GtkLauncher [
 	<category: 'user interface'>
 
 	^ (browsers := GtkNotebookWidget parentWindow: window)
-				    showAll;
+				    show;
                                     whenSelectionChangedSend: #historyChanged to: self;
 				    addWidget: self buildClassBrowserWidget labeled: 'Browser';
 				    yourself
@@ -853,7 +855,7 @@ GtkVisualGSTTool subclass: GtkLauncher [
 	<category: 'image events'>
 
 	outputs isVisible 
-		ifTrue: [ outputs hideAll ]
+		ifTrue: [ outputs hide ]
 		ifFalse: [ outputs showPane ]
     ]
 
@@ -943,7 +945,7 @@ GtkVisualGSTTool subclass: GtkLauncher [
         <category: 'pane events'>
 
 	historyWidget isVisible ifFalse: [ ^ self ].
-	topSidebar hideAll
+	topSidebar hide
     ]
 
     senderSelected [
@@ -991,16 +993,13 @@ GtkVisualGSTTool subclass: GtkLauncher [
         senderResultWidget selectedResult: self currentWidgetOfBrowser
     ]
 
-    keyPressedOn: aGtkWidget keyEvent: aGdkEventKey [
+    keyPressedOn: controller keyval: keyval keycode: keycode state: state [
         <category: 'key event'>
 
-        | event |
-        event := aGdkEventKey castTo: GTK.GdkEventKey type.
-
-	event keyval value = 65473 ifTrue: [ self showHideBottomPane. ^ true ].
-	(event state value bitAnd: GTK.Gdk gdkControlMask) = 0 ifTrue: [ ^ false ].
-	(#(65417 65289 65056) includes: event keyval value) ifFalse: [ ^ false ].
-	(event state value bitAnd: GTK.Gdk gdkShiftMask) = 0  
+	keyval = 65473 ifTrue: [ self showHideBottomPane. ^ true ].
+	(state bitAnd: GTK.Gdk gdkControlMask) = 0 ifTrue: [ ^ false ].
+	(#(65417 65289 65056) includes: keyval) ifFalse: [ ^ false ].
+	(state bitAnd: GTK.Gdk gdkShiftMask) = 0
 					    ifFalse: [ self previousTab ]
 					    ifTrue: [ self nextTab ].
         ^ true

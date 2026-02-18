@@ -60,7 +60,7 @@ Object subclass: EntryExample [
 	Gtk mainQuit
     ]
 
-    delete: object event: event data: data [
+    delete: object data: data [
 	<category: 'event handling'>
 	window destroy
     ]
@@ -76,13 +76,13 @@ Object subclass: EntryExample [
 	    to: self
 	    selector: #destroy:data:
 	    userData: nil.
-	window 
-	    connectSignal: 'delete_event'
+	window
+	    connectSignal: 'close-request'
 	    to: self
-	    selector: #delete:event:data:
+	    selector: #delete:data:
 	    userData: nil.
 	vbox := GtkBox new: Gtk gtkOrientationVertical spacing: 0.
-	window add: vbox.
+	window setChild: vbox.
 	vbox show.
 	entry := GtkEntry new.
 	entry setMaxLength: 50.
@@ -99,22 +99,14 @@ Object subclass: EntryExample [
 	    newTextLength: -1
 	    position: (CInt gcValue: entry getText size).
 	entry selectRegion: 0 endPos: entry getText size.
-	vbox 
-	    packStart: entry
-	    expand: true
-	    fill: true
-	    padding: 0.
+	vbox append: entry.
 	entry show.
 	hbox := GtkBox new: Gtk gtkOrientationHorizontal spacing: 0.
-	vbox add: hbox.
+	vbox append: hbox.
 	hbox show.
 	check := GtkCheckButton newWithLabel: 'Editable'.
-	hbox 
-	    packStart: check
-	    expand: true
-	    fill: true
-	    padding: 0.
-	check 
+	hbox append: check.
+	check
 	    connectSignal: 'toggled'
 	    to: self
 	    selector: #toggled:data:
@@ -122,11 +114,7 @@ Object subclass: EntryExample [
 	check setActive: true.
 	check show.
 	check := GtkCheckButton newWithLabel: 'Visible'.
-	hbox 
-	    packStart: check
-	    expand: true
-	    fill: true
-	    padding: 0.
+	hbox append: check.
 	check 
 	    connectSignal: 'toggled'
 	    to: self
@@ -140,13 +128,8 @@ Object subclass: EntryExample [
 	    to: self
 	    selector: #clicked:data:
 	    userData: nil.
-	vbox 
-	    packStart: button
-	    expand: true
-	    fill: true
-	    padding: 0.
-	button setFlags: Gtk gtkCanDefault.
-	button grabDefault.
+	vbox append: button.
+	window setDefaultWidget: button.
 	button show.
 	window show
     ]

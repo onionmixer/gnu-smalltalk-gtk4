@@ -92,10 +92,10 @@ Object subclass: GtkEntryDialog [
 	entryWidget := GTK.GtkEntry new.
         entryWidget setActivatesDefault: true.
 	hbox
-	    add: labelWidget;
-	    add: entryWidget;
-	    showAll.
-	aGtkDialog getVBox add: hbox
+	    append: labelWidget;
+	    append: entryWidget;
+	    show.
+	aGtkDialog getVBox append: hbox
     ]
 ]
 

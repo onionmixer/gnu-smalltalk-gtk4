@@ -154,27 +154,18 @@ Object subclass: BEventTarget [
 	 (all with the angular brackets!)."
 
 	<category: 'intercepting events'>
-	| block |
+	| block keyCtrl |
 	aSelector numArgs = 0 ifFalse: [^self invalidArgsError: '0'].
-	'onKeyEvent TODO implement own collection and check in that..' printNl.
-	block := 
-		[:widget :event :userData | 
-		"anObject perform: aSelector asSymbol."
-
+	block :=
+		[:controller :keyval :keycode :state |
+		"TODO: filter by key"
 		false].
-	self 
-	    connectSignal: 'key-press-event'
+	keyCtrl := GTK.GtkEventControllerKey new.
+	keyCtrl connectSignal: 'key-pressed'
 	    to: block
-	    selector: #value:value:value:
-	    userData: nil
-
-	"(self getKeyPressEventNames: key) do: [ :each |
-	 self
-	 bind: each
-	 to: aSelector
-	 of: anObject
-	 parameters: ''
-	 ]"
+	    selector: #value:value:value:value:
+	    userData: nil.
+	self connected addController: keyCtrl
     ]
 
     onKeyEventSend: aSelector to: anObject [
@@ -205,18 +196,17 @@ Object subclass: BEventTarget [
 	 passed to such an event procedure"
 
 	<category: 'intercepting events'>
-	| block |
+	| block keyCtrl |
 	aSelector numArgs = 1 ifFalse: [^self invalidArgsError: '1'].
-	'key up TODO implement Tk''s %K and pass it' printNl.
-	block := 
-		[:widget :event :userData | 
-		userData key perform: userData value with: nil.
-		false].
-	self 
-	    connectSignal: 'key-release-event'
+	block :=
+		[:controller :keyval :keycode :state |
+		anObject perform: aSelector with: nil].
+	keyCtrl := GTK.GtkEventControllerKey new.
+	keyCtrl connectSignal: 'key-released'
 	    to: block
-	    selector: #value:value:value:
-	    userData: anObject -> aSelector asSymbol
+	    selector: #value:value:value:value:
+	    userData: nil.
+	self connected addController: keyCtrl
     ]
 
     onMouseDoubleEvent: button send: aSelector to: anObject [
@@ -225,24 +215,20 @@ Object subclass: BEventTarget [
 	 mouse position will be passed as a Point."
 
 	<category: 'intercepting events'>
-	| block |
+	| block gesture |
 	aSelector numArgs = 1 ifFalse: [^self invalidArgsError: '1'].
 	self registerEventReceiver: anObject.
-	block := 
-		[:widget :event :userData | 
-		| buttonEv |
-		buttonEv := event castTo: GTK.GdkEventButton type.
-		(buttonEv button value = button 
-		    and: [buttonEv type value = GTK.Gdk gdk2buttonPress]) 
-			ifTrue: 
-			    [userData key perform: userData value
-				with: buttonEv x value @ buttonEv y value].
-		false].
-	self 
-	    connectSignal: 'button-press-event'
+	block :=
+		[:gest :nPress :x :y |
+		nPress = 2 ifTrue:
+		    [anObject perform: aSelector with: x @ y]].
+	gesture := GTK.GtkGestureClick new.
+	gesture setButton: button.
+	gesture connectSignal: 'pressed'
 	    to: block
-	    selector: #value:value:value:
-	    userData: anObject -> aSelector asSymbol
+	    selector: #value:value:value:value:
+	    userData: nil.
+	self connected addController: gesture
     ]
 
     onMouseDoubleEventSend: aSelector to: anObject [
@@ -253,25 +239,21 @@ Object subclass: BEventTarget [
 	 parameter."
 
 	<category: 'intercepting events'>
-	| block |
+	| block gesture |
 	aSelector numArgs = 2 ifFalse: [^self invalidArgsError: '1'].
 	self registerEventReceiver: anObject.
-	block := 
-		[:widget :event :userData | 
-		| buttonEv |
-		buttonEv := event castTo: GTK.GdkEventButton type.
-		buttonEv type value = GTK.Gdk gdk2buttonPress 
-		    ifTrue: 
-			[userData key 
-			    perform: userData value
-			    with: buttonEv x value @ buttonEv y value
-			    with: buttonEv button value].
-		false].
-	self 
-	    connectSignal: 'button-press-event'
+	block :=
+		[:gest :nPress :x :y |
+		nPress = 2 ifTrue:
+		    [anObject perform: aSelector
+			with: x @ y
+			with: (gest getCurrentButton)]].
+	gesture := GTK.GtkGestureClick new.
+	gesture connectSignal: 'pressed'
 	    to: block
-	    selector: #value:value:value:
-	    userData: anObject -> aSelector asSymbol
+	    selector: #value:value:value:value:
+	    userData: nil.
+	self connected addController: gesture
     ]
 
     onMouseDownEvent: button send: aSelector to: anObject [
@@ -280,24 +262,20 @@ Object subclass: BEventTarget [
 	 mouse position will be passed as a Point."
 
 	<category: 'intercepting events'>
-	| block |
+	| block gesture |
 	aSelector numArgs = 1 ifFalse: [^self invalidArgsError: '1'].
 	self registerEventReceiver: anObject.
-	block := 
-		[:widget :event :userData | 
-		| buttonEv |
-		buttonEv := event castTo: GTK.GdkEventButton type.
-		(buttonEv button value = button 
-		    and: [buttonEv type value = GTK.Gdk gdkButtonPress]) 
-			ifTrue: 
-			    [userData key perform: userData value
-				with: buttonEv x value @ buttonEv y value].
-		false].
-	self 
-	    connectSignal: 'button-press-event'
+	block :=
+		[:gest :nPress :x :y |
+		nPress = 1 ifTrue:
+		    [anObject perform: aSelector with: x @ y]].
+	gesture := GTK.GtkGestureClick new.
+	gesture setButton: button.
+	gesture connectSignal: 'pressed'
 	    to: block
-	    selector: #value:value:value:
-	    userData: anObject -> aSelector asSymbol
+	    selector: #value:value:value:value:
+	    userData: nil.
+	self connected addController: gesture
     ]
 
     onMouseDownEventSend: aSelector to: anObject [
@@ -308,25 +286,21 @@ Object subclass: BEventTarget [
 	 parameter."
 
 	<category: 'intercepting events'>
-	| block |
+	| block gesture |
 	aSelector numArgs = 2 ifFalse: [^self invalidArgsError: '2'].
 	self registerEventReceiver: anObject.
-	block := 
-		[:widget :event :userData | 
-		| buttonEv |
-		buttonEv := event castTo: GTK.GdkEventButton type.
-		buttonEv type value = GTK.Gdk gdkButtonPress 
-		    ifTrue: 
-			[userData key 
-			    perform: userData value
-			    with: buttonEv x value @ buttonEv y value
-			    with: buttonEv button value].
-		false].
-	self 
-	    connectSignal: 'button-press-event'
+	block :=
+		[:gest :nPress :x :y |
+		nPress = 1 ifTrue:
+		    [anObject perform: aSelector
+			with: x @ y
+			with: (gest getCurrentButton)]].
+	gesture := GTK.GtkGestureClick new.
+	gesture connectSignal: 'pressed'
 	    to: block
-	    selector: #value:value:value:
-	    userData: anObject -> aSelector asSymbol
+	    selector: #value:value:value:value:
+	    userData: nil.
+	self connected addController: gesture
     ]
 
     onMouseEnterEventSend: aSelector to: anObject [
@@ -334,15 +308,14 @@ Object subclass: BEventTarget [
 	 identified by aSelector to anObject."
 
 	<category: 'intercepting events'>
+	| motionCtrl |
 	aSelector numArgs = 0 ifFalse: [^self invalidArgsError: '0'].
-	self 
-	    connectSignal: 'enter-notify-event'
-	    to: 
-		[:widget :ev :data | 
-		data key perform: data value.
-		false]
+	motionCtrl := GTK.GtkEventControllerMotion new.
+	motionCtrl connectSignal: 'enter'
+	    to: [:controller :x :y | anObject perform: aSelector]
 	    selector: #value:value:value:
-	    userData: anObject -> aSelector asSymbol
+	    userData: nil.
+	self connected addController: motionCtrl
     ]
 
     onMouseLeaveEventSend: aSelector to: anObject [
@@ -350,15 +323,14 @@ Object subclass: BEventTarget [
 	 identified by aSelector to anObject."
 
 	<category: 'intercepting events'>
+	| motionCtrl |
 	aSelector numArgs = 0 ifFalse: [^self invalidArgsError: '0'].
-	self 
-	    connectSignal: 'leave-notify-event'
-	    to: 
-		[:widget :ev :data | 
-		data key perform: data value.
-		false]
-	    selector: #value:value:value:
-	    userData: anObject -> aSelector asSymbol
+	motionCtrl := GTK.GtkEventControllerMotion new.
+	motionCtrl connectSignal: 'leave'
+	    to: [:controller | anObject perform: aSelector]
+	    selector: #value:
+	    userData: nil.
+	self connected addController: motionCtrl
     ]
 
     onMouseMoveEvent: button send: aSelector to: anObject [
@@ -367,24 +339,21 @@ Object subclass: BEventTarget [
 	 to anObject. The mouse position will be passed as a Point."
 
 	<category: 'intercepting events'>
-	| modMask block |
+	| block motionCtrl modMask |
 	aSelector numArgs = 1 ifFalse: [^self invalidArgsError: '1'].
 	self registerEventReceiver: anObject.
 	modMask := GTK.Gdk gdkButton1Mask bitShift: button - 1.
-	block := 
-		[:widget :event :userData | 
-		| motionEv |
-		motionEv := event castTo: GTK.GdkEventMotion type.
-		(motionEv state value anyMask: modMask) 
-		    ifTrue: 
-			[userData key perform: userData value
-			    with: motionEv x value @ motionEv y value].
-		false].
-	self 
-	    connectSignal: 'motion-notify-event'
+	block :=
+		[:controller :x :y |
+		(controller getCurrentEventState anyMask: modMask)
+		    ifTrue:
+			[anObject perform: aSelector with: x @ y]].
+	motionCtrl := GTK.GtkEventControllerMotion new.
+	motionCtrl connectSignal: 'motion'
 	    to: block
 	    selector: #value:value:value:
-	    userData: anObject -> aSelector asSymbol
+	    userData: nil.
+	self connected addController: motionCtrl
     ]
 
     onMouseMoveEventSend: aSelector to: anObject [
@@ -392,21 +361,18 @@ Object subclass: BEventTarget [
 	 by aSelector to anObject. The mouse position will be passed as a Point."
 
 	<category: 'intercepting events'>
-	| block |
+	| block motionCtrl |
 	aSelector numArgs = 1 ifFalse: [^self invalidArgsError: '1'].
 	self registerEventReceiver: anObject.
-	block := 
-		[:widget :event :userData | 
-		| motionEv |
-		motionEv := event castTo: GTK.GdkEventMotion type.
-		userData key perform: userData value
-		    with: motionEv x value @ motionEv y value.
-		false].
-	self 
-	    connectSignal: 'motion-notify-event'
+	block :=
+		[:controller :x :y |
+		anObject perform: aSelector with: x @ y].
+	motionCtrl := GTK.GtkEventControllerMotion new.
+	motionCtrl connectSignal: 'motion'
 	    to: block
 	    selector: #value:value:value:
-	    userData: anObject -> aSelector asSymbol
+	    userData: nil.
+	self connected addController: motionCtrl
     ]
 
     onMouseTripleEvent: button send: aSelector to: anObject [
@@ -415,24 +381,20 @@ Object subclass: BEventTarget [
 	 mouse position will be passed as a Point."
 
 	<category: 'intercepting events'>
-	| block |
+	| block gesture |
 	aSelector numArgs = 1 ifFalse: [^self invalidArgsError: '1'].
 	self registerEventReceiver: anObject.
-	block := 
-		[:widget :event :userData | 
-		| buttonEv |
-		buttonEv := event castTo: GTK.GdkEventButton type.
-		(buttonEv button value = button 
-		    and: [buttonEv type value = GTK.Gdk gdk3buttonPress]) 
-			ifTrue: 
-			    [userData key perform: userData value
-				with: buttonEv x value @ buttonEv y value].
-		false].
-	self 
-	    connectSignal: 'button-press-event'
+	block :=
+		[:gest :nPress :x :y |
+		nPress = 3 ifTrue:
+		    [anObject perform: aSelector with: x @ y]].
+	gesture := GTK.GtkGestureClick new.
+	gesture setButton: button.
+	gesture connectSignal: 'pressed'
 	    to: block
-	    selector: #value:value:value:
-	    userData: anObject -> aSelector asSymbol
+	    selector: #value:value:value:value:
+	    userData: nil.
+	self connected addController: gesture
     ]
 
     onMouseTripleEventSend: aSelector to: anObject [
@@ -443,25 +405,21 @@ Object subclass: BEventTarget [
 	 parameter."
 
 	<category: 'intercepting events'>
-	| block |
+	| block gesture |
 	aSelector numArgs = 2 ifFalse: [^self invalidArgsError: '1'].
 	self registerEventReceiver: anObject.
-	block := 
-		[:widget :event :userData | 
-		| buttonEv |
-		buttonEv := event castTo: GTK.GdkEventButton type.
-		buttonEv type value = GTK.Gdk gdk3buttonPress 
-		    ifTrue: 
-			[userData key 
-			    perform: userData value
-			    with: buttonEv x value @ buttonEv y value
-			    with: buttonEv button value].
-		false].
-	self 
-	    connectSignal: 'button-press-event'
+	block :=
+		[:gest :nPress :x :y |
+		nPress = 3 ifTrue:
+		    [anObject perform: aSelector
+			with: x @ y
+			with: (gest getCurrentButton)]].
+	gesture := GTK.GtkGestureClick new.
+	gesture connectSignal: 'pressed'
 	    to: block
-	    selector: #value:value:value:
-	    userData: anObject -> aSelector asSymbol
+	    selector: #value:value:value:value:
+	    userData: nil.
+	self connected addController: gesture
     ]
 
     onMouseUpEvent: button send: aSelector to: anObject [
@@ -470,23 +428,19 @@ Object subclass: BEventTarget [
 	 mouse position will be passed as a Point."
 
 	<category: 'intercepting events'>
-	| block |
+	| block gesture |
 	aSelector numArgs = 1 ifFalse: [^self invalidArgsError: '1'].
 	self registerEventReceiver: anObject.
-	block := 
-		[:widget :event :userData | 
-		| buttonEv |
-		buttonEv := event castTo: GTK.GdkEventButton type.
-		buttonEv button value = button 
-		    ifTrue: 
-			[userData key perform: userData value
-			    with: buttonEv x value @ buttonEv y value].
-		false].
-	self 
-	    connectSignal: 'button-release-event'
+	block :=
+		[:gest :nPress :x :y |
+		anObject perform: aSelector with: x @ y].
+	gesture := GTK.GtkGestureClick new.
+	gesture setButton: button.
+	gesture connectSignal: 'released'
 	    to: block
-	    selector: #value:value:value:
-	    userData: anObject -> aSelector asSymbol
+	    selector: #value:value:value:value:
+	    userData: nil.
+	self connected addController: gesture
     ]
 
     onMouseUpEventSend: aSelector to: anObject [
@@ -497,23 +451,20 @@ Object subclass: BEventTarget [
 	 parameter."
 
 	<category: 'intercepting events'>
-	| block |
+	| block gesture |
 	aSelector numArgs = 2 ifFalse: [^self invalidArgsError: '2'].
 	self registerEventReceiver: anObject.
-	block := 
-		[:widget :event :userData | 
-		| buttonEv |
-		buttonEv := event castTo: GTK.GdkEventButton type.
-		userData key 
-		    perform: userData value
-		    with: buttonEv x value @ buttonEv y value
-		    with: buttonEv button value.
-		false].
-	self 
-	    connectSignal: 'button-release-event'
+	block :=
+		[:gest :nPress :x :y |
+		anObject perform: aSelector
+		    with: x @ y
+		    with: (gest getCurrentButton)].
+	gesture := GTK.GtkGestureClick new.
+	gesture connectSignal: 'released'
 	    to: block
-	    selector: #value:value:value:
-	    userData: anObject -> aSelector asSymbol
+	    selector: #value:value:value:value:
+	    userData: nil.
+	self connected addController: gesture
     ]
 
     onResizeSend: aSelector to: anObject [
@@ -525,18 +476,14 @@ Object subclass: BEventTarget [
 	| block |
 	aSelector numArgs = 1 ifFalse: [^self invalidArgsError: '2'].
 	self registerEventReceiver: anObject.
-	block := 
-		[:widget :event :userData | 
-		| configEv |
-		configEv := event castTo: GTK.GdkEventConfigure type.
-		userData key perform: userData value
-		    with: configEv x value @ configEv y value.
-		false].
-	self 
-	    connectSignal: 'configure-event'
+	block :=
+		[:widget :width :height |
+		anObject perform: aSelector with: width @ height].
+	self connected
+	    connectSignal: 'resize'
 	    to: block
 	    selector: #value:value:value:
-	    userData: anObject -> aSelector asSymbol
+	    userData: nil
     ]
 
     connectSignal: aString to: anObject selector: aSymbol userData: userData [
@@ -2379,9 +2326,7 @@ scrolled, like list boxes or text widgets.'>
 	self container setPolicy: GTK.Gtk gtkPolicyAutomatic
 	    vscrollbarPolicy: GTK.Gtk gtkPolicyAutomatic.
 	horizontal := vertical := true.
-	self needsViewport 
-	    ifTrue: [self container addWithViewport: self connected]
-	    ifFalse: [self container add: self connected].
+	self container setChild: self connected.
 	super show.
 	self container show
     ]

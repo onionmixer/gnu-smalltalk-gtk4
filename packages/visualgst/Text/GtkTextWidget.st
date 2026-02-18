@@ -100,15 +100,15 @@ GtkConcreteWidget subclass: GtkTextWidget [
         | vbox |
         vbox := GTK.GtkBox new: GTK.Gtk gtkOrientationVertical spacing: 3.
         self packPluginsInto: vbox.
-        vbox packStart: (GTK.GtkScrolledWindow withChild: textWidget) expand: true fill: true padding: 0.
+        vbox append: (GTK.GtkScrolledWindow withChild: textWidget).
         ^vbox
     ]
 
     packPluginsInto: vbox [
 	<category: 'user interface'>
         vbox
-            packEnd: ((findWidget := GtkFindWidget on: self) mainWidget) expand: false fill: false padding: 0;
-            packEnd: ((replaceWidget := GtkReplaceWidget on: self)  mainWidget) expand: false fill: false padding: 0;
+            append: ((findWidget := GtkFindWidget on: self) mainWidget);
+            append: ((replaceWidget := GtkReplaceWidget on: self)  mainWidget);
             yourself
     ]
 
@@ -252,15 +252,15 @@ GtkConcreteWidget subclass: GtkTextWidget [
     showFind [
         <category: 'user interface'>
 
-        replaceWidget hideAll.
-	findWidget showAll; grabFocus
+        replaceWidget hide.
+	findWidget show; grabFocus
     ]
 
     showReplace [
         <category: 'user interface'>
 
-        findWidget hideAll.
-	replaceWidget showAll; grabFocus
+        findWidget hide.
+	replaceWidget show; grabFocus
     ]
 
     replace: aSearchString by: aReplaceString [

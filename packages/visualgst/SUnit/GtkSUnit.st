@@ -161,7 +161,7 @@ GtkBrowsingTool subclass: GtkSUnit [
     buildNamespaceWidget [
 	<category: 'user interface'>
 
-	namespaceWidget := GtkNamespaceSUnitWidget showAll
+	namespaceWidget := GtkNamespaceSUnitWidget show
 				whenSelectionChangedSend: #onNamespaceChanged to: self;
 				yourself.
 	^ namespaceWidget mainWidget
@@ -170,7 +170,7 @@ GtkBrowsingTool subclass: GtkSUnit [
     buildClassWidget [
 	<category: 'user interface'>
 
-	classWidget := GtkClassSUnitWidget showAll 
+	classWidget := GtkClassSUnitWidget show 
 				selectionMode: GTK.Gtk gtkSelectionMultiple;
 				whenSelectionChangedSend: #onClassChanged to: self;
 				yourself.
@@ -180,7 +180,7 @@ GtkBrowsingTool subclass: GtkSUnit [
     buildMethodWidget [
 	<category: 'user interface'>
 
-	methodWidget := GtkMethodSUnitWidget showAll
+	methodWidget := GtkMethodSUnitWidget show
 				whenSelectionChangedSend: #onMethodChanged to: self;
                                 yourself.
         ^ methodWidget mainWidget
@@ -189,7 +189,7 @@ GtkBrowsingTool subclass: GtkSUnit [
     buildSourceCodeWidget [
         <category: 'user interface'>
 
-        sourceCodeWidget := GtkSourceCodeWidget showAll.
+        sourceCodeWidget := GtkSourceCodeWidget show.
 	sourceCodeWidget parentWindow: window.
 	sourceCodeWidget browser: self.
         ^ sourceCodeWidget mainWidget

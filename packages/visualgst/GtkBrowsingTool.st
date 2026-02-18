@@ -57,7 +57,7 @@ GtkVisualGSTTool subclass: GtkBrowsingTool [
     onDelete: aGtkWidget event: aGdkEvent [
         <category: 'window events'>
 
-        self saveCodeOr: [ window hideAll ].
+        self saveCodeOr: [ window hide ].
         ^ true
     ]
 

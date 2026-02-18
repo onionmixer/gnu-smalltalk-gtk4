@@ -62,11 +62,11 @@ GtkBrowsingTool subclass: GtkAssistant [
 
         webview := GtkWebView new
                         openUrl: 'http://library.gnome.org/devel/gtk/stable/index.html';
-                        showAll;
+                        show;
                         yourself.
 
 	^ (GTK.GtkScrolledWindow withChild: webview)
-	    showAll; 
+	    show; 
 	    yourself
     ]
 

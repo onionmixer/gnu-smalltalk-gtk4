@@ -613,7 +613,7 @@ GTK.GtkDialog extend [
 
         self
             setModal: true;
-            showAll 
+            show 
     ]
 
     destroy: aGtkDialog [
@@ -628,7 +628,7 @@ GTK.GtkDialog extend [
         self
             setModal: true;
             connectSignal: 'response' to: aBlock selector: #cull:cull:;
-            showAll 
+            show 
     ]
     
     showModalDestroy [
@@ -637,7 +637,7 @@ GTK.GtkDialog extend [
         self
             setModal: true;
             connectSignal: 'response' to: self selector: #destroy:;
-            showAll 
+            show 
     ]
 
     showOnAnswer: aBlock [
@@ -646,7 +646,7 @@ GTK.GtkDialog extend [
         self
             setModal: false;
             connectSignal: 'response' to: aBlock selector: #cull:cull:;
-            showAll 
+            show 
     ]
 ]
 

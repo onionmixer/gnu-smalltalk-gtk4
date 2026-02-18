@@ -102,7 +102,7 @@ GtkConcreteWidget subclass: GtkNotebookWidget [
         ^ (GTK.GtkBox new: GTK.Gtk gtkOrientationHorizontal spacing: 0)
             add: (labels add: (GTK.GtkLabel new: aString));
             add: close;
-            showAll;
+            show;
             yourself
     ]
 
@@ -180,7 +180,7 @@ GtkConcreteWidget subclass: GtkNotebookWidget [
     showPane [
 	<category: 'widget'>
 
-	notebook showAll.
+	notebook show.
 	pages do: [ :each | each postInitialize ]
     ]
 ]

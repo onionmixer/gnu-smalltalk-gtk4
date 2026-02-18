@@ -54,34 +54,16 @@ Object subclass: ArrowExample [
 	    to: self
 	    selector: #destroy:data:
 	    userData: nil.
-	window setBorderWidth: 10.
 	box := GtkBox new: Gtk gtkOrientationHorizontal spacing: 0.
-	box setBorderWidth: 2.
-	window add: box.
+	window setChild: box.
 	button := GtkButton createArrowButton: 'pan-up-symbolic'.
-	box
-	    packStart: button
-	    expand: false
-	    fill: false
-	    padding: 3.
+	box append: button.
 	button := GtkButton createArrowButton: 'pan-down-symbolic'.
-	box
-	    packStart: button
-	    expand: false
-	    fill: false
-	    padding: 3.
+	box append: button.
 	button := GtkButton createArrowButton: 'pan-start-symbolic'.
-	box
-	    packStart: button
-	    expand: false
-	    fill: false
-	    padding: 3.
+	box append: button.
 	button := GtkButton createArrowButton: 'pan-end-symbolic'.
-	box
-	    packStart: button
-	    expand: false
-	    fill: false
-	    padding: 3.
+	box append: button.
 	box show.
 	window show
     ]
@@ -98,7 +80,7 @@ GTK.GtkButton class extend [
 	| button image |
 	button := self new.
 	image := GtkImage newFromIconName: iconName size: Gtk gtkIconSizeButton.
-	button add: image.
+	button setChild: image.
 	button show.
 	image show.
 	^button

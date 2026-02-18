@@ -1307,11 +1307,7 @@ right or from top to bottom.'>
 	 the children just added. Answer the new child."
 
 	<category: 'accessing'>
-	self connected 
-	    packStart: child container
-	    expand: false
-	    fill: false
-	    padding: 0.
+	self connected append: child container.
 	^child
     ]
 
@@ -3315,11 +3311,7 @@ it wasn''t for me... )):->'>
 	 Specifies a menu widget to be used as a menubar."
 
 	<category: 'accessing'>
-	self uiBox 
-	    packStart: aBMenuBar connected
-	    expand: false
-	    fill: false
-	    padding: 0.
+	self uiBox append: aBMenuBar connected.
 	self properties at: #menu put: aBMenuBar
     ]
 
@@ -3401,25 +3393,26 @@ it wasn''t for me... )):->'>
 	<category: 'private'>
 	self container: (GTK.GtkWindow new: GTK.Gtk gtkWindowToplevel).
 	self container 
-	    connectSignal: 'delete-event'
+	    connectSignal: 'close-request'
 	    to: self
 	    selector: #onDelete:data:
 	    userData: nil.
-	self container 
-	    connectSignal: 'configure-event'
+	self container
+	    connectSignal: 'notify::default-width'
 	    to: self
-	    selector: #onConfigure:data:
+	    selector: #onConfigure:pspec:data:
+	    userData: nil.
+	self container
+	    connectSignal: 'notify::default-height'
+	    to: self
+	    selector: #onConfigure:pspec:data:
 	    userData: nil.
 	uiBox := GTK.GtkBox new: GTK.Gtk gtkOrientationVertical spacing: 0.
-	self container add: uiBox.
+	self container setChild: uiBox.
 
 	"Create the GtkPlacer"
 	super create.
-	uiBox 
-	    packEnd: self connected
-	    expand: true
-	    fill: true
-	    padding: 0
+	uiBox append: self connected
     ]
 
     show [
@@ -3430,7 +3423,7 @@ it wasn''t for me... )):->'>
 	uiBox show
     ]
 
-    onConfigure: object data: data [
+    onConfigure: object pspec: pspec data: data [
 	<category: 'private'>
 	self cacheWindowSize
     ]
@@ -3832,11 +3825,7 @@ directly use me - always rely on the #new and #popup: class methods.'>
 	 initialization on the children just added. Answer the new child."
 
 	<category: 'geometry management'>
-	self uiBox 
-	    packEnd: w
-	    expand: true
-	    fill: true
-	    padding: 1.
+	self uiBox append: w.
 	w onDestroySend: #destroy to: self
     ]
 
@@ -4185,7 +4174,7 @@ common dialog boxes, such as choose-a-file and choose-a-color.'>
     addButton: aLabel [
 	<category: 'private'>
 	| button |
-	self buttonBox add: (button := GTK.GtkButton newWithLabel: aLabel).
+	self buttonBox append: (button := GTK.GtkButton newWithLabel: aLabel).
 	button show.
 	button 
 	    connectSignal: 'clicked'
@@ -4218,18 +4207,10 @@ common dialog boxes, such as choose-a-file and choose-a-color.'>
 	buttonBox := GTK.GtkButtonBox new: GTK.Gtk gtkOrientationHorizontal.
 	buttonBox setSpacing: 5.
 	buttonBox setLayout: GTK.Gtk gtkButtonboxEnd.
-	uiBox 
-	    packEnd: buttonBox
-	    expand: false
-	    fill: false
-	    padding: 5.
+	uiBox append: buttonBox.
 	buttonBox show.
 	separator := GTK.GtkSeparator new: GTK.Gtk gtkOrientationHorizontal.
-	uiBox 
-	    packEnd: separator
-	    expand: false
-	    fill: false
-	    padding: 0.
+	uiBox append: separator.
 	separator show.
 
 	"Put the GtkPlacer at the end of the list of the end-packed widgets,
@@ -4238,20 +4219,12 @@ common dialog boxes, such as choose-a-file and choose-a-color.'>
 	initInfo isNil ifTrue: [^self].
 	label := GTK.GtkLabel new: initInfo key.
 	label setAlignment: 0 yalign: 0.
-	uiBox 
-	    packStart: label
-	    expand: false
-	    fill: false
-	    padding: 5.
+	uiBox append: label.
 	label show.
 	initInfo value isNil ifTrue: [^self].
 	entry := GTK.GtkEntry new.
 	entry setText: initInfo value.
-	uiBox 
-	    packStart: entry
-	    expand: false
-	    fill: false
-	    padding: 0.
+	uiBox append: entry.
 	entry show
     ]
 
@@ -4297,7 +4270,7 @@ common dialog boxes, such as choose-a-file and choose-a-color.'>
 	 refer to BWindow>>#modalMap."
 
 	<category: 'widget protocol'>
-	self toplevel container showAll.
+	self toplevel container show.
 	self toplevel modalMap
     ]
 ]
@@ -4624,12 +4597,12 @@ right button (Button 3) is clicked on another window.'>
 
     create [
 	<category: 'private'>
+	| gesture |
 	super create.
-	attachedWidget connected 
-	    connectSignal: 'button-press-event'
-	    to: self
-	    selector: #onPopup:event:data:
-	    userData: nil
+	gesture := GTK.GtkGestureClick new.
+	gesture setButton: 3.
+	gesture connectSignal: 'pressed' to: self selector: #'onPopup:nPress:x:y:'.
+	attachedWidget connected addController: gesture
     ]
 
     destroyed [
@@ -4638,19 +4611,15 @@ right button (Button 3) is clicked on another window.'>
 	attachedWidget := nil
     ]
 
-    onPopup: widget event: event data: data [
+    onPopup: gesture nPress: nPress x: x y: y [
 	<category: 'private'>
-	| buttonEv |
-	buttonEv := event castTo: GTK.GdkEventButton type.
-	buttonEv button value = 3 ifFalse: [^false].
-	self connected getSubmenu 
+	self connected getSubmenu
 	    popup: nil
 	    parentMenuItem: nil
 	    func: nil
 	    data: nil
 	    button: 3
-	    activateTime: buttonEv time value.
-	^true
+	    activateTime: 0.
     ]
 
     popup [

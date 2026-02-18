@@ -68,11 +68,11 @@ GtkBrowsingTool subclass: GtkWebBrowser [
 
         webview := GtkWebView new
                         openUrl: 'http://smalltalk.gnu.org/';
-                        showAll;
+                        show;
                         yourself.
 
 	^ (GTK.GtkScrolledWindow withChild: webview)
-	    showAll; 
+	    show; 
 	    yourself
     ]
 

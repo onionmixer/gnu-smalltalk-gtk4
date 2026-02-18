@@ -35,13 +35,14 @@ PackageLoader fileInPackage: 'GTK'.
 Namespace current: GTK [
 
 Object subclass: EventBoxExample [
-    
+    | window |
+
     <category: nil>
     <comment: nil>
 
-    buttonPressEvent: object event: event data: data [
+    buttonPressed: gesture nPress: nPress x: x y: y [
 	<category: 'event handling'>
-	data destroy
+	window destroy
     ]
 
     destroy: object data: data [
@@ -51,30 +52,21 @@ Object subclass: EventBoxExample [
 
     open [
 	<category: 'layout'>
-	| window eventBox label |
+	| label gesture |
 	window := GtkWindow new: Gtk gtkWindowToplevel.
-	window 
+	window
 	    connectSignal: 'destroy'
 	    to: self
 	    selector: #destroy:data:
 	    userData: nil.
 	window setTitle: 'Event Box'.
-	window setBorderWidth: 10.
-	eventBox := GtkEventBox new.
-	window add: eventBox.
-	eventBox show.
 	label := GtkLabel new: 'Click here to quit, quit, quit, quit, quit'.
-	eventBox add: label.
-	label show.
 	label setSizeRequest: 110 height: 20.
-	eventBox setEvents: Gdk gdkButtonPressMask.
-	eventBox 
-	    connectSignal: 'button_press_event'
-	    to: self
-	    selector: #buttonPressEvent:event:data:
-	    userData: window.
-	eventBox realize.
-	eventBox getWindow setCursor: (GdkCursor new: Gdk gdkHand1).
+	label setCursorFromName: 'pointer'.
+	gesture := GtkGestureClick new.
+	gesture connectSignal: 'pressed' to: self selector: #'buttonPressed:nPress:x:y:'.
+	label addController: gesture.
+	window setChild: label.
 	window show
     ]
 ]

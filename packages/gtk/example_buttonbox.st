@@ -54,100 +54,65 @@ Object subclass: ButtonBoxExample [
 	    to: self
 	    selector: #destroy:data:
 	    userData: nil.
-	window setBorderWidth: 10.
 	mainVBox := GtkBox new: Gtk gtkOrientationVertical spacing: 0.
-	window add: mainVBox.
+	window setChild: mainVBox.
 	frameHorz := GtkFrame new: 'Horizontal Button Boxes'.
-	mainVBox 
-	    packStart: frameHorz
-	    expand: true
-	    fill: true
-	    padding: 10.
+	mainVBox append: frameHorz.
 	vbox := GtkBox new: Gtk gtkOrientationVertical spacing: 0.
-	vbox setBorderWidth: 10.
-	frameHorz add: vbox.
+	frameHorz setChild: vbox.
 	vbox
-	    packStart: (GtkButtonBox
+	    append: (GtkButtonBox
 		    createButtonBox: 'Spread (spacing 40)'
 		    orientation: Gtk gtkOrientationHorizontal
 		    spacing: 40
-		    layout: Gtk gtkButtonboxSpread)
-	    expand: true
-	    fill: true
-	    padding: 0.
+		    layout: Gtk gtkButtonboxSpread).
 	vbox
-	    packStart: (GtkButtonBox
+	    append: (GtkButtonBox
 		    createButtonBox: 'Edge (spacing 30)'
 		    orientation: Gtk gtkOrientationHorizontal
 		    spacing: 30
-		    layout: Gtk gtkButtonboxEdge)
-	    expand: true
-	    fill: true
-	    padding: 0.
+		    layout: Gtk gtkButtonboxEdge).
 	vbox
-	    packStart: (GtkButtonBox
+	    append: (GtkButtonBox
 		    createButtonBox: 'Start (spacing 20)'
 		    orientation: Gtk gtkOrientationHorizontal
 		    spacing: 20
-		    layout: Gtk gtkButtonboxStart)
-	    expand: true
-	    fill: true
-	    padding: 0.
+		    layout: Gtk gtkButtonboxStart).
 	vbox
-	    packStart: (GtkButtonBox
+	    append: (GtkButtonBox
 		    createButtonBox: 'End (spacing 10)'
 		    orientation: Gtk gtkOrientationHorizontal
 		    spacing: 10
-		    layout: Gtk gtkButtonboxEnd)
-	    expand: true
-	    fill: true
-	    padding: 0.
+		    layout: Gtk gtkButtonboxEnd).
 	frameVert := GtkFrame new: 'Vertical Button Boxes'.
-	mainVBox 
-	    packStart: frameVert
-	    expand: true
-	    fill: true
-	    padding: 10.
+	mainVBox append: frameVert.
 	hbox := GtkBox new: Gtk gtkOrientationHorizontal spacing: 0.
-	hbox setBorderWidth: 10.
-	frameVert add: hbox.
+	frameVert setChild: hbox.
 	hbox
-	    packStart: (GtkButtonBox
+	    append: (GtkButtonBox
 		    createButtonBox: 'Spread (spacing 5)'
 		    orientation: Gtk gtkOrientationVertical
 		    spacing: 5
-		    layout: Gtk gtkButtonboxSpread)
-	    expand: true
-	    fill: true
-	    padding: 0.
+		    layout: Gtk gtkButtonboxSpread).
 	hbox
-	    packStart: (GtkButtonBox
+	    append: (GtkButtonBox
 		    createButtonBox: 'Edge (spacing 30)'
 		    orientation: Gtk gtkOrientationVertical
 		    spacing: 30
-		    layout: Gtk gtkButtonboxEdge)
-	    expand: true
-	    fill: true
-	    padding: 0.
+		    layout: Gtk gtkButtonboxEdge).
 	hbox
-	    packStart: (GtkButtonBox
+	    append: (GtkButtonBox
 		    createButtonBox: 'Start (spacing 20)'
 		    orientation: Gtk gtkOrientationVertical
 		    spacing: 20
-		    layout: Gtk gtkButtonboxStart)
-	    expand: true
-	    fill: true
-	    padding: 0.
+		    layout: Gtk gtkButtonboxStart).
 	hbox
-	    packStart: (GtkButtonBox
+	    append: (GtkButtonBox
 		    createButtonBox: 'End (spacing 20)'
 		    orientation: Gtk gtkOrientationVertical
 		    spacing: 20
-		    layout: Gtk gtkButtonboxEnd)
-	    expand: true
-	    fill: true
-	    padding: 0.
-	window showAll
+		    layout: Gtk gtkButtonboxEnd).
+	window show
     ]
 ]
 
@@ -162,16 +127,15 @@ GTK.GtkButtonBox class extend [
 	| box frame button |
 	frame := GtkFrame new: title.
 	box := self new: orientation.
-	box setBorderWidth: 5.
-	frame add: box.
+	frame setChild: box.
 	box setLayout: layout.
 	box setSpacing: spacing.
 	button := GtkButton newWithLabel: 'OK'.
-	box add: button.
+	box append: button.
 	button := GtkButton newWithLabel: 'Cancel'.
-	box add: button.
+	box append: button.
 	button := GtkButton newWithLabel: 'Help'.
-	box add: button.
+	box append: button.
 	^frame
     ]
 

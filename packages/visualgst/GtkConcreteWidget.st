@@ -45,12 +45,12 @@ Object subclass: GtkConcreteWidget [
             yourself
     ]
 
-    GtkConcreteWidget class >> showAll [
+    GtkConcreteWidget class >> show [
 	<category: 'instance creation'>
 
 	^ self new
 	    initialize;
-	    showAll;
+	    show;
 	    yourself
     ]
 
@@ -80,20 +80,20 @@ Object subclass: GtkConcreteWidget [
     mainWidget: aGtkWidget [
 	<category: 'accessing'>
 
-	child ifNotNil: [ child hideAll  ].
+	child ifNotNil: [ child hide  ].
 	child := aGtkWidget
     ]
 
-    showAll [
+    show [
 	<category: 'user interface'>
 
-	child showAll
+	child show
     ]
 
-    hideAll [
+    hide [
 	<category: 'user interface'>
 
-	child hideAll
+	child hide
     ]
 
     isVisible [
@@ -126,24 +126,25 @@ Object subclass: GtkConcreteWidget [
         ^ self focusedWidget perform: aSymbol
     ]
 
-    onPress: aGtkWidget event: aGdkEvent [
+    onPress: gesture nPress: nPress x: x y: y [
         <category: 'button event'>
 
-        | menu aGdkButtonEvent |
-        aGdkButtonEvent := aGdkEvent castTo: GTK.GdkEventButton type.
-        aGdkButtonEvent button value = 3 ifFalse: [ ^ false ].
+        | menu |
         menu := popupMenu asPopupMenu.
         menu attachToWidget: self treeView detacher: nil.
-        menu popup: nil parentMenuItem: nil func: nil data: nil button: 3 activateTime: aGdkButtonEvent time value.
-        menu showAll.
-        ^ true
+        menu popup: nil parentMenuItem: nil func: nil data: nil button: 3 activateTime: 0.
+        menu show.
     ]
 
     connectToWhenPopupMenu: aMenuBuilder [
 	<category: 'user interface'>
 
+	| gesture |
 	popupMenu := aMenuBuilder.
-	^ self treeView connectSignal: 'button-press-event' to: self selector: #'onPress:event:'
+	gesture := GTK.GtkGestureClick new.
+	gesture setButton: 3.
+	gesture connectSignal: 'pressed' to: self selector: #'onPress:nPress:x:y:'.
+	self treeView addController: gesture
     ]
 
     grabFocus [

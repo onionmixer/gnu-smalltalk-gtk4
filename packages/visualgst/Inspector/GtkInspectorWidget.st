@@ -98,7 +98,7 @@ GtkConcreteWidget subclass: GtkInspectorWidget [
 
 	^ workspaceWidget := (GtkWorkspaceWidget new)
 			    initialize;
-			    showAll;
+			    show;
 			    yourself
     ]
 

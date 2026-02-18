@@ -89,7 +89,7 @@ GtkConcreteWidget subclass: GtkClassBrowserWidget [
 	^ classAndInstanceSide := (GTK.GtkNotebook new)
 	    appendPage: self buildInstanceBrowser tabLabel: (GTK.GtkLabel new: 'Instance');
 	    appendPage: self buildClassBrowser tabLabel: (GTK.GtkLabel new: 'Class');
-	    showAll;
+	    show;
 	    setCurrentPage: 0;
 	    connectSignal: 'switch-page' to: self selector: #'classInstanceSwitchOn:page:number:';
 	    yourself
@@ -100,7 +100,7 @@ GtkConcreteWidget subclass: GtkClassBrowserWidget [
 	^ (GTK.GtkNotebook new)
 	    appendPage: self buildCategoryAndClass tabLabel: (GTK.GtkLabel new: 'Class');
 	    appendPage: self buildHierarchy tabLabel: (GTK.GtkLabel new: 'Hierarchy');
-	    showAll;
+	    show;
 	    setCurrentPage: 0;
 	    connectSignal: 'switch-page' to: self selector: #'namespaceHierarchySwitchOn:page:number:';
 	    yourself
@@ -123,7 +123,7 @@ GtkConcreteWidget subclass: GtkClassBrowserWidget [
     buildCodeView [
 	<category: 'user interface'>
 
-	codeWidget := GtkSourceCodeWidget showAll 
+	codeWidget := GtkSourceCodeWidget show 
 			parentWindow: self parentWindow;
 			browser: self;
 			yourself.
@@ -134,7 +134,7 @@ GtkConcreteWidget subclass: GtkClassBrowserWidget [
     buildWidget: aClass whenSelectionChangedSend: aSymbol [
 	<category: 'user interface'>
 
-	^ aClass showAll
+	^ aClass show
                 whenSelectionChangedSend: aSymbol to: self;
                 yourself
     ]
@@ -182,7 +182,7 @@ GtkConcreteWidget subclass: GtkClassBrowserWidget [
 	^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationVertical)
 	    pack1: self buildBrowser resize: true shrink: false;
 	    pack2: self buildCodeView resize: true shrink: true ;
-	    showAll;
+	    show;
 	    yourself
     ]
 

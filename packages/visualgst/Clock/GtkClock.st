@@ -41,7 +41,7 @@ Smalltalk.Object subclass: GtkClock [
 
 	^ (self new)
 	    initialize;
-	    showAll;
+	    show;
 	    yourself
     ]
 
@@ -51,7 +51,7 @@ Smalltalk.Object subclass: GtkClock [
 	^ (self new)
 	    initialize;
 	    resize: aPoint;
-	    showAll;
+	    show;
 	    yourself
     ]
 
@@ -172,14 +172,13 @@ Smalltalk.Object subclass: GtkClock [
 
 	window := (GTK.GtkWindow new: GTK.Gtk gtkWindowToplevel).
 	window
-	    setAppPaintable: true;
 	    connectSignal: 'draw' to: self selector: #'draw:context:';
-	    connectSignal: 'delete-event' to: self selector: #'delete:event:';
+	    connectSignal: 'close-request' to: self selector: #'delete:';
 	    setDecorated: false.
 	radius := 100
     ]
 
-    delete: aGtkWidget event: aGdkEvent [
+    delete: aGtkWidget [
         <category: 'windows event'>
 
         self quit.
@@ -192,11 +191,11 @@ Smalltalk.Object subclass: GtkClock [
 	window resize: aPoint x height: aPoint y
     ]
 
-    showAll [
+    show [
 	| delay |
 
 	delay := Delay forSeconds: 1.
-	window showAll.
+	window show.
 	process := [ [ true ] whileTrue: [ window queueDraw. delay wait ] ] fork
     ]
 ]

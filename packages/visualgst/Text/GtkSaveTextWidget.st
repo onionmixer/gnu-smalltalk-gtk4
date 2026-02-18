@@ -56,9 +56,9 @@ GtkTextPluginWidget subclass: GtkSaveTextWidget [
 	<category: 'user interface'>
 
 	^ super hBox
-	    packStart: (label := GTK.GtkLabel new: '') expand: false fill: false padding: 2;
-	    packEnd: self buildAcceptButton expand: false fill: false padding: 0; 
-	    packEnd: self buildDropButton expand: false fill: false padding: 0;
+	    append: (label := GTK.GtkLabel new: '');
+	    append: self buildAcceptButton;
+	    append: self buildDropButton;
 	    yourself
     ]
 

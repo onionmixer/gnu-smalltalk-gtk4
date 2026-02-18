@@ -132,7 +132,7 @@ GtkTextWidget subclass: GtkSourceCodeWidget [
     packPluginsInto: vbox [
 	<category: 'user interface'>
         vbox
-            packStart: ((saveWidget := GtkSaveTextWidget on: self)  mainWidget) expand: false fill: false padding: 0.
+            append: ((saveWidget := GtkSaveTextWidget on: self)  mainWidget).
         super packPluginsInto: vbox
     ]
 
@@ -140,7 +140,7 @@ GtkTextWidget subclass: GtkSourceCodeWidget [
         <category: 'user interface'>
 
         saveWidget label: aString.
-	saveWidget showAll
+	saveWidget show
     ]
 
     postInitialize [
@@ -166,7 +166,7 @@ GtkTextWidget subclass: GtkSourceCodeWidget [
 	<category: 'buffer events'>
 
 	self clearUndo.
-        saveWidget hideAll.
+        saveWidget hide.
 	self buffer setText: self codeText
     ]
 
@@ -197,7 +197,7 @@ GtkTextWidget subclass: GtkSourceCodeWidget [
     codeSaved [
 	<category: 'accessing'>
 
-        saveWidget hideAll.
+        saveWidget hide.
 	self textSaved
     ]
 

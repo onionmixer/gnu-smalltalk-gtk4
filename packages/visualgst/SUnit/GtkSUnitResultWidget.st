@@ -44,9 +44,12 @@ GtkConcreteWidget subclass: GtkSUnitResult [
     buildTreeView [
         <category: 'user interface'>
 
-        resultTree := (GTK.GtkTreeView newWithTextColumn: self model title: 'Results')
-                            connectSignal: 'button-press-event' to: self selector: #'onPress:event:' userData: nil;
-                            yourself.
+	| gesture |
+        resultTree := GTK.GtkTreeView newWithTextColumn: self model title: 'Results'.
+	gesture := GTK.GtkGestureClick new.
+	gesture setButton: 3.
+	gesture connectSignal: 'pressed' to: self selector: #'onPress:nPress:x:y:'.
+	resultTree addController: gesture.
         ^ GTK.GtkScrolledWindow withChild: resultTree
     ]
 
@@ -94,17 +97,14 @@ GtkConcreteWidget subclass: GtkSUnitResult [
         aGtkMenu append: menuitem.
     ]
 
-    onPress: aGtkWidget event: aGdkEvent [
+    onPress: gesture nPress: nPress x: x y: y [
 	<category: 'events'>
-	| aGdkButtonEvent menu |
-        aGdkButtonEvent := aGdkEvent castTo: GTK.GdkEventButton type.
-        aGdkButtonEvent button value = 3 ifFalse: [ ^ false ].
+	| menu |
         menu := GTK.GtkMenu new.
-	self popupMenuOn: aGtkWidget menu: menu.
+	self popupMenuOn: resultTree menu: menu.
         menu attachToWidget: resultTree detacher: nil.
-        menu showAll.
-        menu popup: nil parentMenuItem: nil func: nil data: nil button: 3 activateTime: aGdkButtonEvent time value.
-        ^ true
+        menu show.
+        menu popup: nil parentMenuItem: nil func: nil data: nil button: 3 activateTime: 0.
     ]
 
     debugTest [

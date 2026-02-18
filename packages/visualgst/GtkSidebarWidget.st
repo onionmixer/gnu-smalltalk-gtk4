@@ -51,7 +51,7 @@ GtkConcreteWidget subclass: GtkSidebarWidget [
     postInitialize [
 	<category: 'initialization'>
 
-	self hideAll
+	self hide
     ]
 
     add: aGtkWidget labeled: aString [
@@ -71,15 +71,15 @@ GtkConcreteWidget subclass: GtkSidebarWidget [
     show: anIndex [
 	<category: 'notebook'>
 
-	activeWidget ifNotNil: [ :aWidget | aWidget hideAll ].
-	self mainWidget showAll.
+	activeWidget ifNotNil: [ :aWidget | aWidget hide ].
+	self mainWidget show.
 	self mainWidget setCurrentPage: anIndex - 1.
 	activeWidget := (widgets at: anIndex)
 					showAll;
 					yourself
     ]
 
-    showAll [
+    show [
 	<category: 'notebook'>
 
 	self mainWidget show
@@ -97,7 +97,7 @@ GtkConcreteWidget subclass: GtkSidebarWidget [
 	self hideMainPained
     ]
 
-    hideAll [
+    hide [
 	<category: 'notebook'>
 
 	self hideMainPained
@@ -106,7 +106,7 @@ GtkConcreteWidget subclass: GtkSidebarWidget [
     hideMainPained [
 	<category: 'notebook'>
 
-	self mainWidget hideAll
+	self mainWidget hide
     ]
 
     panedOrientation [

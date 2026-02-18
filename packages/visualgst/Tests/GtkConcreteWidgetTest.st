@@ -37,12 +37,12 @@ TestCase subclass: GtkConcreteWidgetTest [
 
     | show |
 
-    showAll [
+    show [
 
 	show := true
     ]
 
-    hideAll [
+    hide [
 
 	show := false
     ]
@@ -60,9 +60,9 @@ TestCase subclass: GtkConcreteWidgetTest [
 	self assert: widget parentWindow = #foo.
 	widget mainWidget: self.
 	self assert: widget mainWidget = self.
-	widget showAll.
+	widget show.
 	self assert: show.
-	widget hideAll.
+	widget hide.
 	self assert: show not.
 	self assert: widget isVisible not.
 	self should: [ widget grabFocus. true ].

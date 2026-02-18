@@ -68,7 +68,7 @@ GtkConcreteWidget subclass: GtkInspectorBrowserWidget [
 	^  (GTK.GtkNotebook new)
 	    appendPage: self buildInstanceBrowser tabLabel: (GTK.GtkLabel new: 'Instance');
 	    appendPage: self buildClassBrowser tabLabel: (GTK.GtkLabel new: 'Class');
-	    showAll;
+	    show;
 	    setCurrentPage: 0;
 	    connectSignal: 'switch-page' to: self selector: #'classInstanceSwitchOn:page:number:' userData: nil;
 	    yourself
@@ -88,7 +88,7 @@ GtkConcreteWidget subclass: GtkInspectorBrowserWidget [
     buildHierarchy [
 	<category: 'user interface'>
 
-	classHierarchyWidget := GtkClassHierarchyWidget showAll
+	classHierarchyWidget := GtkClassHierarchyWidget show
 				    whenSelectionChangedSend: #onClassHierarchyChanged to: self;
 				    yourself.
 
@@ -98,7 +98,7 @@ GtkConcreteWidget subclass: GtkInspectorBrowserWidget [
     buildClassMethodView [
 	<category: 'user interface'>
 
-	cMethodWidget := GtkMethodWidget showAll
+	cMethodWidget := GtkMethodWidget show
 			    whenSelectionChangedSend: #onClassSideMethodChanged to: self;
 			    yourself.
 
@@ -108,7 +108,7 @@ GtkConcreteWidget subclass: GtkInspectorBrowserWidget [
     buildInstanceMethodView [
         <category: 'user interface'>
 
-        iMethodWidget := GtkMethodWidget showAll 
+        iMethodWidget := GtkMethodWidget show 
                             whenSelectionChangedSend: #onInstanceSideMethodChanged to: self;
                             yourself.
 

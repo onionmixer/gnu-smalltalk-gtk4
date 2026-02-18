@@ -63,7 +63,7 @@ GtkConcreteWidget subclass: GtkTextPluginWidget [
         <category: 'user interface'>
 
         ^ (GTK.GtkBox new: GTK.Gtk gtkOrientationHorizontal spacing: 3)
-            packEnd: self buildCloseButton expand: false fill: false padding: 0;
+            append: self buildCloseButton;
             yourself
     ]
 
@@ -71,7 +71,7 @@ GtkConcreteWidget subclass: GtkTextPluginWidget [
 	<category: 'user interface'>
 
 	^ (GTK.GtkBox new: GTK.Gtk gtkOrientationVertical spacing: 3)
-	    packStart: self hBox expand: false fill: false padding: 0;
+	    append: self hBox;
 	    yourself
     ]
 

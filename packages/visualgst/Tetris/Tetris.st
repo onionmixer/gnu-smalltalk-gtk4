@@ -69,8 +69,10 @@ GtkMainWindow subclass: Tetris [
 
 	super postInitialize.
         canvasWidget grabFocus.
-	window
-	    connectSignal: 'key-press-event' to: self selector: #'keyPressedOn:keyEvent:'
+	| keyCtrl |
+	keyCtrl := GTK.GtkEventControllerKey new.
+	keyCtrl connectSignal: 'key-pressed' to: self selector: #'keyPressedOn:keyval:keycode:state:'.
+	window addController: keyCtrl
     ]
 
     onDelete [
@@ -177,18 +179,15 @@ GtkMainWindow subclass: Tetris [
         ^ true
     ]
 
-    keyPressedOn: aGtkWidget keyEvent: aGdkEventKey [
+    keyPressedOn: controller keyval: keyval keycode: keycode state: state [
 	<category: 'key event'>
 
-	| event |
 	movingBlocks ifFalse: [ ^ false ].
 
-	event := aGdkEventKey castTo: GTK.GdkEventKey type.
-
-	event keyval value = 65361 ifTrue: [ self movePieceLeft. ^ true ].
-	event keyval value = 65363 ifTrue: [ self movePieceRight. ^ true ].
-	event keyval value = 65362 ifTrue: [ self rotatePiece. ^ true ].
-	event keyval value = 65364 ifTrue: [ self dropPiece. ^ true ].
+	keyval = 65361 ifTrue: [ self movePieceLeft. ^ true ].
+	keyval = 65363 ifTrue: [ self movePieceRight. ^ true ].
+	keyval = 65362 ifTrue: [ self rotatePiece. ^ true ].
+	keyval = 65364 ifTrue: [ self dropPiece. ^ true ].
 
 	^ false
     ]
@@ -245,7 +244,7 @@ GtkMainWindow subclass: Tetris [
 	<category: 'game'>
 
 	process terminate.
-	window hideAll
+	window hide
     ]
 
     gameOver [

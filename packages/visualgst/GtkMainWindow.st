@@ -41,7 +41,7 @@ Smalltalk.Object subclass: GtkMainWindow [
 
 	^ (self new)
 	    initialize;
-	    showAll;
+	    show;
 	    postInitialize;
 	    yourself
     ]
@@ -52,7 +52,7 @@ Smalltalk.Object subclass: GtkMainWindow [
 	^ (self new)
 	    initialize;
 	    resize: aPoint;
-	    showAll;
+	    show;
 	    postInitialize;
 	    yourself
     ]
@@ -157,7 +157,7 @@ that are specific to this version of GNU Smalltalk.';
     close [
 	<category: 'events'>
 
-	window hideAll
+	window hide
     ]
 
     initialize [
@@ -201,13 +201,13 @@ that are specific to this version of GNU Smalltalk.';
 	<category: 'initialization'>
 
         window
-            connectSignal: 'delete-event' to: self selector: #'onDelete:event:'
+            connectSignal: 'close-request' to: self selector: #'onDelete:'
     ]
 
-    onDelete: aGtkWidget event: aGdkEvent [
+    onDelete: aGtkWidget [
 	<category: 'events'>
 
-        window hideAll.
+        window hide.
         ^ true
     ]
 
@@ -266,7 +266,7 @@ that are specific to this version of GNU Smalltalk.';
     appendWidget: aGtkWidget [
 	<category: 'toolbar'>
 
-	self appendToolItem: ((GTK.GtkToolItem new) add: aGtkWidget)
+	self appendToolItem: ((GTK.GtkToolItem new) setChild: aGtkWidget)
     ]
 
     resize: aPoint [
@@ -275,14 +275,14 @@ that are specific to this version of GNU Smalltalk.';
 	window resize: aPoint x height: aPoint y
     ]
 
-    showAll [
+    show [
 	{menuBar->false. toolBar->false. centralWidget->true. statusBar->false} do: [ :each |
-	    each key ifNotNil: [ self container 
-		packStart: each key expand: each value fill: true padding: 0 ] ].
+	    each key ifNotNil: [ self container
+		append: each key ] ].
 
-	window 
-	    add: self container;
-	    showAll
+	window
+	    setChild: self container;
+	    show
     ]
 
     focusedWidget [

@@ -54,20 +54,19 @@ Object subclass: AspectFrameExample [
 	    selector: #destroy:data:
 	    userData: nil.
 	window setTitle: 'Aspect Frame'.
-	window setBorderWidth: 10.
-	aspectFrame := GtkAspectFrame 
+	aspectFrame := GtkAspectFrame
 		    new: '2x1'
 		    xalign: 0.5
 		    yalign: 0.5
 		    ratio: 2
 		    obeyChild: false.
-	window add: aspectFrame.
+	window setChild: aspectFrame.
 
 	"We ask for a 200x200 drawing area, but we are forcing a 2x1 ratio so
 	 the AspectFrame will give us a 200x100 area."
 	drawingArea := GtkDrawingArea new.
 	drawingArea setSizeRequest: 200 height: 200.
-	aspectFrame add: drawingArea.
+	aspectFrame setChild: drawingArea.
 	drawingArea show.
 	aspectFrame show.
 	window show

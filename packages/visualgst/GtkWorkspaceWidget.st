@@ -51,7 +51,7 @@ GtkTextWidget subclass: GtkWorkspaceWidget [
     postInitialize [
         <category: 'initialize'>
 
-	variableWidget hideAll.
+	variableWidget hide.
 	super postInitialize
     ]
 
@@ -121,7 +121,7 @@ GtkTextWidget subclass: GtkWorkspaceWidget [
 	<category: 'smalltalk event'>
 
 	variableWidget mainWidget getVisible 
-		ifFalse: [ variableWidget showAll ]
-		ifTrue: [ variableWidget hideAll ].
+		ifFalse: [ variableWidget show ]
+		ifTrue: [ variableWidget hide ].
     ]
 ]

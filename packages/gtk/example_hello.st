@@ -58,8 +58,8 @@ Object subclass: HelloWorldExample [
 		    new: '
                 Push me and watch stdout!                ' , '
 '.
-	w add: b.
-	b add: l.
+	w setChild: b.
+	b setChild: l.
 	b show.
 	l show.
 	w setTitle: 'GTK+ bindings demo'.

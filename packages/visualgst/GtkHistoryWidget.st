@@ -59,9 +59,12 @@ GtkConcreteWidget subclass: GtkHistoryWidget [
     buildListView [
 	<category: 'user interface'>
 
-        widget := (GTK.GtkTreeView createListWithModel: {{GtkColumnTextType title: 'History'}})
-                            connectSignal: 'button-press-event' to: self selector: #'onPress:event:';
-                            yourself.
+	| gesture |
+        widget := GTK.GtkTreeView createListWithModel: {{GtkColumnTextType title: 'History'}}.
+	gesture := GTK.GtkGestureClick new.
+	gesture setButton: 3.
+	gesture connectSignal: 'pressed' to: self selector: #'onPress:nPress:x:y:'.
+	widget addController: gesture.
         widget getSelection setMode: GTK.Gtk gtkSelectionBrowse.
         widget getSelection connectSignal: 'changed' to: self selector: #onSelectionChanged.
         (model := GtkListModel on: widget getModel)
@@ -79,20 +82,17 @@ GtkConcreteWidget subclass: GtkHistoryWidget [
         widget selectNth: historyStack selectedIndex.
     ]
 
-    onPress: aGtkWidget event: aGdkEvent [
+    onPress: gesture nPress: nPress x: x y: y [
         <category: 'button event'>
 
-        | menu aGdkButtonEvent |
-        aGdkButtonEvent := aGdkEvent castTo: GTK.GdkEventButton type.
-        aGdkButtonEvent button value = 3 ifFalse: [ ^ false ].
+        | menu |
         menu := GTK.GtkMenu new.
         menu appendMenuItems: {{'Inspect a class'. self. #inspectClass}.
             {'Open in new tab'. self. #browseTabbedClass}.
             "{'Open in new window'. self. #browseClass}"}.
         menu attachToWidget: widget detacher: nil.
-        menu popup: nil parentMenuItem: nil func: nil data: nil button: 3 activateTime: aGdkButtonEvent time value.
-        menu showAll.
-        ^ true
+        menu popup: nil parentMenuItem: nil func: nil data: nil button: 3 activateTime: 0.
+        menu show.
     ]
 
     targetObject [

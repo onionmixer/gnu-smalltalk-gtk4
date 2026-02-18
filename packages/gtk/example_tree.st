@@ -67,22 +67,16 @@ Object subclass: TreeExample [
 	    to: self
 	    selector: #destroy:
 	    userData: nil.
-	window setBorderWidth: 10.
 	vbox := GtkBox new: Gtk gtkOrientationVertical spacing: 9.
-	vbox setBorderWidth: 2.
-	window add: vbox.
+	window setChild: vbox.
 	frame := GtkFrame new: nil.
-	vbox 
-	    packStart: frame
-	    expand: true
-	    fill: true
-	    padding: 0.
+	vbox append: frame.
 	scroll := GtkScrolledWindow new: nil vadjustment: nil.
-	frame add: scroll.
+	frame setChild: scroll.
 	scroll setPolicy: Gtk gtkPolicyAutomatic
 	    vscrollbarPolicy: Gtk gtkPolicyAutomatic.
 	treeView := GtkTreeView new.
-	scroll add: treeView.
+	scroll setChild: treeView.
 	treeView getSelection 
 	    connectSignal: 'changed'
 	    to: self
@@ -99,11 +93,7 @@ Object subclass: TreeExample [
 	    to: self
 	    selector: #closeClicked:
 	    userData: nil.
-	vbox 
-	    packStart: button
-	    expand: false
-	    fill: false
-	    padding: 0.
+	vbox append: button.
 
 	"typs := (CArrayCType elementType: CIntType numberOfElements: 3) new.
 	 typs
@@ -135,7 +125,7 @@ Object subclass: TreeExample [
 
 	"Display"
 	window setDefaultSize: 300 height: 500.
-	window showAll
+	window show
     ]
 
     topLevelNodes [

@@ -123,21 +123,15 @@ Object subclass: TicTacToe [
 	    to: self
 	    selector: #destroy:data:
 	    userData: nil.
-	window setBorderWidth: 10.
 	vbox := GtkBox new: Gtk gtkOrientationVertical spacing: 0.
-	vbox setBorderWidth: 2.
-	window add: vbox.
+	window setChild: vbox.
 	buttons := Array new: 9.
 	1 to: 7
 	    by: 3
 	    do: 
 		[:i | 
 		hbox := (GtkBox new: Gtk gtkOrientationHorizontal spacing: 0) setHomogeneous: true; yourself.
-		vbox 
-		    packStart: hbox
-		    expand: true
-		    fill: true
-		    padding: 0.
+		vbox append: hbox.
 		i to: i + 2
 		    do: 
 			[:j | 
@@ -147,30 +141,18 @@ Object subclass: TicTacToe [
 			    to: self
 			    selector: #clicked:data:
 			    userData: j.
-			hbox 
-			    packStart: button
-			    expand: true
-			    fill: true
-			    padding: 0]].
+			hbox append: button]].
 	button := GtkButton newWithLabel: 'Reset'.
 	button 
 	    connectSignal: 'clicked'
 	    to: self
 	    selector: #resetClicked:data:
 	    userData: nil.
-	vbox 
-	    packEnd: button
-	    expand: false
-	    fill: false
-	    padding: 0.
-	vbox 
-	    packEnd: (GtkSeparator new: Gtk gtkOrientationHorizontal)
-	    expand: false
-	    fill: false
-	    padding: 5.
+	vbox append: button.
+	vbox append: (GtkSeparator new: Gtk gtkOrientationHorizontal).
 	self reset.
 	window setDefaultSize: 100 height: 130.
-	window showAll
+	window show
     ]
 ]
 
