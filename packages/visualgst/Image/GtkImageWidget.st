@@ -61,8 +61,8 @@ GtkConcreteWidget subclass: GtkImageWidget [
 			    yourself.
         ^ (GTK.GtkBox new: GTK.Gtk gtkOrientationHorizontal spacing: 3)
             setHomogeneous: true;
-            add: (GTK.GtkLabel new: 'Class or method :');
-            add: searchEntry;
+            append: (GTK.GtkLabel new: 'Class or method :');
+            append: searchEntry;
             yourself
     ]
 

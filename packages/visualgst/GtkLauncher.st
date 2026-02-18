@@ -354,7 +354,7 @@ GtkVisualGSTTool subclass: GtkLauncher [
 	outputs := GtkNotebookWidget new
 				initialize;
 				parentWindow: window;
-				showAll;
+				show;
 				yourself.
 	^ outputs
 	    addPermanentWidget: (transcriptWidget := self buildTranscriptWidget) labeled: 'Transcript';

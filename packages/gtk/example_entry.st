@@ -68,7 +68,7 @@ Object subclass: EntryExample [
     open [
 	<category: 'layout'>
 	| vbox hbox button check pos |
-	window := GtkWindow new: Gtk gtkWindowToplevel.
+	window := GtkWindow new.
 	window setSizeRequest: 200 height: 100.
 	window setTitle: 'GTK Entry'.
 	window 

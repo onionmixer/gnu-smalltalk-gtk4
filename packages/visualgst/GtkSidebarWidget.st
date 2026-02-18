@@ -75,7 +75,7 @@ GtkConcreteWidget subclass: GtkSidebarWidget [
 	self mainWidget show.
 	self mainWidget setCurrentPage: anIndex - 1.
 	activeWidget := (widgets at: anIndex)
-					showAll;
+					show;
 					yourself
     ]
 

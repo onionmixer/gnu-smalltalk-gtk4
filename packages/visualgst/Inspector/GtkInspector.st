@@ -102,8 +102,12 @@ GtkBrowsingTool subclass: GtkInspector [
 	<category: 'user interface'>
 
 	^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationVertical)
-            pack1: self buildInspectorWidget mainWidget resize: true shrink: false;
-            pack2: self buildWorkspaceWidget mainWidget resize: false shrink: true;
+            setStartChild: self buildInspectorWidget mainWidget;
+            setResizeStartChild: true;
+            setShrinkStartChild: false;
+            setEndChild: self buildWorkspaceWidget mainWidget;
+            setResizeEndChild: false;
+            setShrinkEndChild: true;
             yourself
     ]
 
@@ -114,7 +118,7 @@ GtkBrowsingTool subclass: GtkInspector [
 				parentWindow: window;
 				initialize;
 				inspector: self;
-				showAll;
+				show;
 				yourself
     ]
 
@@ -124,7 +128,7 @@ GtkBrowsingTool subclass: GtkInspector [
 	^ workspaceWidget := (GtkInspectorSourceWidget new)
 				parentWindow: window;
 				initialize;
-				showAll;
+				show;
 				yourself
     ]
 
@@ -134,7 +138,7 @@ GtkBrowsingTool subclass: GtkInspector [
 	^ browserWidget := (GtkInspectorBrowserWidget new)
 				parentWindow: window;
 				initialize;
-				showAll;
+				show;
 				yourself
     ]
 

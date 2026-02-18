@@ -106,8 +106,12 @@ GtkConcreteWidget subclass: GtkInspectorWidget [
         <category: 'user interface'>
    
 	^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationHorizontal)
-	    pack1: self buildTreeWidget resize: true shrink: false;
-            pack2: self buildWorkspaceWidget mainWidget resize: true shrink: false;
+	    setStartChild: self buildTreeWidget;
+	    setResizeStartChild: true;
+	    setShrinkStartChild: false;
+            setEndChild: self buildWorkspaceWidget mainWidget;
+            setResizeEndChild: true;
+            setShrinkEndChild: false;
             yourself
     ]
 

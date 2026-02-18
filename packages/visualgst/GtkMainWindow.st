@@ -178,7 +178,7 @@ that are specific to this version of GNU Smalltalk.';
     initialize [
 	<category: 'intialization'>
 	
-	window := GTK.GtkWindow	new: GTK.Gtk gtkWindowToplevel.
+	window := GTK.GtkWindow new.
 	window addController: self accelGroup.
         self
             title: self windowTitle;

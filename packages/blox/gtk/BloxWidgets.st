@@ -3391,7 +3391,7 @@ it wasn''t for me... )):->'>
 
     create [
 	<category: 'private'>
-	self container: (GTK.GtkWindow new: GTK.Gtk gtkWindowToplevel).
+	self container: GTK.GtkWindow new.
 	self container 
 	    connectSignal: 'close-request'
 	    to: self

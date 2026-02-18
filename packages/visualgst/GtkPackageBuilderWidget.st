@@ -48,16 +48,16 @@ GtkConcreteWidget subclass: GtkPackageBuilderWidget [
         <category: 'user interface'>
 
         ^ (GTK.GtkBox new: GTK.Gtk gtkOrientationVertical spacing: 3)
-            add: self buildPackageNameEntry mainWidget;
-	    add: self buildNamespaceEntry mainWidget;
-            add: self buildPackageEntry mainWidget;
-	    add: self buildPrereq;
-	    add: self buildProvideEntry;
-	    add: self buildTestsEntry mainWidget;
-	    add: self buildClassCategoryEntry mainWidget;
-	    add: self buildClassCategory;
-	    add: self buildRessourcesEntry;
-	    add: self buildButtons;
+            append: self buildPackageNameEntry mainWidget;
+	    append: self buildNamespaceEntry mainWidget;
+            append: self buildPackageEntry mainWidget;
+	    append: self buildPrereq;
+	    append: self buildProvideEntry;
+	    append: self buildTestsEntry mainWidget;
+	    append: self buildClassCategoryEntry mainWidget;
+	    append: self buildClassCategory;
+	    append: self buildRessourcesEntry;
+	    append: self buildButtons;
             yourself
     ]
 

@@ -111,7 +111,7 @@ GtkTextWidget subclass: GtkSourceCodeWidget [
 	<category: 'user interface'>
 	
         ^ (GTK.GtkFrame new: 'Code')
-            add: super buildWidget;
+            setChild: super buildWidget;
             yourself
     ]
 

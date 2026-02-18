@@ -60,7 +60,7 @@ Object subclass: TreeExample [
 	"Visual components"
 
 	| vbox frame scroll col rend typs |
-	window := GtkWindow new: Gtk gtkWindowToplevel.
+	window := GtkWindow new.
 	window setTitle: 'Tree Example'.
 	window 
 	    connectSignal: 'destroy'

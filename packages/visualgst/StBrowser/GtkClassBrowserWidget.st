@@ -180,8 +180,12 @@ GtkConcreteWidget subclass: GtkClassBrowserWidget [
         <category: 'user interface'>
 
 	^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationVertical)
-	    pack1: self buildBrowser resize: true shrink: false;
-	    pack2: self buildCodeView resize: true shrink: true ;
+	    setStartChild: self buildBrowser;
+	    setResizeStartChild: true;
+	    setShrinkStartChild: false;
+	    setEndChild: self buildCodeView;
+	    setResizeEndChild: true;
+	    setShrinkEndChild: true;
 	    show;
 	    yourself
     ]

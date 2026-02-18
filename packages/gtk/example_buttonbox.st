@@ -47,7 +47,7 @@ Object subclass: ButtonBoxExample [
     open [
 	<category: 'layout'>
 	| window mainVBox hbox vbox frameHorz frameVert |
-	window := GtkWindow new: Gtk gtkWindowToplevel.
+	window := GtkWindow new.
 	window setTitle: 'Button Boxes'.
 	window 
 	    connectSignal: 'destroy'

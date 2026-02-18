@@ -47,7 +47,7 @@ Object subclass: AspectFrameExample [
     open [
 	<category: 'layout'>
 	| window aspectFrame drawingArea |
-	window := GtkWindow new: Gtk gtkWindowToplevel.
+	window := GtkWindow new.
 	window 
 	    connectSignal: 'destroy'
 	    to: self

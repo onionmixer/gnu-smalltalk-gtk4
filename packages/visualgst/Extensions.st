@@ -335,10 +335,10 @@ GTK.GtkButton class extend [
         <category: 'instance creation'>
 
         | image |
-        image := GTK.GtkImage newFromIconName: anIconName size: GTK.Gtk gtkIconSizeMenu.
+        image := GTK.GtkImage newFromIconName: anIconName.
         ^ (GTK.GtkButton new)
-                setImage: image;
-                setRelief: GTK.Gtk gtkReliefNone;
+                setChild: image;
+                addCssClass: 'flat';
                 yourself
     ]
 
@@ -666,19 +666,29 @@ GTK.GtkPaned class extend [
 
     addAll: anArray from: anInteger [
 
-        ^ anArray size - anInteger = 0 
+        ^ anArray size - anInteger = 0
                 ifTrue: [ self new
-                                pack1: (anArray at: anInteger) resize: true shrink: true;
+                                setStartChild: (anArray at: anInteger);
+                                setResizeStartChild: true;
+                                setShrinkStartChild: true;
                                 yourself ]
-                ifFalse: [ 
-                    anArray size - anInteger > 1 ifTrue: [ 
+                ifFalse: [
+                    anArray size - anInteger > 1 ifTrue: [
 					    self new
-                                                    pack1: (anArray at: anInteger) resize: true shrink: true;
-                                                    pack2: (self addAll: anArray from: anInteger + 1) resize: true shrink: false;
+                                                    setStartChild: (anArray at: anInteger);
+                                                    setResizeStartChild: true;
+                                                    setShrinkStartChild: true;
+                                                    setEndChild: (self addAll: anArray from: anInteger + 1);
+                                                    setResizeEndChild: true;
+                                                    setShrinkEndChild: false;
                                                     yourself ]
                                     ifFalse: [ self new
-                                                    pack1: (anArray at: anInteger) resize: true shrink: true;
-                                                    pack2: (anArray at: anInteger + 1) resize: true shrink: false;
+                                                    setStartChild: (anArray at: anInteger);
+                                                    setResizeStartChild: true;
+                                                    setShrinkStartChild: true;
+                                                    setEndChild: (anArray at: anInteger + 1);
+                                                    setResizeEndChild: true;
+                                                    setShrinkEndChild: false;
                                                     yourself ] ]
     ]
 

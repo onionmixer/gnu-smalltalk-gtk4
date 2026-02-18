@@ -95,8 +95,12 @@ GtkBrowsingTool subclass: GtkSUnit [
 	<category: 'user interface'>
 
 	^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationHorizontal)
-	    pack1: self buildNamespaceWidget resize: true shrink: false;
-	    pack2: self buildClassWidget resize: true shrink: false;
+	    setStartChild: self buildNamespaceWidget;
+	    setResizeStartChild: true;
+	    setShrinkStartChild: false;
+	    setEndChild: self buildClassWidget;
+	    setResizeEndChild: true;
+	    setShrinkEndChild: false;
 	    yourself
     ]
 
@@ -104,8 +108,12 @@ GtkBrowsingTool subclass: GtkSUnit [
 	<category: 'user interface'>
 
 	^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationHorizontal)
-	    pack1: self buildNamespaceAndClassWidget resize: true shrink: false;
-	    pack2: self buildMethodWidget resize: true shrink: false;
+	    setStartChild: self buildNamespaceAndClassWidget;
+	    setResizeStartChild: true;
+	    setShrinkStartChild: false;
+	    setEndChild: self buildMethodWidget;
+	    setResizeEndChild: true;
+	    setShrinkEndChild: false;
 	    yourself
     ]
 
@@ -113,8 +121,12 @@ GtkBrowsingTool subclass: GtkSUnit [
 	<category: 'user interface'>
 
 	^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationVertical)
-	    pack1: self buildNamespaceAndClassAndMethodWidget resize: true shrink: false;
-	    pack2: self buildSourceCodeWidget resize: true shrink: false;
+	    setStartChild: self buildNamespaceAndClassAndMethodWidget;
+	    setResizeStartChild: true;
+	    setShrinkStartChild: false;
+	    setEndChild: self buildSourceCodeWidget;
+	    setResizeEndChild: true;
+	    setShrinkEndChild: false;
 	    yourself
     ]
 
@@ -132,8 +144,12 @@ GtkBrowsingTool subclass: GtkSUnit [
         <category: 'intialize-release'>
 
 	^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationVertical)
-	    pack1: self buildMiniBrowser resize: true shrink: false;
-	    pack2: self buildResultWidget resize: true shrink: false;
+	    setStartChild: self buildMiniBrowser;
+	    setResizeStartChild: true;
+	    setShrinkStartChild: false;
+	    setEndChild: self buildResultWidget;
+	    setResizeEndChild: true;
+	    setShrinkEndChild: false;
 	    yourself
     ]
 

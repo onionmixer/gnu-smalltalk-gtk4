@@ -52,7 +52,7 @@ Object subclass: HelloWorldExample [
     open [
 	<category: 'layout'>
 	| w b l |
-	w := GtkWindow new: Gtk gtkWindowToplevel.
+	w := GtkWindow new.
 	b := GtkButton new.
 	l := GtkLabel 
 		    new: '

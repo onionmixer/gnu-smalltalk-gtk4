@@ -58,8 +58,8 @@ GtkConcreteWidget subclass: GtkEntryWidget [
         entry := GTK.GtkEntry new.
         ^ (GTK.GtkBox new: GTK.Gtk gtkOrientationHorizontal spacing: 3)
 			setHomogeneous: true;
-			add: (GTK.GtkLabel new: label);
-			add: entry;
+			append: (GTK.GtkLabel new: label);
+			append: entry;
 			yourself
     ]
 

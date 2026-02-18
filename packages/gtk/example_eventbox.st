@@ -53,7 +53,7 @@ Object subclass: EventBoxExample [
     open [
 	<category: 'layout'>
 	| label gesture |
-	window := GtkWindow new: Gtk gtkWindowToplevel.
+	window := GtkWindow new.
 	window
 	    connectSignal: 'destroy'
 	    to: self

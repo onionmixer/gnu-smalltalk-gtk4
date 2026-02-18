@@ -116,7 +116,7 @@ Object subclass: TicTacToe [
     open [
 	<category: 'window layout'>
 	| button vbox hbox |
-	window := GtkWindow new: Gtk gtkWindowToplevel.
+	window := GtkWindow new.
 	window setTitle: 'Tic-tac-toe'.
 	window 
 	    connectSignal: 'destroy'

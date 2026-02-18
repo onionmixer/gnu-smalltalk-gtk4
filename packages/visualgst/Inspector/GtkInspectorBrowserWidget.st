@@ -79,7 +79,7 @@ GtkConcreteWidget subclass: GtkInspectorBrowserWidget [
 
 	codeWidget := (GtkSourceCodeWidget parentWindow: self parentWindow)
 			browser: self;
-			showAll;
+			show;
 			yourself.
     
 	^ codeWidget mainWidget

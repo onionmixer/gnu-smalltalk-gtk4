@@ -170,7 +170,7 @@ Smalltalk.Object subclass: GtkClock [
     initialize [
 	<category: 'intialization'>
 
-	window := (GTK.GtkWindow new: GTK.Gtk gtkWindowToplevel).
+	window := GTK.GtkWindow new.
 	window
 	    connectSignal: 'draw' to: self selector: #'draw:context:';
 	    connectSignal: 'close-request' to: self selector: #'delete:';

@@ -47,7 +47,7 @@ Object subclass: ArrowExample [
     open [
 	<category: 'layout'>
 	| window button box |
-	window := GtkWindow new: Gtk gtkWindowToplevel.
+	window := GtkWindow new.
 	window setTitle: 'Arrow Buttons'.
 	window 
 	    connectSignal: 'destroy'
@@ -79,7 +79,7 @@ GTK.GtkButton class extend [
 	<category: 'creating arrow buttons'>
 	| button image |
 	button := self new.
-	image := GtkImage newFromIconName: iconName size: Gtk gtkIconSizeButton.
+	image := GtkImage newFromIconName: iconName.
 	button setChild: image.
 	button show.
 	image show.

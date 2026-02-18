@@ -93,15 +93,15 @@ GtkConcreteWidget subclass: GtkNotebookWidget [
         <category: 'user interface'>
 
         | image close |
-        image := GTK.GtkImage newFromIconName: anIconName size: GTK.Gtk gtkIconSizeMenu.
+        image := GTK.GtkImage newFromIconName: anIconName.
         close := (GTK.GtkButton new)
-                    setImage: image;
-                    setRelief: GTK.Gtk gtkReliefNone;
+                    setChild: image;
+                    addCssClass: 'flat';
                     connectSignal: 'pressed' to: self selector: #'closeIt:at:' userData: aSmallInteger;
                     yourself.
         ^ (GTK.GtkBox new: GTK.Gtk gtkOrientationHorizontal spacing: 0)
-            add: (labels add: (GTK.GtkLabel new: aString));
-            add: close;
+            append: (labels add: (GTK.GtkLabel new: aString));
+            append: close;
             show;
             yourself
     ]
