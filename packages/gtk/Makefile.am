@@ -78,7 +78,7 @@ libs.def: Makefile
 	    -L*) \
 	      j=`echo $$i | sed 's,^-L,,'` ; \
 	      echo "_gtk_vm_proxy->dlAddSearchDir(\"$$j\");" ;; \
-	    -lG*|-lg*|-lATK*|-latk*|-lPango*|-lpango*) \
+	    -lG*|-lg*|-lATK*|-latk*|-lPango*|-lpango*|-lgtk*) \
 	      j=`echo $$i | sed 's,^-l,lib,'` ; \
 	      echo "_gtk_vm_proxy->dlOpen(\"$$j\", false);" ;; \
 	    *) ;; \
@@ -105,7 +105,7 @@ order: mkorder.awk Makefile $(LOCAL_FILES)
 	$(AWK) \
 	  -vPKG_CONFIG='$(PKG_CONFIG)' \
 	  -v_prefixes='g atk pango' \
-	  -v_libs="gobject-2.0 gdk-2.0 gdk-pixbuf-2.0 pango gtk+-2.0 atk" \
+	  -v_libs="gobject-2.0 gdk-3.0 gdk-pixbuf-2.0 pango gtk+-3.0 atk" \
 	  -v_files="$(GTK_FILES) $(LOCAL_FILES)" -f $(srcdir)/mkorder.awk \
 	  | while read i; do \
 	    case "$$i" in \

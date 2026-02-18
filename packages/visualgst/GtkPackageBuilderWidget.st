@@ -47,7 +47,7 @@ GtkConcreteWidget subclass: GtkPackageBuilderWidget [
     buildMainWidget [
         <category: 'user interface'>
 
-        ^ (GTK.GtkVBox new: false spacing: 3)
+        ^ (GTK.GtkBox new: GTK.Gtk gtkOrientationVertical spacing: 3)
             add: self buildPackageNameEntry mainWidget;
 	    add: self buildNamespaceEntry mainWidget;
             add: self buildPackageEntry mainWidget;
@@ -125,18 +125,18 @@ GtkConcreteWidget subclass: GtkPackageBuilderWidget [
     buildPrereq [
 
         | hbox vbox add remove |
-        hbox := GTK.GtkHBox new: false spacing: 0.
+        hbox := GTK.GtkBox new: GTK.Gtk gtkOrientationHorizontal spacing: 0.
 
         hbox packStart: self buildPrereqEntry expand: true fill: true padding: 3.
-        add := GTK.GtkButton createButton: GTK.Gtk gtkStockAdd.
+        add := GTK.GtkButton createButton: 'list-add-symbolic'.
         add
             setTooltipText: 'Add a file into the package';
             connectSignal: 'clicked' to: self selector: #addPrereq.
 
-        vbox := GTK.GtkVBox new: false spacing: 0.
+        vbox := GTK.GtkBox new: GTK.Gtk gtkOrientationVertical spacing: 0.
         vbox packStart: add expand: false fill: true padding: 3.
 
-        remove := GTK.GtkButton createButton: GTK.Gtk gtkStockRemove.
+        remove := GTK.GtkButton createButton: 'list-remove-symbolic'.
         remove
             setTooltipText: 'Remove the selected file from the list'.
         vbox packStart: remove expand: false fill: true padding: 3.
@@ -185,19 +185,19 @@ GtkConcreteWidget subclass: GtkPackageBuilderWidget [
     buildClassCategory [
 
 	| hbox vbox add remove |
-	hbox := GTK.GtkHBox new: false spacing: 0.
-	
+	hbox := GTK.GtkBox new: GTK.Gtk gtkOrientationHorizontal spacing: 0.
+
 	hbox packStart: self buildFilesEntry expand: true fill: true padding: 3.
-        add := GTK.GtkButton createButton: GTK.Gtk gtkStockAdd.
+        add := GTK.GtkButton createButton: 'list-add-symbolic'.
         add
 	    setTooltipText: 'Add a file into the package';
             connectSignal: 'clicked' to: self selector: #addCategory.
 
-	vbox := GTK.GtkVBox new: false spacing: 0.
+	vbox := GTK.GtkBox new: GTK.Gtk gtkOrientationVertical spacing: 0.
         vbox packStart: add expand: false fill: true padding: 3.
 
-        remove := GTK.GtkButton createButton: GTK.Gtk gtkStockRemove.
-	remove 
+        remove := GTK.GtkButton createButton: 'list-remove-symbolic'.
+	remove
 	    setTooltipText: 'Remove the selected file from the list'.
         vbox packStart: remove expand: false fill: true padding: 3.
         hbox packStart: vbox expand: false fill: true padding: 3.
@@ -222,16 +222,16 @@ GtkConcreteWidget subclass: GtkPackageBuilderWidget [
         <category: 'user interface'>
 
         | hbox add cancel |
-        hbox := GTK.GtkHBox new: false spacing: 0.
+        hbox := GTK.GtkBox new: GTK.Gtk gtkOrientationHorizontal spacing: 0.
 
-        add := GTK.GtkButton createButton: GTK.Gtk gtkStockAdd.
+        add := GTK.GtkButton createButton: 'list-add-symbolic'.
         add
             setTooltipText: 'Save the package';
             connectSignal: 'clicked' to: self selector: #buildPackage.
 
         hbox packStart: add expand: false fill: true padding: 3.
 
-        cancel := GTK.GtkButton createButton: GTK.Gtk gtkStockRemove.
+        cancel := GTK.GtkButton createButton: 'list-remove-symbolic'.
         cancel
             setTooltipText: 'Cancel'.
         hbox packStart: cancel expand: false fill: true padding: 3.

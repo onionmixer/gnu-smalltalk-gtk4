@@ -49,7 +49,7 @@ Command subclass: CopyEditCommand [
 
     stockIcon [
 
-	^ 'gtk-copy'
+	^ 'edit-copy-symbolic'
     ]
 
     execute [

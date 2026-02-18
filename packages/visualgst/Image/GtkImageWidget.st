@@ -47,7 +47,7 @@ GtkConcreteWidget subclass: GtkImageWidget [
     buildMainWidget [
         <category: 'user interface'>
 
-        ^ GTK.GtkVPaned new
+        ^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationVertical)
             add1: self buildFinderEntry;
             add2: self buildClassAndMethodList;
             yourself
@@ -59,7 +59,8 @@ GtkConcreteWidget subclass: GtkImageWidget [
         searchEntry := GTK.GtkEntry new
 			    connectSignal: 'activate' to: self selector: #searchValidate;
 			    yourself.
-        ^ (GTK.GtkHBox new: true spacing: 3)
+        ^ (GTK.GtkBox new: GTK.Gtk gtkOrientationHorizontal spacing: 3)
+            setHomogeneous: true;
             add: (GTK.GtkLabel new: 'Class or method :');
             add: searchEntry;
             yourself

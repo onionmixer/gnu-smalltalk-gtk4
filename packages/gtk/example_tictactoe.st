@@ -124,7 +124,7 @@ Object subclass: TicTacToe [
 	    selector: #destroy:data:
 	    userData: nil.
 	window setBorderWidth: 10.
-	vbox := GtkVBox new: false spacing: 0.
+	vbox := GtkBox new: Gtk gtkOrientationVertical spacing: 0.
 	vbox setBorderWidth: 2.
 	window add: vbox.
 	buttons := Array new: 9.
@@ -132,7 +132,7 @@ Object subclass: TicTacToe [
 	    by: 3
 	    do: 
 		[:i | 
-		hbox := GtkHBox new: true spacing: 0.
+		hbox := (GtkBox new: Gtk gtkOrientationHorizontal spacing: 0) setHomogeneous: true; yourself.
 		vbox 
 		    packStart: hbox
 		    expand: true
@@ -164,7 +164,7 @@ Object subclass: TicTacToe [
 	    fill: false
 	    padding: 0.
 	vbox 
-	    packEnd: GtkHSeparator new
+	    packEnd: (GtkSeparator new: Gtk gtkOrientationHorizontal)
 	    expand: false
 	    fill: false
 	    padding: 5.

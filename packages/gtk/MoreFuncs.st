@@ -28,54 +28,26 @@ GtkAccelGroup extend [
 ]
 
 
-"These have a weird name in C."
+"GtkObject signals replaced with GObject signal API for GTK3."
 
-GtkObject extend [
-    signalEmit: signal args: argsArray [
-	<category: 'C call-outs'>
-	<cCall: 'gtk_signal_emit' returning: #void
-	args: #(#self #int #variadic)>
-	
-    ]
-
+GLib.GObject extend [
     signalEmitByName: signal args: argsArray [
 	<category: 'C call-outs'>
-	<cCall: 'gtk_signal_emit_by_name' returning: #void
+	<cCall: 'g_signal_emit_by_name' returning: #void
 	args: #(#self #string #variadic)>
-	
-    ]
-
-    signalNEmissions: signal [
-	<category: 'C call-outs'>
-	<cCall: 'gtk_signal_n_emissions' returning: #int
-	args: #(#self #int)>
-	
-    ]
-
-    signalNEmissionsByName: signal [
-	<category: 'C call-outs'>
-	<cCall: 'gtk_signal_n_emissions_by_name' returning: #int
-	args: #(#self #string)>
-	
-    ]
-
-    signalEmitStop: signal [
-	<category: 'C call-outs'>
-	<cCall: 'gtk_signal_emit_stop' returning: #void
-	args: #(#self #int)>
-	
     ]
 
     signalEmitStopByName: signal [
-	<category: 'C call-outs'>
-	<cCall: 'gtk_signal_emit_stop_by_name' returning: #void
-	args: #(#self #string)>
-	
+	"Stop the current emission of the named signal."
+	<category: 'signals'>
+	| signalId detail |
+	signalId := GLib.GObject signalLookup: signal itype: (GLib.GType type: self class).
+	signalId = 0 ifFalse: [
+	    GLib.GObject signalStopEmission: self signalId: signalId detail: 0 ]
     ]
-
 ]
 
-GTK.GdkDrawable extend [
+GTK.GdkWindow extend [
 
     cairoCreate [
         <category: 'C call-outs'>

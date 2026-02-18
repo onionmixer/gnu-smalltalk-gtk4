@@ -66,22 +66,22 @@ GtkConcreteWidget subclass: GtkClassBrowserWidget [
 
     buildBrowser [
 
-	^ GTK.GtkHPaned addAll: {self buildCategoryClassesAndHierarchy. self buildProtocolAndMethod}
+	^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationHorizontal) addAll: {self buildCategoryClassesAndHierarchy. self buildProtocolAndMethod}
     ]
 
     buildCategoryAndClass [
 
-	^ GTK.GtkHPaned addAll: {self buildNamespaceView. self buildClassView}
+	^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationHorizontal) addAll: {self buildNamespaceView. self buildClassView}
     ]
 
     buildClassBrowser [
 
-	^ GTK.GtkHPaned addAll: {self buildClassCategoryView. self buildClassMethodView}
+	^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationHorizontal) addAll: {self buildClassCategoryView. self buildClassMethodView}
     ]
 
     buildInstanceBrowser [
 
-	^ GTK.GtkHPaned addAll: {self buildInstanceCategoryView. self buildInstanceMethodView}
+	^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationHorizontal) addAll: {self buildInstanceCategoryView. self buildInstanceMethodView}
     ]
 
     buildProtocolAndMethod [
@@ -179,7 +179,7 @@ GtkConcreteWidget subclass: GtkClassBrowserWidget [
     buildBrowserPaned [
         <category: 'user interface'>
 
-	^ GTK.GtkVPaned new
+	^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationVertical)
 	    pack1: self buildBrowser resize: true shrink: false;
 	    pack2: self buildCodeView resize: true shrink: true ;
 	    showAll;

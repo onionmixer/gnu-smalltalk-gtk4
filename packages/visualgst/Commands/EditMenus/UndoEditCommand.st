@@ -49,7 +49,7 @@ Command subclass: UndoEditCommand [
 
     stockIcon [
 
-	^ 'gtk-undo'
+	^ 'edit-undo-symbolic'
     ]
 
     execute [

@@ -56,7 +56,6 @@
 #define __GTK_PLACER_H__
 
 
-#include <gdk/gdk.h>
 #include <gtk/gtk.h>
 
 
@@ -132,9 +131,8 @@ void       gtk_placer_resize_rel       (GtkPlacer      *placer,
 					gint		rel_width,
 					gint		rel_height);
 void       gtk_placer_set_has_window   (GtkPlacer      *placer,
-					gboolean        has_window);
+					gboolean	has_window);
 gboolean   gtk_placer_get_has_window   (GtkPlacer      *placer);
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

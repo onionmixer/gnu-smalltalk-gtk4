@@ -63,14 +63,14 @@ GtkConcreteWidget subclass: GtkNotebookWidget [
     addWidget: aWidget labeled: aString [
 	<category: 'user interface'>
 
-	self addWidget: aWidget labelWidget: (self buildLabelWidget: aString withIcon: GTK.Gtk gtkStockClose at: aWidget)
+	self addWidget: aWidget labelWidget: (self buildLabelWidget: aString withIcon: 'window-close-symbolic' at: aWidget)
     ]
 
 
     updateWidget: aWidget withLabel: aString [
 	<category: 'user interface'>
 
-	notebook setTabLabel: aWidget mainWidget tabLabel: (self buildLabelWidget: aString withIcon: GTK.Gtk gtkStockClose at: aWidget)
+	notebook setTabLabel: aWidget mainWidget tabLabel: (self buildLabelWidget: aString withIcon: 'window-close-symbolic' at: aWidget)
     ]
 
     addPermanentWidget: aWidget labeled: aString [
@@ -89,17 +89,17 @@ GtkConcreteWidget subclass: GtkNotebookWidget [
         pages size > 1 ifTrue: [ notebook setShowTabs: true ]
     ]
 
-    buildLabelWidget: aString withIcon: aStockString at: aSmallInteger [
+    buildLabelWidget: aString withIcon: anIconName at: aSmallInteger [
         <category: 'user interface'>
 
         | image close |
-        image := GTK.GtkImage newFromStock: aStockString size: GTK.Gtk gtkIconSizeMenu.
+        image := GTK.GtkImage newFromIconName: anIconName size: GTK.Gtk gtkIconSizeMenu.
         close := (GTK.GtkButton new)
                     setImage: image;
                     setRelief: GTK.Gtk gtkReliefNone;
                     connectSignal: 'pressed' to: self selector: #'closeIt:at:' userData: aSmallInteger;
                     yourself.
-        ^ (GTK.GtkHBox new: false spacing: 0)
+        ^ (GTK.GtkBox new: GTK.Gtk gtkOrientationHorizontal spacing: 0)
             add: (labels add: (GTK.GtkLabel new: aString));
             add: close;
             showAll;

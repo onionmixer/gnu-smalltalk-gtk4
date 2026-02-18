@@ -56,7 +56,8 @@ GtkConcreteWidget subclass: GtkEntryWidget [
         <category: 'user interface'>
 
         entry := GTK.GtkEntry new.
-        ^ (GTK.GtkHBox new: true spacing: 3)
+        ^ (GTK.GtkBox new: GTK.Gtk gtkOrientationHorizontal spacing: 3)
+			setHomogeneous: true;
 			add: (GTK.GtkLabel new: label);
 			add: entry;
 			yourself

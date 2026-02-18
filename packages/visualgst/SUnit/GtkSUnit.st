@@ -93,7 +93,7 @@ GtkBrowsingTool subclass: GtkSUnit [
     buildNamespaceAndClassWidget [
 	<category: 'user interface'>
 
-	^ (GTK.GtkHPaned new)
+	^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationHorizontal)
 	    pack1: self buildNamespaceWidget resize: true shrink: false;
 	    pack2: self buildClassWidget resize: true shrink: false;
 	    yourself
@@ -102,7 +102,7 @@ GtkBrowsingTool subclass: GtkSUnit [
     buildNamespaceAndClassAndMethodWidget [
 	<category: 'user interface'>
 
-	^ (GTK.GtkHPaned new)
+	^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationHorizontal)
 	    pack1: self buildNamespaceAndClassWidget resize: true shrink: false;
 	    pack2: self buildMethodWidget resize: true shrink: false;
 	    yourself
@@ -111,7 +111,7 @@ GtkBrowsingTool subclass: GtkSUnit [
     buildMiniBrowser [
 	<category: 'user interface'>
 
-	^ (GTK.GtkVPaned new)
+	^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationVertical)
 	    pack1: self buildNamespaceAndClassAndMethodWidget resize: true shrink: false;
 	    pack2: self buildSourceCodeWidget resize: true shrink: false;
 	    yourself
@@ -130,7 +130,7 @@ GtkBrowsingTool subclass: GtkSUnit [
     buildCentralWidget [
         <category: 'intialize-release'>
 
-	^ (GTK.GtkVPaned new)
+	^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationVertical)
 	    pack1: self buildMiniBrowser resize: true shrink: false;
 	    pack2: self buildResultWidget resize: true shrink: false;
 	    yourself

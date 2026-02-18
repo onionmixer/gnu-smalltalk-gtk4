@@ -54,12 +54,47 @@ CStruct subclass: GtkRequisition [
 
 
 
+"GdkColor is deprecated in GTK3. Use GdkRGBA instead."
 CStruct subclass: GdkColor [
 
     <category: 'GDK'>
     <comment: nil>
     <declaration: #(#(#pixel #uint) #(#red #ushort) #(#green #ushort) #(#blue #ushort))>
 
+]
+
+
+CStruct subclass: GdkRGBA [
+
+    <category: 'GDK'>
+    <comment: 'GTK3 color representation using doubles (0.0-1.0).'>
+    <declaration: #(#(#red #double) #(#green #double) #(#blue #double) #(#alpha #double))>
+
+    GdkRGBA class >> red: r green: g blue: b alpha: a [
+	<category: 'instance creation'>
+	| rgba |
+	rgba := self new.
+	rgba red value: r.
+	rgba green value: g.
+	rgba blue value: b.
+	rgba alpha value: a.
+	^rgba
+    ]
+
+    GdkRGBA class >> red: r green: g blue: b [
+	<category: 'instance creation'>
+	^self red: r green: g blue: b alpha: 1.0
+    ]
+
+    GdkRGBA class >> fromGdkColor: aGdkColor [
+	"Convert a legacy GdkColor (0-65535 range) to GdkRGBA (0.0-1.0 range)."
+	<category: 'instance creation'>
+	^self
+	    red: aGdkColor red value / 65535.0
+	    green: aGdkColor green value / 65535.0
+	    blue: aGdkColor blue value / 65535.0
+	    alpha: 1.0
+    ]
 ]
 
 

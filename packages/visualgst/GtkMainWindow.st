@@ -72,7 +72,7 @@ Smalltalk.Object subclass: GtkMainWindow [
     container [
 	<category: 'accessing'>
 
-	^ container ifNil: [ container := GTK.GtkVBox new: false spacing: 0 ]
+	^ container ifNil: [ container := GTK.GtkBox new: GTK.Gtk gtkOrientationVertical spacing: 0 ]
     ]
 
     accelGroup [

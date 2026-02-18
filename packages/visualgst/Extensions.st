@@ -331,11 +331,11 @@ VariableBinding extend [
 
 GTK.GtkButton class extend [
 
-    createButton: aStockId [
+    createButton: anIconName [
         <category: 'instance creation'>
 
         | image |
-        image := GTK.GtkImage newFromStock: aStockId size: GTK.Gtk gtkIconSizeMenu.
+        image := GTK.GtkImage newFromIconName: anIconName size: GTK.Gtk gtkIconSizeMenu.
         ^ (GTK.GtkButton new)
                 setImage: image;
                 setRelief: GTK.Gtk gtkReliefNone;
@@ -345,25 +345,25 @@ GTK.GtkButton class extend [
     closeButton [
 	<category: 'instance creation'>
 
-        ^ self createButton: GTK.Gtk gtkStockClose
+        ^ self createButton: 'window-close-symbolic'
     ]
 
     previousButton [
 	<category: 'instance creation'>
 
-        ^ self createButton: GTK.Gtk gtkStockGoBack
+        ^ self createButton: 'go-previous-symbolic'
     ]
 
     nextButton [
 	<category: 'instance creation'>
 
-         ^ self createButton: GTK.Gtk gtkStockGoForward
+         ^ self createButton: 'go-next-symbolic'
     ]
 
     replaceButton [
         <category: 'instance creation'>
 
-         ^ self createButton: GTK.Gtk gtkStockFindAndReplace
+         ^ self createButton: 'edit-find-replace-symbolic'
     ]
 ]
 

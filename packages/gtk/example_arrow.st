@@ -55,33 +55,29 @@ Object subclass: ArrowExample [
 	    selector: #destroy:data:
 	    userData: nil.
 	window setBorderWidth: 10.
-	box := GtkHBox new: false spacing: 0.
+	box := GtkBox new: Gtk gtkOrientationHorizontal spacing: 0.
 	box setBorderWidth: 2.
 	window add: box.
-	button := GtkButton createArrowButton: Gtk gtkArrowUp
-		    shadowType: Gtk gtkShadowIn.
-	box 
+	button := GtkButton createArrowButton: 'pan-up-symbolic'.
+	box
 	    packStart: button
 	    expand: false
 	    fill: false
 	    padding: 3.
-	button := GtkButton createArrowButton: Gtk gtkArrowDown
-		    shadowType: Gtk gtkShadowOut.
-	box 
+	button := GtkButton createArrowButton: 'pan-down-symbolic'.
+	box
 	    packStart: button
 	    expand: false
 	    fill: false
 	    padding: 3.
-	button := GtkButton createArrowButton: Gtk gtkArrowLeft
-		    shadowType: Gtk gtkShadowEtchedIn.
-	box 
+	button := GtkButton createArrowButton: 'pan-start-symbolic'.
+	box
 	    packStart: button
 	    expand: false
 	    fill: false
 	    padding: 3.
-	button := GtkButton createArrowButton: Gtk gtkArrowRight
-		    shadowType: Gtk gtkShadowEtchedOut.
-	box 
+	button := GtkButton createArrowButton: 'pan-end-symbolic'.
+	box
 	    packStart: button
 	    expand: false
 	    fill: false
@@ -97,14 +93,14 @@ Object subclass: ArrowExample [
 
 GTK.GtkButton class extend [
 
-    createArrowButton: arrowType shadowType: shadowType [
+    createArrowButton: iconName [
 	<category: 'creating arrow buttons'>
-	| button arrow |
+	| button image |
 	button := self new.
-	arrow := GtkArrow new: arrowType shadowType: shadowType.
-	button add: arrow.
+	image := GtkImage newFromIconName: iconName size: Gtk gtkIconSizeButton.
+	button add: image.
 	button show.
-	arrow show.
+	image show.
 	^button
     ]
 

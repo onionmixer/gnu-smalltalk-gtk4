@@ -50,17 +50,17 @@ GtkConcreteWidget subclass: GtkInspectorBrowserWidget [
 
     buildBrowser [
 
-	^ GTK.GtkHPaned addAll: {self buildHierarchy. self buildProtocolAndMethod}
+	^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationHorizontal) addAll: {self buildHierarchy. self buildProtocolAndMethod}
     ]
 
     buildClassBrowser [
 
-	^ GTK.GtkHPaned addAll: {self buildClassMethodView}
+	^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationHorizontal) addAll: {self buildClassMethodView}
     ]
 
     buildInstanceBrowser [
 
-	^ GTK.GtkHPaned addAll: {self buildInstanceMethodView}
+	^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationHorizontal) addAll: {self buildInstanceMethodView}
     ]
 
     buildProtocolAndMethod [
@@ -121,7 +121,7 @@ GtkConcreteWidget subclass: GtkInspectorBrowserWidget [
 	classHierarchyUpdate := false.
 	checkCode := true.
 	state := NamespaceState on: self with: Smalltalk.
-	self mainWidget: (GTK.GtkVPaned addAll: {self buildBrowser. self buildCodeView})
+	self mainWidget: ((GTK.GtkPaned new: GTK.Gtk gtkOrientationVertical) addAll: {self buildBrowser. self buildCodeView})
     ]
 
     classInstanceSwitchOn: aGtkNotebook page: aGtkNotebookPage number: aSmallInteger [

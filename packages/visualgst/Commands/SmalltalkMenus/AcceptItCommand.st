@@ -49,7 +49,7 @@ Command subclass: AcceptItCommand [
 
     stockIcon [
 
-        ^ 'gtk-apply'
+        ^ 'emblem-ok-symbolic'
     ]
 
     acceptClassDefinitionOn: aNamespace [

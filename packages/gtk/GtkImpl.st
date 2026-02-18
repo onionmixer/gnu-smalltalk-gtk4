@@ -16,7 +16,7 @@ GtkAlignment class extend [
 ]
 
 
-GdkDrawable extend [
+GdkWindow extend [
 
     withContextDo: aBlock [
 	"Execute aBlock passing a valid Cairo context for the
@@ -593,16 +593,16 @@ GTK.GtkDialog extend [
 
 GTK.GtkFileChooserDialog class extend [
 
-    for: aGtkFileChooserAction title: aString parent: aGtkWidget button: aGtkStock  [
+    for: aGtkFileChooserAction title: aString parent: aGtkWidget button: aButtonLabel  [
         <category: 'instance creation'>
 
         ^ self
             new: aString
             parent: aGtkWidget
             action: aGtkFileChooserAction
-            varargs: {GTK.Gtk gtkStockCancel.
+            varargs: {'_Cancel'.
                     GTK.Gtk gtkResponseCancel.
-                    aGtkStock.
+                    aButtonLabel.
                     GTK.Gtk gtkResponseAccept.
                     nil}
     ]
@@ -614,7 +614,7 @@ GTK.GtkFileChooserDialog class extend [
             for: GTK.Gtk gtkFileChooserActionSave
             title: aString
             parent: aGtkWidget
-            button: GTK.Gtk gtkStockSave
+            button: '_Save'
     ]
 
     load: aString parent: aGtkWidget [
@@ -624,7 +624,7 @@ GTK.GtkFileChooserDialog class extend [
             for: GTK.Gtk gtkFileChooserActionOpen
             title: aString
             parent: aGtkWidget
-            button: GTK.Gtk gtkStockOpen
+            button: '_Open'
     ]
 
     selectFolder: aString parent: aGtkWidget [
@@ -634,7 +634,7 @@ GTK.GtkFileChooserDialog class extend [
             for: GTK.Gtk gtkFileChooserActionSelectFolder
             title: aString
             parent: aGtkWidget
-            button: GTK.Gtk gtkStockOpen    
+            button: '_Open'
     ]
 ]
 
@@ -1025,9 +1025,14 @@ GTK.GtkTreeView extend [
 
 
 GTK.GtkToolButton class extend [
-    newFromStock: icon label: aString [ 
-        ^(self newFromStock: icon)
+    newFromIconName: icon label: aString [
+        ^(self new: nil iconWidget: (GTK.GtkImage newFromIconName: icon size: GTK.Gtk gtkIconSizeSmallToolbar))
 	    setLabel: aString;
 	    yourself
+    ]
+
+    "Keep for backwards compatibility."
+    newFromStock: icon label: aString [
+        ^self newFromIconName: icon label: aString
     ]
 ]

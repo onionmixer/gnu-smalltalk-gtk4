@@ -64,7 +64,7 @@ GtkFindWidget subclass: GtkReplaceWidget [
         <category: 'user interface'>
 
 	| hBox |
-	^ (GTK.GtkHBox new: false spacing: 3)
+	^ (GTK.GtkBox new: GTK.Gtk gtkOrientationHorizontal spacing: 3)
             packStart: (GTK.GtkLabel new: 'Replace with:') expand: false fill: false padding: 2;
             packStart: self replaceEntry expand: false fill: false padding: 15;
 	    packStart: self replaceButton expand: false fill: false padding: 15;

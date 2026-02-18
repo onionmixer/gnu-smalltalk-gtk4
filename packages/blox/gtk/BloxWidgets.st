@@ -968,8 +968,8 @@ BPrimitive subclass: BForm [
 	| color |
 	value printNl.
 	'fixme implement bg color, will need CStruct Color' printNl
-	"color:=GTK.GdkColor new.
-	 GTK.GdkColor parse: value color: color.
+	"color:=GTK.GdkRGBA new.
+	 GTK.GdkRGBA parse: value color: color.
 	 self container modifyBg: GTK.Gtk gtkStateNormal color: (nil)"
     ]
 
@@ -1336,8 +1336,8 @@ right or from top to bottom.'>
     create [
 	<category: 'private'>
 	self verticalLayout 
-	    ifTrue: [self connected: (GTK.GtkVBox new: false spacing: 0)]
-	    ifFalse: [self connected: (GTK.GtkHBox new: false spacing: 0)]
+	    ifTrue: [self connected: (GTK.GtkBox new: GTK.Gtk gtkOrientationVertical spacing: 0)]
+	    ifFalse: [self connected: (GTK.GtkBox new: GTK.Gtk gtkOrientationHorizontal spacing: 0)]
     ]
 
     verticalLayout [
@@ -3410,7 +3410,7 @@ it wasn''t for me... )):->'>
 	    to: self
 	    selector: #onConfigure:data:
 	    userData: nil.
-	uiBox := GTK.GtkVBox new: false spacing: 0.
+	uiBox := GTK.GtkBox new: GTK.Gtk gtkOrientationVertical spacing: 0.
 	self container add: uiBox.
 
 	"Create the GtkPlacer"
@@ -3997,8 +3997,8 @@ common dialog boxes, such as choose-a-file and choose-a-color.'>
 		    new: aLabel
 		    parent: parent container
 		    action: action
-		    varargs: 
-			{GTK.Gtk gtkStockCancel.
+		    varargs:
+			{'_Cancel'.
 			GTK.Gtk gtkResponseCancel.
 			button.
 			GTK.Gtk gtkResponseAccept.
@@ -4085,7 +4085,7 @@ common dialog boxes, such as choose-a-file and choose-a-color.'>
 	    defaultExtension: ext
 	    types: typeList
 	    action: GTK.Gtk gtkFileChooserActionOpen
-	    button: GTK.Gtk gtkStockOpen
+	    button: '_Open'
     ]
 
     BDialog class >> chooseFileToSave: parent label: aLabel default: name defaultExtension: ext types: typeList [
@@ -4123,7 +4123,7 @@ common dialog boxes, such as choose-a-file and choose-a-color.'>
 	    defaultExtension: ext
 	    types: typeList
 	    action: GTK.Gtk gtkFileChooserActionSave
-	    button: GTK.Gtk gtkStockSave
+	    button: '_Save'
     ]
 
     addButton: aLabel receiver: anObject index: anInt [
@@ -4215,7 +4215,7 @@ common dialog boxes, such as choose-a-file and choose-a-color.'>
 	| uiBox label separator |
 	super create.
 	uiBox := self toplevel uiBox.
-	buttonBox := GTK.GtkHButtonBox new.
+	buttonBox := GTK.GtkButtonBox new: GTK.Gtk gtkOrientationHorizontal.
 	buttonBox setSpacing: 5.
 	buttonBox setLayout: GTK.Gtk gtkButtonboxEnd.
 	uiBox 
@@ -4224,7 +4224,7 @@ common dialog boxes, such as choose-a-file and choose-a-color.'>
 	    fill: false
 	    padding: 5.
 	buttonBox show.
-	separator := GTK.GtkHSeparator new.
+	separator := GTK.GtkSeparator new: GTK.Gtk gtkOrientationHorizontal.
 	uiBox 
 	    packEnd: separator
 	    expand: false
@@ -4233,7 +4233,7 @@ common dialog boxes, such as choose-a-file and choose-a-color.'>
 	separator show.
 
 	"Put the GtkPlacer at the end of the list of the end-packed widgets,
-	 which puts it above our GtkHSeparator and GtkHButtonBox."
+	 which puts it above our GtkSeparator and GtkButtonBox."
 	uiBox reorderChild: self toplevel connected position: -1.
 	initInfo isNil ifTrue: [^self].
 	label := GTK.GtkLabel new: initInfo key.
@@ -4775,7 +4775,7 @@ eh eh eh!!'>
 			    tooltip: 'FIXME'
 			    stockId: nil.
 
-		"FIXME, when to use stock options?  GTK.Gtk gtkStockOpen."
+		"FIXME, when to use icon names?  E.g. 'document-open-symbolic'."
 		action 
 		    connectSignal: 'activate'
 		    to: self

@@ -123,19 +123,19 @@ GtkBrowsingTool subclass: GtkDebugger [
     buildInspectorsWidget [
 	<category: 'user interface'>
 
-	^ GTK.GtkHPaned addAll: {self buildInspectorWidget mainWidget. self buildStackInspectorWidget}
+	^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationHorizontal) addAll: {self buildInspectorWidget mainWidget. self buildStackInspectorWidget}
     ]
 
     buildCodeAndStateWidget [
 	<category: 'intialize-release'>
 
-	^ GTK.GtkVPaned addAll: {self buildSourceWidget mainWidget. self buildInspectorsWidget}
+	^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationVertical) addAll: {self buildSourceWidget mainWidget. self buildInspectorsWidget}
     ]
 
     buildCentralWidget [
 	<category: 'intialize-release'>
 
-	^ GTK.GtkVPaned addAll: {self buildContextWidget mainWidget. self buildCodeAndStateWidget}
+	^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationVertical) addAll: {self buildContextWidget mainWidget. self buildCodeAndStateWidget}
     ]
 
     createExecuteMenus [

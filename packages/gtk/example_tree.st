@@ -68,7 +68,7 @@ Object subclass: TreeExample [
 	    selector: #destroy:
 	    userData: nil.
 	window setBorderWidth: 10.
-	vbox := GtkVBox new: false spacing: 9.
+	vbox := GtkBox new: Gtk gtkOrientationVertical spacing: 9.
 	vbox setBorderWidth: 2.
 	window add: vbox.
 	frame := GtkFrame new: nil.

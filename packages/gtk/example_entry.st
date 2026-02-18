@@ -81,7 +81,7 @@ Object subclass: EntryExample [
 	    to: self
 	    selector: #delete:event:data:
 	    userData: nil.
-	vbox := GtkVBox new: false spacing: 0.
+	vbox := GtkBox new: Gtk gtkOrientationVertical spacing: 0.
 	window add: vbox.
 	vbox show.
 	entry := GtkEntry new.
@@ -105,7 +105,7 @@ Object subclass: EntryExample [
 	    fill: true
 	    padding: 0.
 	entry show.
-	hbox := GtkHBox new: false spacing: 0.
+	hbox := GtkBox new: Gtk gtkOrientationHorizontal spacing: 0.
 	vbox add: hbox.
 	hbox show.
 	check := GtkCheckButton newWithLabel: 'Editable'.
@@ -134,7 +134,7 @@ Object subclass: EntryExample [
 	    userData: #setVisibility:.
 	check setActive: true.
 	check show.
-	button := GtkButton newFromStock: 'gtk-close'.
+	button := GtkButton newWithLabel: 'Close'.
 	button 
 	    connectSignal: 'clicked'
 	    to: self

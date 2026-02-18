@@ -49,7 +49,7 @@ Command subclass: PasteEditCommand [
 
     stockIcon [
 
-	^ 'gtk-paste'
+	^ 'edit-paste-symbolic'
     ]
 
     execute [

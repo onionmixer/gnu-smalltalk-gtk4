@@ -49,7 +49,7 @@ Command subclass: RedoEditCommand [
 
     stockIcon [
 
-	^ 'gtk-redo'
+	^ 'edit-redo-symbolic'
     ]
 
     execute [

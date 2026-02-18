@@ -399,8 +399,8 @@ GtkVisualGSTTool subclass: GtkLauncher [
     buildBrowserAndWorkspaceWidget [
         <category: 'intialize-release'>
 
-        ^ GTK.GtkVPaned addAll: {
-		    GTK.GtkHPaned addAll: {self buildImplementorPaned. self buildBottomPanedAndClassBrowser. self buildRightSidebarPaned}. 
+        ^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationVertical) addAll: {
+		    (GTK.GtkPaned new: GTK.Gtk gtkOrientationHorizontal) addAll: {self buildImplementorPaned. self buildBottomPanedAndClassBrowser. self buildRightSidebarPaned}.
 		    self buildNotebookWorkspaceWidget mainWidget}
     ]
 
@@ -471,7 +471,7 @@ GtkVisualGSTTool subclass: GtkLauncher [
     buildBottomPanedAndClassBrowser [
         <category: 'user interface'>
 
-	^ GTK.GtkVPaned addAll: {self buildTopSidebar. self buildClassBrowserTabbedWidget mainWidget}
+	^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationVertical) addAll: {self buildTopSidebar. self buildClassBrowserTabbedWidget mainWidget}
     ]
 
     buildClassBrowserTabbedWidget [
@@ -577,7 +577,7 @@ GtkVisualGSTTool subclass: GtkLauncher [
 	<category: 'user interface'>
 
 	self
-	    appendToolItem: ((GTK.GtkToolButton newFromStock: 'gtk-new')
+	    appendToolItem: ((GTK.GtkToolButton newFromIconName: 'document-new-symbolic')
 				connectSignal: 'clicked' to: self selector: #newWorkspace;
 				setTooltipText: 'Create a new workspace';
 				yourself).

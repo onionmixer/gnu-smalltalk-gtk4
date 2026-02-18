@@ -49,7 +49,7 @@ DoItCommand subclass: DebugItCommand [
 
     stockIcon [
 
-        ^ 'gtk-sort-descending'
+        ^ 'utilities-terminal-symbolic'
     ]
 
     execute [

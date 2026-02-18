@@ -95,10 +95,10 @@ GtkMainWindow subclass: Tetris [
 
     buildCentralWidget [
 	<category: 'user interface'>
-	
+
 	^ canvasWidget := GTK.GtkDrawingArea new
 	    setSizeRequest: 400 height: 700;
-	    connectSignal: 'expose_event' to: self selector: #'expose:event:';
+	    connectSignal: 'draw' to: self selector: #'draw:context:';
 	    yourself
     ]
 
@@ -164,16 +164,15 @@ GtkMainWindow subclass: Tetris [
 	    stroke.
     ]
 
-    expose: aGtkWidget event: aGdkEventExpose [
+    draw: aGtkWidget context: aCairoContext [
 	<category: 'drawing event'>
 
-	aGtkWidget getWindow withContextDo: [ :cr |
-            canvas := cr.
-            self
-                clearArea: aGtkWidget getAllocation;
-		drawArea;
-		drawGrid;
-		drawScore ].
+	canvas := Cairo.CairoContext context: aCairoContext.
+	self
+	    clearArea: aGtkWidget getAllocation;
+	    drawArea;
+	    drawGrid;
+	    drawScore.
 
         ^ true
     ]

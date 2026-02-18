@@ -87,7 +87,7 @@ Object subclass: GtkEntryDialog [
 
         defaultButton := GTK.Gtk perform: buttons first second.
         aGtkDialog setDefaultResponse: defaultButton.
-	hbox := GTK.GtkHBox new: true spacing: 0.
+	hbox := (GTK.GtkBox new: GTK.Gtk gtkOrientationHorizontal spacing: 0) setHomogeneous: true; yourself.
 	labelWidget := GTK.GtkLabel new: aString.
 	entryWidget := GTK.GtkEntry new.
         entryWidget setActivatesDefault: true.

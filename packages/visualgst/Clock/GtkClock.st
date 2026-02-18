@@ -149,18 +149,20 @@ Smalltalk.Object subclass: GtkClock [
             drawSecondLine: context
     ]
 
-    expose: aGtkWidget event: aGdkEventExpose [
+    draw: aGtkWidget context: aCairoContext [
+	<category: 'drawing'>
 
-	aGtkWidget getWindow withContextDo: [ :cr |
-	    canvas := cr.
+	| cr |
+	cr := Cairo.CairoContext context: aCairoContext.
+	canvas := cr.
 
-	    x := 128.
-	    y := 128.
+	x := 128.
+	y := 128.
 
-	    self 
-		clearArea: aGtkWidget getAllocation;
-		time;
-		drawClock: cr ].
+	self
+	    clearArea: aGtkWidget getAllocation;
+	    time;
+	    drawClock: cr.
 
 	^ true
     ]
@@ -169,9 +171,9 @@ Smalltalk.Object subclass: GtkClock [
 	<category: 'intialization'>
 
 	window := (GTK.GtkWindow new: GTK.Gtk gtkWindowToplevel).
-	window 
-	    setColormap: window getScreen getRgbaColormap;
-	    connectSignal: 'expose_event' to: self selector: #'expose:event:';
+	window
+	    setAppPaintable: true;
+	    connectSignal: 'draw' to: self selector: #'draw:context:';
 	    connectSignal: 'delete-event' to: self selector: #'delete:event:';
 	    setDecorated: false.
 	radius := 100

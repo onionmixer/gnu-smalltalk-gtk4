@@ -49,7 +49,7 @@ DoItCommand subclass: InspectItCommand [
 
     stockIcon [
 
-        ^ 'gtk-convert'
+        ^ 'edit-find-symbolic'
     ]
 
     execute [

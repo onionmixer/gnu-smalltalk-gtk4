@@ -55,7 +55,7 @@ Object subclass: ButtonBoxExample [
 	    selector: #destroy:data:
 	    userData: nil.
 	window setBorderWidth: 10.
-	mainVBox := GtkVBox new: false spacing: 0.
+	mainVBox := GtkBox new: Gtk gtkOrientationVertical spacing: 0.
 	window add: mainVBox.
 	frameHorz := GtkFrame new: 'Horizontal Button Boxes'.
 	mainVBox 
@@ -63,36 +63,40 @@ Object subclass: ButtonBoxExample [
 	    expand: true
 	    fill: true
 	    padding: 10.
-	vbox := GtkVBox new: false spacing: 0.
+	vbox := GtkBox new: Gtk gtkOrientationVertical spacing: 0.
 	vbox setBorderWidth: 10.
 	frameHorz add: vbox.
-	vbox 
-	    packStart: (GtkHButtonBox 
+	vbox
+	    packStart: (GtkButtonBox
 		    createButtonBox: 'Spread (spacing 40)'
+		    orientation: Gtk gtkOrientationHorizontal
 		    spacing: 40
 		    layout: Gtk gtkButtonboxSpread)
 	    expand: true
 	    fill: true
 	    padding: 0.
-	vbox 
-	    packStart: (GtkHButtonBox 
+	vbox
+	    packStart: (GtkButtonBox
 		    createButtonBox: 'Edge (spacing 30)'
+		    orientation: Gtk gtkOrientationHorizontal
 		    spacing: 30
 		    layout: Gtk gtkButtonboxEdge)
 	    expand: true
 	    fill: true
 	    padding: 0.
-	vbox 
-	    packStart: (GtkHButtonBox 
+	vbox
+	    packStart: (GtkButtonBox
 		    createButtonBox: 'Start (spacing 20)'
+		    orientation: Gtk gtkOrientationHorizontal
 		    spacing: 20
 		    layout: Gtk gtkButtonboxStart)
 	    expand: true
 	    fill: true
 	    padding: 0.
-	vbox 
-	    packStart: (GtkHButtonBox 
+	vbox
+	    packStart: (GtkButtonBox
 		    createButtonBox: 'End (spacing 10)'
+		    orientation: Gtk gtkOrientationHorizontal
 		    spacing: 10
 		    layout: Gtk gtkButtonboxEnd)
 	    expand: true
@@ -104,36 +108,40 @@ Object subclass: ButtonBoxExample [
 	    expand: true
 	    fill: true
 	    padding: 10.
-	hbox := GtkHBox new: false spacing: 0.
+	hbox := GtkBox new: Gtk gtkOrientationHorizontal spacing: 0.
 	hbox setBorderWidth: 10.
 	frameVert add: hbox.
-	hbox 
-	    packStart: (GtkVButtonBox 
+	hbox
+	    packStart: (GtkButtonBox
 		    createButtonBox: 'Spread (spacing 5)'
+		    orientation: Gtk gtkOrientationVertical
 		    spacing: 5
 		    layout: Gtk gtkButtonboxSpread)
 	    expand: true
 	    fill: true
 	    padding: 0.
-	hbox 
-	    packStart: (GtkVButtonBox 
+	hbox
+	    packStart: (GtkButtonBox
 		    createButtonBox: 'Edge (spacing 30)'
+		    orientation: Gtk gtkOrientationVertical
 		    spacing: 30
 		    layout: Gtk gtkButtonboxEdge)
 	    expand: true
 	    fill: true
 	    padding: 0.
-	hbox 
-	    packStart: (GtkVButtonBox 
+	hbox
+	    packStart: (GtkButtonBox
 		    createButtonBox: 'Start (spacing 20)'
+		    orientation: Gtk gtkOrientationVertical
 		    spacing: 20
 		    layout: Gtk gtkButtonboxStart)
 	    expand: true
 	    fill: true
 	    padding: 0.
-	hbox 
-	    packStart: (GtkVButtonBox 
+	hbox
+	    packStart: (GtkButtonBox
 		    createButtonBox: 'End (spacing 20)'
+		    orientation: Gtk gtkOrientationVertical
 		    spacing: 20
 		    layout: Gtk gtkButtonboxEnd)
 	    expand: true
@@ -149,24 +157,20 @@ Object subclass: ButtonBoxExample [
 
 GTK.GtkButtonBox class extend [
 
-    createButtonBox: title spacing: spacing layout: layout [
+    createButtonBox: title orientation: orientation spacing: spacing layout: layout [
 	<category: 'creating button boxes'>
 	| box frame button |
 	frame := GtkFrame new: title.
-
-	"Note the use of polymorphism here: we are extending the Gtk binding
-	 itself!  The original C example had an extra parameter to specify
-	 whether to create an horizontal or vertical button box."
-	box := self new.
+	box := self new: orientation.
 	box setBorderWidth: 5.
 	frame add: box.
 	box setLayout: layout.
 	box setSpacing: spacing.
-	button := GtkButton newFromStock: Gtk gtkStockOk.
+	button := GtkButton newWithLabel: 'OK'.
 	box add: button.
-	button := GtkButton newFromStock: Gtk gtkStockCancel.
+	button := GtkButton newWithLabel: 'Cancel'.
 	box add: button.
-	button := GtkButton newFromStock: Gtk gtkStockHelp.
+	button := GtkButton newWithLabel: 'Help'.
 	box add: button.
 	^frame
     ]

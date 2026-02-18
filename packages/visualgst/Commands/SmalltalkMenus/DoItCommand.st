@@ -49,7 +49,7 @@ Command subclass: DoItCommand [
 
     stockIcon [
 
-	^ 'gtk-execute'
+	^ 'system-run-symbolic'
     ]
 
     execute [

@@ -13,9 +13,9 @@
  *
  * GNU Smalltalk is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
- * Software Foundation; either version 2, or (at your option) any later 
+ * Software Foundation; either version 2, or (at your option) any later
  * version.
- * 
+ *
  * Linking GNU Smalltalk statically or dynamically with other modules is
  * making a combined work based on GNU Smalltalk.  Thus, the terms and
  * conditions of the GNU General Public License cover the whole
@@ -39,13 +39,13 @@
  * modified version which carries forward this exception.
  *
  * GNU Smalltalk is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * GNU Smalltalk; see the file COPYING.  If not, write to the Free Software
- * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  
+ * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  ***********************************************************************/
 
@@ -92,18 +92,9 @@ connect_accel_group (OOP accel_group,
   if (oop_sel_args == _gtk_vm_proxy->nilOOP)
     return (-3); /* Invalid selector */
 
-  /* Check the number of arguments in the selector against the number of
-     arguments in the event callback */
-
-  /* We can return fewer arguments than are in the event, if the others aren't
-     wanted, but we can't return more, and returning nilOOPs instead is not
-     100% satisfactory, so fail. */
   n_params = _gtk_vm_proxy->OOPToInt (oop_sel_args);
   if (n_params > 4)
     return (-4);
-
-  /* Receiver is assumed to be OK, no matter what it is */
-  /* Parameters OK, so carry on and connect the signal */
 
   closure = smalltalk_closure_new (receiver, selector, NULL,
 				   accel_group, n_params);
@@ -163,131 +154,152 @@ container_set_child_property (GtkContainer *aParent,
   gtk_container_child_set_property (aParent, aChild, aProperty, &value);
 }
 
-OOP 
+OOP
 tree_model_get_oop (GtkTreeModel *model,
 		    GtkTreeIter *iter,
-		    int col) 
-{ 
-  GValue gval = { 0 }; 
-  OOP result; 
+		    int col)
+{
+  GValue gval = { 0 };
+  OOP result;
 
-  gtk_tree_model_get_value (model, iter, col, &gval); 
+  gtk_tree_model_get_value (model, iter, col, &gval);
   result = g_value_convert_to_oop (&gval);
   g_value_unset (&gval);
-  return (result); 
-} 
+  return (result);
+}
 
-void 
+void
 list_store_set_oop (GtkListStore *store,
 		    GtkTreeIter *iter,
 		    int col,
-		    OOP value) 
-{ 
+		    OOP value)
+{
     GValue gval = { 0 };
     g_value_init (&gval,
 		  gtk_tree_model_get_column_type (GTK_TREE_MODEL(store), col));
     g_value_fill_from_oop (&gval, value);
-    gtk_list_store_set_value (store, iter, col, &gval); 
+    gtk_list_store_set_value (store, iter, col, &gval);
     g_value_unset (&gval);
-} 
+}
 
-void 
+void
 tree_store_set_oop (GtkTreeStore *store,
 		    GtkTreeIter *iter,
 		    int col,
-		    OOP value) 
-{ 
-    GValue gval = { 0 }; 
+		    OOP value)
+{
+    GValue gval = { 0 };
     g_value_init (&gval, gtk_tree_model_get_column_type (GTK_TREE_MODEL(store), col));
     g_value_fill_from_oop (&gval, value);
-    gtk_tree_store_set_value (store, iter, col, &gval); 
+    gtk_tree_store_set_value (store, iter, col, &gval);
     g_value_unset (&gval);
 }
 
 
-/* Wrappers for macros and missing accessor functions.  */
+/* Wrappers for macros and missing accessor functions.
+   Updated for GTK3 compatibility: direct struct field access replaced
+   with GTK3 accessor functions.  */
 
 static GdkWindow *
 widget_get_window (GtkWidget *widget)
 {
-  return widget->window;
+  return gtk_widget_get_window (widget);
 }
 
 static int
 widget_get_state (GtkWidget *widget)
 {
-  return GTK_WIDGET_STATE (widget);
+  return (int) gtk_widget_get_state_flags (widget);
 }
 
 static int
 widget_get_flags (GtkWidget *widget)
 {
-  return GTK_WIDGET_FLAGS (widget);
+  int flags = 0;
+  if (gtk_widget_get_visible (widget)) flags |= (1 << 0);
+  if (gtk_widget_get_mapped (widget)) flags |= (1 << 1);
+  if (gtk_widget_get_realized (widget)) flags |= (1 << 2);
+  if (gtk_widget_get_sensitive (widget)) flags |= (1 << 3);
+  if (gtk_widget_get_can_focus (widget)) flags |= (1 << 4);
+  if (gtk_widget_has_focus (widget)) flags |= (1 << 5);
+  if (gtk_widget_has_default (widget)) flags |= (1 << 6);
+  if (!gtk_widget_get_has_window (widget)) flags |= (1 << 7);
+  return flags;
 }
 
 static void
 widget_set_flags (GtkWidget *widget, int flags)
 {
-  GTK_WIDGET_SET_FLAGS (widget, flags);
+  if (flags & (1 << 0)) gtk_widget_set_visible (widget, TRUE);
+  if (flags & (1 << 3)) gtk_widget_set_sensitive (widget, TRUE);
+  if (flags & (1 << 4)) gtk_widget_set_can_focus (widget, TRUE);
 }
 
 static void
 widget_unset_flags (GtkWidget *widget, int flags)
 {
-  GTK_WIDGET_UNSET_FLAGS (widget, flags);
+  if (flags & (1 << 0)) gtk_widget_set_visible (widget, FALSE);
+  if (flags & (1 << 3)) gtk_widget_set_sensitive (widget, FALSE);
+  if (flags & (1 << 4)) gtk_widget_set_can_focus (widget, FALSE);
 }
 
 
 static GtkAllocation *
 widget_get_allocation (GtkWidget *wgt)
 {
-  return &(GTK_WIDGET(wgt)->allocation);
+  static GtkAllocation alloc;
+  gtk_widget_get_allocation (wgt, &alloc);
+  return &alloc;
 }
 
 static GtkWidget *
 dialog_get_vbox (GtkDialog *dlg)
 {
-  return (GTK_DIALOG(dlg)->vbox);
+  return gtk_dialog_get_content_area (dlg);
 }
 
 static GtkWidget *
 dialog_get_action_area (GtkDialog *dlg)
 {
-  return (GTK_DIALOG(dlg)->action_area);
+  return gtk_dialog_get_action_area (dlg);
 }
 
 static int
 scrolled_window_get_hscrollbar_visible (GtkScrolledWindow *swnd)
 {
-  return (GTK_SCROLLED_WINDOW(swnd)->hscrollbar_visible);
+  GtkPolicyType hpolicy, vpolicy;
+  gtk_scrolled_window_get_policy (swnd, &hpolicy, &vpolicy);
+  return (hpolicy != GTK_POLICY_NEVER);
 }
 
 static int
 scrolled_window_get_vscrollbar_visible (GtkScrolledWindow *swnd)
 {
-  return (GTK_SCROLLED_WINDOW(swnd)->vscrollbar_visible);
+  GtkPolicyType hpolicy, vpolicy;
+  gtk_scrolled_window_get_policy (swnd, &hpolicy, &vpolicy);
+  return (vpolicy != GTK_POLICY_NEVER);
 }
 
 static int
 adjustment_get_lower (GtkAdjustment *adj)
 {
-  return (GTK_ADJUSTMENT(adj)->lower);
+  return (int) gtk_adjustment_get_lower (adj);
 }
 
 static int
 adjustment_get_upper (GtkAdjustment *adj)
 {
-  return (GTK_ADJUSTMENT(adj)->upper);
+  return (int) gtk_adjustment_get_upper (adj);
 }
 
 static int
 adjustment_get_page_size (GtkAdjustment *adj)
 {
-  return (GTK_ADJUSTMENT(adj)->page_size);
+  return (int) gtk_adjustment_get_page_size (adj);
 }
 
 /* Initialization.  */
- 
+
 static int initialized = 0;
 
 int

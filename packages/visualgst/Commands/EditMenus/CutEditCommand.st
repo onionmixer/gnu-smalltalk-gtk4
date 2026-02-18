@@ -49,7 +49,7 @@ Command subclass: CutEditCommand [
 
     stockIcon [
 
-	^ 'gtk-cut'
+	^ 'edit-cut-symbolic'
     ]
 
     execute [

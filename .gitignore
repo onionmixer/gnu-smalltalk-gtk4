@@ -67,8 +67,19 @@ packages/i18n/ref-del.sed
 packages/net/gnutls-wrapper
 packages/object-dumper/stamp-classes
 packages/sttools/stamp-classes
+packages/debug/debugger/stamp-classes
 snprintfv/snprintfv/compat.stamp
 
 tests/gst.im
+tests/testsuite
 tests/testsuite.dir/
 tests/testsuite.log
+
+# autoreconf generated files
+build-aux/compile
+build-aux/depcomp
+build-aux/mdate-sh
+build-aux/missing
+build-aux/texinfo.tex
+build-aux/ylwrap
+snprintfv/snprintfv/compat.h

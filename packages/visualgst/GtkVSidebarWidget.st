@@ -36,7 +36,7 @@
 GtkSidebarWidget subclass: GtkVSidebarWidget [
 
     panedOrientation [
-	^ GTK.GtkVPaned
+	^ GTK.Gtk gtkOrientationVertical
     ]
 ]
 

@@ -105,7 +105,7 @@ GtkConcreteWidget subclass: GtkInspectorWidget [
     buildView [
         <category: 'user interface'>
    
-	^ GTK.GtkHPaned new
+	^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationHorizontal)
 	    pack1: self buildTreeWidget resize: true shrink: false;
             pack2: self buildWorkspaceWidget mainWidget resize: true shrink: false;
             yourself

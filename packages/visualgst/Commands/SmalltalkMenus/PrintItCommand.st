@@ -49,7 +49,7 @@ DoItCommand subclass: PrintItCommand [
 
     stockIcon [
 
-        ^ 'gtk-print'
+        ^ 'document-print-symbolic'
     ]
 
     execute [

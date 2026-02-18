@@ -101,7 +101,7 @@ GtkBrowsingTool subclass: GtkInspector [
     buildInspectorView [
 	<category: 'user interface'>
 
-	^ GTK.GtkVPaned new
+	^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationVertical)
             pack1: self buildInspectorWidget mainWidget resize: true shrink: false;
             pack2: self buildWorkspaceWidget mainWidget resize: false shrink: true;
             yourself

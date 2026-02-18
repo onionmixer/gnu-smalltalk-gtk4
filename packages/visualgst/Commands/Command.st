@@ -143,7 +143,7 @@ Object subclass: Command [
     buildToolItem [
         <category: 'build'>
 
-	^ (GTK.GtkToolButton newFromStock: self stockIcon label: self item)
+	^ (GTK.GtkToolButton newFromIconName: self stockIcon label: self item)
                                 connectSignal: 'clicked' to: self selector: #executeIfValid;
                                 setTooltipText: self tooltip;
                                 yourself
