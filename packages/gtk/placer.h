@@ -1,6 +1,6 @@
 /***********************************************************************
  *
- *  Gtk+ wrappers for GNU Smalltalk - Placer geometry manager
+ *  GTK wrappers for GNU Smalltalk - Placer geometry manager
  *
  ***********************************************************************/
 
@@ -13,9 +13,9 @@
  *
  * GNU Smalltalk is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
- * Software Foundation; either version 2, or (at your option) any later 
+ * Software Foundation; either version 2, or (at your option) any later
  * version.
- * 
+ *
  * Linking GNU Smalltalk statically or dynamically with other modules is
  * making a combined work based on GNU Smalltalk.  Thus, the terms and
  * conditions of the GNU General Public License cover the whole
@@ -39,13 +39,13 @@
  * modified version which carries forward this exception.
  *
  * GNU Smalltalk is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * GNU Smalltalk; see the file COPYING.  If not, write to the Free Software
- * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  
+ * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  ***********************************************************************/
 
@@ -78,14 +78,14 @@ typedef struct _GtkPlacerChild   GtkPlacerChild;
 
 struct _GtkPlacer
 {
-  GtkContainer container;
+  GtkWidget parent_instance;
 
   GList *children;
 };
 
 struct _GtkPlacerClass
 {
-  GtkContainerClass parent_class;
+  GtkWidgetClass parent_class;
 };
 
 struct _GtkPlacerChild
@@ -130,6 +130,8 @@ void       gtk_placer_resize_rel       (GtkPlacer      *placer,
                                         GtkWidget      *widget,
 					gint		rel_width,
 					gint		rel_height);
+/* GTK4: has_window concept removed. These are kept as no-ops
+   for backwards compatibility with Smalltalk code. */
 void       gtk_placer_set_has_window   (GtkPlacer      *placer,
 					gboolean	has_window);
 gboolean   gtk_placer_get_has_window   (GtkPlacer      *placer);

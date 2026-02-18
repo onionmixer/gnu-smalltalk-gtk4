@@ -14,7 +14,7 @@ EXTRA_DIST = cpp.awk structs.awk funcs.awk mk_enums.awk mk_sizeof.awk mkorder.aw
 gst_module_ldflags = -rpath $(moduleexecdir) -release $(VERSION) -module \
 	-no-undefined -export-symbols-regex gst_initModule
 
-ALL_LIBS = $(GLIB_LIBS) $(GTK_LIBS) $(PANGO_LIBS) $(ATK_LIBS) $(GTHREAD_LIBS) \
+ALL_LIBS = $(GLIB_LIBS) $(GTK_LIBS) $(PANGO_LIBS) $(GTHREAD_LIBS) \
 	$(CAIRO_LIBS)
 
 moduleexec_LTLIBRARIES = gst-gtk.la
@@ -33,11 +33,11 @@ AM_CPPFLAGS = \
   -I$(top_srcdir)/lib-src \
   -I$(top_srcdir)/packages/glib
 
-AM_CFLAGS = $(GLIB_CFLAGS) $(GTK_CFLAGS) $(PANGO_CFLAGS) $(ATK_CFLAGS)
+AM_CFLAGS = $(GLIB_CFLAGS) $(GTK_CFLAGS) $(PANGO_CFLAGS)
 
 GTK_FILES = \
 	  glib-object.h gdk/gdk.h \
-	  gdk-pixbuf/gdk-pixbuf.h gtk/gtk.h atk/atk.h pango/pango.h
+	  gdk-pixbuf/gdk-pixbuf.h gtk/gtk.h pango/pango.h
 
 LOCAL_FILES = $(srcdir)/placer.h
 
@@ -78,7 +78,7 @@ libs.def: Makefile
 	    -L*) \
 	      j=`echo $$i | sed 's,^-L,,'` ; \
 	      echo "_gtk_vm_proxy->dlAddSearchDir(\"$$j\");" ;; \
-	    -lG*|-lg*|-lATK*|-latk*|-lPango*|-lpango*|-lgtk*) \
+	    -lG*|-lg*|-lPango*|-lpango*|-lgtk*) \
 	      j=`echo $$i | sed 's,^-l,lib,'` ; \
 	      echo "_gtk_vm_proxy->dlOpen(\"$$j\", false);" ;; \
 	    *) ;; \
@@ -104,8 +104,8 @@ enums.c: mk_enums cpp order
 order: mkorder.awk Makefile $(LOCAL_FILES)
 	$(AWK) \
 	  -vPKG_CONFIG='$(PKG_CONFIG)' \
-	  -v_prefixes='g atk pango' \
-	  -v_libs="gobject-2.0 gdk-3.0 gdk-pixbuf-2.0 pango gtk+-3.0 atk" \
+	  -v_prefixes='g pango' \
+	  -v_libs="gobject-2.0 gtk4 gdk-pixbuf-2.0 pango" \
 	  -v_files="$(GTK_FILES) $(LOCAL_FILES)" -f $(srcdir)/mkorder.awk \
 	  | while read i; do \
 	    case "$$i" in \

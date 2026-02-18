@@ -38,10 +38,9 @@ BEGIN {
   print "#include <stdlib.h>"
   print "#include <glib.h>"
   print "#include <glib-object.h>"
-  print "#include <atk/atk.h>"
   print "#include <pango/pango.h>"
-  print "#include <gtk/gtk.h>"
   print "#include <gdk/gdk.h>"
+  print "#include <gtk/gtk.h>"
   print "#include <gdk/gdkkeysyms.h>"
 }
 
@@ -2385,6 +2384,10 @@ function print_end_of_category()
 function print_numeric_define(c_name)
 {
   selector = smalltalkize(tolower(c_name))
+  key_name = c_name
+  sub(/^GDK_/, "GDK_KEY_", key_name)
+  if (key_name != c_name)
+    return "#ifdef " c_name "\n  printf(\"\\n" selector " ^%d!\", (int) " c_name ");\n#elif defined(" key_name ")\n  printf(\"\\n" selector " ^%d!\", (int) " key_name ");\n#endif"
   return "#ifdef " c_name "\n  printf(\"\\n" selector " ^%d!\", (int) " c_name ");\n#endif"
 }
 
@@ -2397,7 +2400,7 @@ function print_numeric_enum(c_name)
 function print_string_enum(c_name)
 {
   selector = smalltalkize(tolower(c_name))
-  return "  printf(\"\\n" selector " ^'%s'!\", " c_name ");"
+  return "#ifdef " c_name "\n  printf(\"\\n" selector " ^'%s'!\", " c_name ");\n#endif"
 }
 
 function print_methodsFor( class, category )
@@ -2409,7 +2412,7 @@ function get_enum_class( res )
   if (tolower (res) ~ /pango/) return "Pango"
   if (tolower (res) ~ /gdk/) return "Gdk"
   if (tolower (res) ~ /gtk/) return "Gtk"
-  if (tolower (res) ~ /atk/) return "Atk"
+  # ATK removed in GTK4
   if (tolower (res) ~ /g/) return "GLib"
   return ""
 }

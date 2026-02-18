@@ -488,10 +488,9 @@ GST_PACKAGE_ENABLE([GTK], [gtk], [
   if test "$enable_gtk" != no && test "$gst_cv_glib" != no; then
     maybe_enable_gtk=$enable_gtk
     enable_gtk=no
-    PKG_CHECK_MODULES(GTK, [gtk+-3.0 >= 3.24], [
-      PKG_CHECK_MODULES(ATK, [atk >= 1.0.0], [
-        PKG_CHECK_MODULES(PANGO, [pango >= 1.0.0],
-                           [enable_gtk=$maybe_enable_gtk], :)], [:])], [:])
+    PKG_CHECK_MODULES(GTK, [gtk4 >= 4.0], [
+      PKG_CHECK_MODULES(PANGO, [pango >= 1.0.0],
+                         [enable_gtk=$maybe_enable_gtk], :)], [:])
   fi],
   [enable_gtk gst_cv_cairo],
   [Makefile], [gst-gtk.la])

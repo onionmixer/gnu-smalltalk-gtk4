@@ -12,23 +12,10 @@ Gtk class extend [
 ]
 
 
-
-GtkAccelGroup extend [
-    connect: accelKey accelModes: accelMods accelFlags: accelFlags receiver: receiver selector: selector userData: userData [
-	<category: 'C call-outs'>
-	<cCall: 'gstGtkAccelGroupConnect' returning: #void
-	args: #( #selfSmalltalk #int #int #int #smalltalk #smalltalk #smalltalk)>
-    ]
+"GtkAccelGroup removed in GTK4. Use GtkShortcutController instead."
 
-    connect: accelKey accelModes: accelMods accelFlags: accelFlags receiver: receiver selector: selector [
-	<category: 'C call-outs'>
-	<cCall: 'gstGtkAccelGroupConnectNoUserData' returning: #void
-	args: #( #selfSmalltalk #int #int #int #smalltalk #smalltalk )>
-    ]
-]
 
-
-"GtkObject signals replaced with GObject signal API for GTK3."
+"GtkObject signals replaced with GObject signal API."
 
 GLib.GObject extend [
     signalEmitByName: signal args: argsArray [
@@ -47,178 +34,158 @@ GLib.GObject extend [
     ]
 ]
 
-GTK.GdkWindow extend [
+"GTK4: GdkWindow replaced by GdkSurface. gdk_cairo_create removed;
+ use the cairo context provided by GtkDrawingArea draw function."
 
-    cairoCreate [
-        <category: 'C call-outs'>
-        <cCall: 'gdk_cairo_create' returning: #cObject args: #( #self )>
-    ]
-]
 
-
 GtkWidget extend [
 
     getAllocation [
 	<category: 'C call-outs'>
 	<cCall: 'gstGtkWidgetGetAllocation' returning: #{GtkAllocation}
 	args: #(#self )>
-	
+
     ]
 
-    getWindow [
+    getSurface [
+	"GTK4: returns the GdkSurface for this widget's native ancestor."
 	<category: 'C call-outs'>
-	<cCall: 'gstGtkGetWindow' returning: #{GdkWindow} args: #(#self )>
-	
+	<cCall: 'gstGtkGetSurface' returning: #cObject args: #(#self )>
+
+    ]
+
+    "Backwards compatibility alias."
+    getWindow [
+	<category: 'accessing'>
+	^self getSurface
     ]
 
     getState [
 	<category: 'C call-outs'>
 	<cCall: 'gstGtkGetState' returning: #int args: #(#self )>
-	
+
     ]
 
     getFlags [
 	<category: 'C call-outs'>
 	<cCall: 'gstGtkGetFlags' returning: #int args: #(#self )>
-	
+
     ]
 
     setFlags: flags [
 	<category: 'C call-outs'>
 	<cCall: 'gstGtkSetFlags' returning: #void args: #(#self #int )>
-	
+
     ]
 
     unsetFlags: flags [
 	<category: 'C call-outs'>
 	<cCall: 'gstGtkUnsetFlags' returning: #void args: #(#self #int )>
-	
+
     ]
 
 ]
 
 
-
-GtkContainer extend [
-
-    child: widget propertiesAt: name [
-	<category: 'C call-outs'>
-	<cCall: 'gstGtkGetChildProperty' returning: #smalltalk
-	args: #(#self #cObject #string )>
-	
-    ]
-
-    child: widget propertiesAt: name put: anObject [
-	<category: 'C call-outs'>
-	<cCall: 'gstGtkSetChildProperty' returning: #void
-	args: #(#self #cObject #string #smalltalk )>
-	
-    ]
-
-]
+"GTK4: GtkContainer removed. Child management is widget-specific."
 
 
-
+
 GtkTreeModel extend [
 
     getOop: iter column: aColumn [
 	<category: 'C call-outs'>
 	<cCall: 'gstGtkTreeModelGetOOP' returning: #smalltalk
 	args: #(#self #cObject #int )>
-	
+
     ]
 
 ]
 
 
-
+
 GtkTreeStore extend [
 
     setOop: iter column: aColumn value: aValue [
 	<category: 'C call-outs'>
 	<cCall: 'gstGtkTreeStoreSetOOP' returning: #void
 	args: #(#self #cObject #int #smalltalk )>
-	
+
     ]
 
 ]
 
 
-
+
 GtkListStore extend [
 
     setOop: iter column: aColumn value: aValue [
 	<category: 'C call-outs'>
 	<cCall: 'gstGtkListStoreSetOOP' returning: #void
 	args: #(#self #cObject #int #smalltalk )>
-	
+
     ]
 
 ]
 
 
-
+
 GtkDialog extend [
 
     getVBox [
 	<category: 'C call-outs'>
 	<cCall: 'gstGtkDialogGetVBox' returning: #{GtkWidget} args: #(#self )>
-	
+
     ]
 
-    getActionArea [
-	<category: 'C call-outs'>
-	<cCall: 'gstGtkDialogGetActionArea' returning: #{GtkWidget}
-	args: #(#self )>
-	
-    ]
+    "GTK4: getActionArea removed."
 
 ]
 
 
-
+
 GtkScrolledWindow extend [
 
     getHscrollbarVisible [
 	<category: 'C call-outs'>
 	<cCall: 'gstGtkGetHscrollbarVisible' returning: #boolean args: #(#self )>
-	
+
     ]
 
     getVscrollbarVisible [
 	<category: 'C call-outs'>
 	<cCall: 'gstGtkGetVscrollbarVisible' returning: #boolean args: #(#self )>
-	
+
     ]
 
 ]
 
 
-
+
 GtkAdjustment extend [
 
     getLower [
 	<category: 'C call-outs'>
 	<cCall: 'gstGtkAdjustmentGetLower' returning: #int args: #(#self )>
-	
+
     ]
 
     getUpper [
 	<category: 'C call-outs'>
 	<cCall: 'gstGtkAdjustmentGetUpper' returning: #int args: #(#self )>
-	
+
     ]
 
     getPageSize [
 	<category: 'C call-outs'>
 	<cCall: 'gstGtkAdjustmentGetPageSize' returning: #int args: #(#self )>
-	
+
     ]
 
 ]
 
 
-
+
 "FIXME: funcs.awk is broken for these."
 
 GdkPixbufLoader extend [
@@ -228,33 +195,27 @@ GdkPixbufLoader extend [
 	<category: 'C call-outs'>
 	<cCall: 'gdk_pixbuf_loader_write' returning: #boolean
 	args: #(#self #byteArray #int #cObject )>
-	
+
     ]
 
 ]
 
 
+"GTK4: GtkFileChooserDialog deprecated. Use GtkFileDialog for new code."
 GtkFileChooserDialog extend [
-    getFilename [
+    getFile [
+	"GTK4: returns a GFile for the selected file."
 	<category: 'C call-outs'>
-        <cCall: 'gtk_file_chooser_get_filename' returning: #string args: #( #self )>
+        <cCall: 'gtk_file_chooser_get_file' returning: #cObject args: #( #self )>
     ]
 
     getCurrentFolder [
+	"GTK4: returns a GFile for the current folder."
 	<category: 'C call-outs'>
-        <cCall: 'gtk_file_chooser_get_current_folder' returning: #string args: #( #self )>
+        <cCall: 'gtk_file_chooser_get_current_folder' returning: #cObject args: #( #self )>
     ]
 ]
 
-
-GtkContainer extend [
-
-    getFocusChild [
-	<category: 'C call-outs'>
-        <cCall: 'gtk_container_get_focus_child' returning: #{GtkWidget}
-        args: #( #self )>
-    ]
-]
 
 GTK.GtkNotebook extend [
 
@@ -264,7 +225,7 @@ GTK.GtkNotebook extend [
     ]
 ]
 
-
+
 Eval [
     GtkTreeStore superclass: GtkTreeModel.
     GtkListStore superclass: GtkTreeModel

@@ -66,7 +66,7 @@ BEGIN {
       dest = $(3+is_struct)
 
       is_vtable_decl = src ~ /(Class|Iface)$/
-      is_g_name = src ~ /^(G|Pango|Atk)/
+      is_g_name = src ~ /^(G|Pango)/
       is_pointer = dest ~ /\*/
       if (src ~ /Iface$/ && is_g_name && !is_pointer)
         known_parent[substr (dest, 1, length (dest) - 5)] = "GLib.GObject"
@@ -98,7 +98,7 @@ is_struct && (name in classNames) {
   if (name in known_parent)
     parent = known_parent[name]
   else {
-    parent = ($1 ~ /^(G|Pango|Atk)/) && ($2 !~ /^\*/) && ($1 in emitted) ? $1 : "CObject" 
+    parent = ($1 ~ /^(G|Pango)/) && ($2 !~ /^\*/) && ($1 in emitted) ? $1 : "CObject"
     if (parent == "GObject")
       parent = "GLib.GObject"
   }

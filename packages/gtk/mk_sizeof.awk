@@ -40,7 +40,6 @@ BEGIN {
     print "#include <stdlib.h>"
     print "#include <glib.h>"
     print "#include <glib-object.h>"
-    print "#include <atk/atk.h>"
     print "#include <pango/pango.h>"
     print "#include <gdk/gdk.h>"
     print "#include <gtk/gtk.h>"
@@ -57,7 +56,7 @@ BEGIN {
       src = $(2+is_typedef)
       dest = $(3+is_typedef)
       is_vtable_decl = src ~ /(Class|Iface)$/
-      is_g_name = src ~ /^(G|Pango|Atk)/
+      is_g_name = src ~ /^(G|Pango)/
       is_pointer = dest ~ /\*/
     }
 }

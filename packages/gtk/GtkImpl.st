@@ -7,29 +7,14 @@ GtkTextBuffer extend [
     ]
 ]
 
-
-GtkAlignment class extend [
-    new [
-	<category: 'instance creation'>
-        ^self new: 0 yalign: 0 xscale: 1 yscale: 1
-    ]
-]
 
-
-GdkWindow extend [
+"GTK4: GtkAlignment removed. Use widget margin/halign/valign properties."
 
-    withContextDo: aBlock [
-	"Execute aBlock passing a valid Cairo context for the
-	 window.  The context is invalidated after aBlock returns."
 
-	<category: 'accessing'>
-	| context |
-	[ aBlock value: (context := Cairo.CairoContext context: self cairoCreate) ]
-	    ensure: [ context isNil ifFalse: [ context release ] ]
-    ]
+"GTK4: GdkWindow removed, replaced by GdkSurface.
+ gdk_cairo_create removed. Use GtkDrawingArea setDrawFunc: instead."
 
-]
-
+
 GtkWidget extend [
 
     getSizeRequest [
@@ -45,12 +30,12 @@ GtkWidget extend [
 ]
 
 
-
+
 GtkMessageDialog class extend [
 
     new: parent flags: flags type: type buttons: buttons message: message [
 	<category: 'instance creation'>
-	^self 
+	^self
 	    new: parent
 	    flags: flags
 	    type: type
@@ -61,7 +46,7 @@ GtkMessageDialog class extend [
 
     new: parent flags: flags type: type buttons: buttons message: message tip: tip [
 	<category: 'instance creation'>
-	^self 
+	^self
 	    newWithMarkup: parent
 	    flags: flags
 	    type: type
@@ -74,7 +59,7 @@ GtkMessageDialog class extend [
 
     newWithMarkup: parent flags: flags type: type buttons: buttons message: message [
 	<category: 'instance creation'>
-	^self 
+	^self
 	    newWithMarkup: parent
 	    flags: flags
 	    type: type
@@ -85,7 +70,7 @@ GtkMessageDialog class extend [
 ]
 
 
-
+
 GtkRequisition class extend [
 
     fromPoint: point [
@@ -102,7 +87,7 @@ GtkRequisition class extend [
 ]
 
 
-
+
 GtkRequisition extend [
 
     x [
@@ -129,7 +114,7 @@ GtkRequisition extend [
 ]
 
 
-
+
 GdkRectangle class extend [
 
     fromRectangle: rect [
@@ -148,7 +133,7 @@ GdkRectangle class extend [
 ]
 
 
-
+
 GdkRectangle extend [
 
     left [
@@ -224,7 +209,7 @@ GdkRectangle extend [
 ]
 
 
-
+
 GtkTreeIter class extend [
 
     Prototype := nil.
@@ -244,7 +229,7 @@ GtkTreeIter class extend [
 ]
 
 
-
+
 GtkTextIter class extend [
 
     Prototype := nil.
@@ -264,7 +249,7 @@ GtkTextIter class extend [
 ]
 
 
-
+
 GtkTreeModel extend [
 
     getIter: path [
@@ -294,7 +279,7 @@ GtkTreeModel extend [
 	<category: 'accessing'>
 	| iter |
 	iter := GTK.GtkTreeIter new.
-	self 
+	self
 	    iterNthChild: iter
 	    parent: parent
 	    n: n.
@@ -312,7 +297,7 @@ GtkTreeModel extend [
 ]
 
 
-
+
 GtkTreeSelection extend [
 
     getSelected [
@@ -326,7 +311,7 @@ GtkTreeSelection extend [
 ]
 
 
-
+
 GtkListStore extend [
 
     insert: anInteger [
@@ -372,7 +357,7 @@ GtkListStore extend [
 ]
 
 
-
+
 GtkTextBuffer extend [
 
     setText: aString [
@@ -441,7 +426,7 @@ GtkTextBuffer extend [
 	<category: 'accessing'>
 	| result |
 	result := GTK.GtkTextIter new.
-	self 
+	self
 	    getIterAtLineOffset: result
 	    lineNumber: lineNumber
 	    charOffset: charOffset.
@@ -472,7 +457,7 @@ GtkTextBuffer extend [
 	"Insert aString at the insertion point."
 
 	<category: 'accessing'>
-	self 
+	self
 	    insert: iter
 	    text: aString
 	    len: aString size
@@ -481,7 +466,7 @@ GtkTextBuffer extend [
 ]
 
 
-
+
 Gtk class extend [
     | loop |
 
@@ -502,56 +487,21 @@ Gtk class extend [
 ]
 
 
-
-GtkAccelGroup class extend [
-
-    acceleratorParse: accelerator [
-	<category: 'C call-outs'>
-
-	| cAccKey cAccMod |
-	cAccKey := CInt gcValue: 0.
-	cAccMod := CInt gcValue: 0.
-	GTK.Gtk acceleratorParse: accelerator acceleratorKey: cAccKey acceleratorMods: cAccMod.
-	^ {cAccKey value. cAccMod value}
-    ]
-
-    acceleratorGroup: aGtkAccelGroup accelerator: aString path: aPathString [
-	<category: 'C call-outs'>
-
-	| result |
-	result := self acceleratorParse: aString.
-	GTK.GtkAccelMap addEntry: aPathString accelKey: result first accelMods: result second
-    ]
-]
+"GTK4: GtkAccelGroup removed. Use GtkShortcutController instead."
 
 
-GtkAccelGroup extend [
-
-    append: anArray [
-        <category: 'accessing'>
-
-        anArray do: [ :each |
-            self class
-                acceleratorGroup: self
-                accelerator: each first
-                path: each second ]
-    ]
-]
-
-
-
 GtkButton class extend [
 
     label: aString onPressedSend: aSymbol to: anObject [
     <category: 'instance creation'>
 
     ^ (GTK.GtkButton newWithLabel: aString)
-        connectSignal: 'pressed' to: anObject selector: aSymbol userData: nil;
+        connectSignal: 'clicked' to: anObject selector: aSymbol userData: nil;
         yourself
     ]
 ]
 
-
+
 GTK.GtkDialog extend [
     run [
         <category: 'services'>
@@ -572,7 +522,7 @@ GTK.GtkDialog extend [
                 selector: #quit.
 
             self
-                connectSignal: 'delete_event'
+                connectSignal: 'close-request'
                 to: [ answer := Gtk gtkResponseDeleteEvent. loop quit. true ]
                 selector: #value.
 
@@ -590,7 +540,8 @@ GTK.GtkDialog extend [
     ]
 ]
 
-
+
+"GTK4: GtkFileChooserDialog deprecated. Use GtkFileDialog for new code."
 GTK.GtkFileChooserDialog class extend [
 
     for: aGtkFileChooserAction title: aString parent: aGtkWidget button: aButtonLabel  [
@@ -638,12 +589,12 @@ GTK.GtkFileChooserDialog class extend [
     ]
 ]
 
-
+
 GTK.GtkListStore extend [
 
     appendItem: anArray [
 	<category: 'accessing'>
-   
+
 	| iter |
 	iter := self append.
 	self at: iter put: anArray.
@@ -667,7 +618,7 @@ GTK.GtkListStore extend [
 	aBlock value: iter.
 	[ self iterNext: iter ] whileTrue: [ aBlock value: iter ]
     ]
-   
+
     do: aBlock [
 	<category: 'accessing'>
 
@@ -689,76 +640,23 @@ GTK.GtkListStore extend [
     ]
 ]
 
-
-GTK.GtkMenuItem class extend [
 
-    menuItem: aString connectTo: anObject selector: aSymbol userData: userData [
-	<category: 'instance creation'>
+"GTK4: GtkMenuItem/GtkMenu removed. Use GMenu/GAction model-based menus."
 
-	^ (self newWithLabel: aString)
-	    connectSignal: 'activate' to: anObject selector: aSymbol userData: userData;
-	    yourself
-    ]
 
-    menuItem: aString connectTo: anObject selector: aSymbol [
-        <category: 'instance creation'>
-
-        ^ self menuItem: aString connectTo: anObject selector: aSymbol userData: nil 
-    ]
-
-    menuItem: aString accelPath: anAccelPathString [
-	<category: 'instance creation'>
-
-	^ (self newWithLabel: aString)
-	    setAccelPath: anAccelPathString;
-	    yourself
-    ]
-
-    menuItem: aString accelPath: anAccelPathString connectTo: anObject selector: aSymbol [
-        <category: 'instance creation'>
-
-        ^ (self menuItem: aString accelPath: anAccelPathString)
-            connectSignal: 'activate' to: anObject selector: aSymbol userData: nil;
-            yourself
-    ]
-]
-
-
-GTK.GtkMenu extend [
-
-    appendSeparator [
-    <category: 'accessing'>
-
-    self append: GTK.GtkMenuItem new
-    ]
-
-    appendMenuItems: anArray [
-    <category: 'accessing'>
-
-    anArray do: [ :each |
-        self append: 
-	(each isEmpty 
-	    ifTrue: [ GTK.GtkMenuItem new ]
-	    ifFalse: [ (GTK.GtkMenuItem newWithLabel: (each at: 1))
-		connectSignal: 'activate' to: (each at: 2) selector: (each at: 3) userData: nil;
-		yourself ]) ]
-    ]
-]
-
-
 GTK.GtkScrolledWindow class extend [
 
     withChild: aGtkWidget [
     <category: 'instance creation'>
 
-    ^ (GTK.GtkScrolledWindow new: nil vadjustment: nil)
-        add: aGtkWidget;
+    ^ GTK.GtkScrolledWindow new
+        setChild: aGtkWidget;
         setPolicy: GTK.Gtk gtkPolicyAutomatic vscrollbarPolicy: GTK.Gtk gtkPolicyAutomatic;
         yourself
     ]
 ]
 
-
+
 GTK.GtkTextBuffer extend [
 
     text [
@@ -808,7 +706,7 @@ GTK.GtkTextBuffer extend [
     ]
 ]
 
-
+
 GTK.GtkTreeModel extend [
 
     at: aGtkTreeIter [
@@ -875,7 +773,7 @@ GTK.GtkTreeModel extend [
     ]
 ]
 
-
+
 GTK.GtkTreeStore extend [
 
     itersDo: aBlock iter: aGtkTreeIter [
@@ -916,14 +814,14 @@ GTK.GtkTreeStore extend [
 
         | iter |
         iter := GTK.GtkTreeIter new.
-        self 
+        self
 	    append: iter parent: aGtkTreeIter;
 	    at: iter put: anArray.
 	^ iter
     ]
 ]
 
-
+
 GTK.GtkTreeView class extend [
 
     newWith: aGtkModel columns: anArray [
@@ -1020,19 +918,5 @@ GTK.GtkTreeView extend [
 
 	self hasSelectedItem ifFalse: [ self error: 'Nothing is selected' ].
 	^ (self getModel getPath: self selectedIter) getIndices value + 1
-    ]
-]
-
-
-GTK.GtkToolButton class extend [
-    newFromIconName: icon label: aString [
-        ^(self new: nil iconWidget: (GTK.GtkImage newFromIconName: icon size: GTK.Gtk gtkIconSizeSmallToolbar))
-	    setLabel: aString;
-	    yourself
-    ]
-
-    "Keep for backwards compatibility."
-    newFromStock: icon label: aString [
-        ^self newFromIconName: icon label: aString
     ]
 ]

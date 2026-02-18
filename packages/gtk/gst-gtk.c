@@ -1,6 +1,6 @@
 /***********************************************************************
  *
- *  Gtk+ wrappers for GNU Smalltalk
+ *  GTK wrappers for GNU Smalltalk
  *
  ***********************************************************************/
 
@@ -56,11 +56,9 @@
 #include <stdio.h>
 #include <assert.h>
 #include <errno.h>
-#include <gdk/gdk.h>
 #include <gtk/gtk.h>
 #include <glib-object.h>
 #include <glib.h>
-#include <atk/atk.h>
 #include <pango/pango.h>
 
 #include <gobject/gvaluecollector.h>
@@ -74,85 +72,9 @@
 
 static VMProxy *_gtk_vm_proxy;
 
-static int
-connect_accel_group (OOP accel_group,
-                     guint accel_key,
-                     GdkModifierType accel_mods,
-                     GtkAccelFlags accel_flags,
-                     OOP receiver,
-                     OOP selector,
-		     OOP user_data)
-{
-  GtkAccelGroup *cObject = _gtk_vm_proxy->OOPToCObject (accel_group);
-  int n_params;
-  GClosure *closure;
-  OOP oop_sel_args;
-
-  oop_sel_args = _gtk_vm_proxy->strMsgSend (selector, "numArgs", NULL);
-  if (oop_sel_args == _gtk_vm_proxy->nilOOP)
-    return (-3); /* Invalid selector */
-
-  n_params = _gtk_vm_proxy->OOPToInt (oop_sel_args);
-  if (n_params > 4)
-    return (-4);
-
-  closure = smalltalk_closure_new (receiver, selector, NULL,
-				   accel_group, n_params);
-  gtk_accel_group_connect (cObject, accel_key, accel_mods, accel_flags, closure);
-  return 0;
-}
-
-static int
-connect_accel_group_no_user_data (OOP accel_group,
-		                  guint accel_key,
-		                  GdkModifierType accel_mods,
-		                  GtkAccelFlags accel_flags,
-		                  OOP receiver,
-		                  OOP selector)
-{
-  return connect_accel_group (accel_group, accel_key, accel_mods,
-		              accel_flags, receiver, selector, NULL);
-}
-
-OOP
-container_get_child_property (GtkContainer *aParent,
-			      GtkWidget *aChild,
-			      const char *aProperty)
-{
-  GParamSpec *spec;
-  GValue result = {0,};
-
-  g_return_val_if_fail (GTK_WIDGET (aParent) ==
-		        gtk_widget_get_parent (GTK_WIDGET (aChild)),
-			_gtk_vm_proxy->nilOOP);
-
-  spec = gtk_container_class_find_child_property (G_OBJECT_GET_CLASS (aParent),
-					          aProperty);
-
-  g_value_init (&result, spec->value_type);
-  gtk_container_child_get_property (aParent, aChild, aProperty, &result);
-  return (g_value_convert_to_oop (&result));
-}
-
-void
-container_set_child_property (GtkContainer *aParent,
-			      GtkWidget *aChild,
-			      const char *aProperty,
-			      OOP aValue)
-{
-  GParamSpec *spec;
-  GValue value = {0,};
-
-  g_return_if_fail (GTK_WIDGET (aParent) ==
-		    gtk_widget_get_parent (GTK_WIDGET (aChild)));
-
-  spec = gtk_container_class_find_child_property (G_OBJECT_GET_CLASS (aParent),
-						  aProperty);
-
-  g_value_init (&value, spec->value_type);
-  g_value_fill_from_oop (&value, aValue);
-  gtk_container_child_set_property (aParent, aChild, aProperty, &value);
-}
+/* GtkAccelGroup removed in GTK4 (use GtkShortcutController).
+   GtkContainer removed in GTK4 (child properties replaced by
+   widget-specific APIs). */
 
 OOP
 tree_model_get_oop (GtkTreeModel *model,
@@ -196,14 +118,16 @@ tree_store_set_oop (GtkTreeStore *store,
 }
 
 
-/* Wrappers for macros and missing accessor functions.
-   Updated for GTK3 compatibility: direct struct field access replaced
-   with GTK3 accessor functions.  */
+/* Wrappers for accessor functions.
+   Updated for GTK4 compatibility.  */
 
-static GdkWindow *
-widget_get_window (GtkWidget *widget)
+static GdkSurface *
+widget_get_surface (GtkWidget *widget)
 {
-  return gtk_widget_get_window (widget);
+  GtkNative *native = gtk_widget_get_native (widget);
+  if (native)
+    return gtk_native_get_surface (native);
+  return NULL;
 }
 
 static int
@@ -220,10 +144,10 @@ widget_get_flags (GtkWidget *widget)
   if (gtk_widget_get_mapped (widget)) flags |= (1 << 1);
   if (gtk_widget_get_realized (widget)) flags |= (1 << 2);
   if (gtk_widget_get_sensitive (widget)) flags |= (1 << 3);
-  if (gtk_widget_get_can_focus (widget)) flags |= (1 << 4);
+  if (gtk_widget_get_focusable (widget)) flags |= (1 << 4);
   if (gtk_widget_has_focus (widget)) flags |= (1 << 5);
-  if (gtk_widget_has_default (widget)) flags |= (1 << 6);
-  if (!gtk_widget_get_has_window (widget)) flags |= (1 << 7);
+  /* bit 6 (has_default) removed in GTK4 */
+  /* bit 7 (no_window/has_window) removed in GTK4 */
   return flags;
 }
 
@@ -232,7 +156,7 @@ widget_set_flags (GtkWidget *widget, int flags)
 {
   if (flags & (1 << 0)) gtk_widget_set_visible (widget, TRUE);
   if (flags & (1 << 3)) gtk_widget_set_sensitive (widget, TRUE);
-  if (flags & (1 << 4)) gtk_widget_set_can_focus (widget, TRUE);
+  if (flags & (1 << 4)) gtk_widget_set_focusable (widget, TRUE);
 }
 
 static void
@@ -240,29 +164,30 @@ widget_unset_flags (GtkWidget *widget, int flags)
 {
   if (flags & (1 << 0)) gtk_widget_set_visible (widget, FALSE);
   if (flags & (1 << 3)) gtk_widget_set_sensitive (widget, FALSE);
-  if (flags & (1 << 4)) gtk_widget_set_can_focus (widget, FALSE);
+  if (flags & (1 << 4)) gtk_widget_set_focusable (widget, FALSE);
 }
 
 
 static GtkAllocation *
 widget_get_allocation (GtkWidget *wgt)
 {
+  /* GTK4: gtk_widget_get_allocation() removed.
+     Use width/height; x/y are 0 in widget's own coordinate space. */
   static GtkAllocation alloc;
-  gtk_widget_get_allocation (wgt, &alloc);
+  alloc.x = 0;
+  alloc.y = 0;
+  alloc.width = gtk_widget_get_width (wgt);
+  alloc.height = gtk_widget_get_height (wgt);
   return &alloc;
 }
 
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 static GtkWidget *
 dialog_get_vbox (GtkDialog *dlg)
 {
   return gtk_dialog_get_content_area (dlg);
 }
-
-static GtkWidget *
-dialog_get_action_area (GtkDialog *dlg)
-{
-  return gtk_dialog_get_action_area (dlg);
-}
+G_GNUC_END_IGNORE_DEPRECATIONS
 
 static int
 scrolled_window_get_hscrollbar_visible (GtkScrolledWindow *swnd)
@@ -312,22 +237,15 @@ void
 gst_initModule (proxy)
      VMProxy *proxy;
 {
-  int argc = 1;
-  gchar *argvArray[] = { (char *) "gst", NULL };
-  gchar **argv = argvArray;
-
-  initialized = gtk_init_check (&argc, &argv);
+  /* GTK4: gtk_init_check() takes no arguments. */
+  initialized = gtk_init_check ();
 
   _gtk_vm_proxy = proxy;
-  _gtk_vm_proxy->defineCFunc ("gstGtkConnectAccelGroup", connect_accel_group);
-  _gtk_vm_proxy->defineCFunc ("gstGtkConnectAccelGroupNoUserData", connect_accel_group_no_user_data);
-  _gtk_vm_proxy->defineCFunc ("gstGtkGetChildProperty", container_get_child_property);
-  _gtk_vm_proxy->defineCFunc ("gstGtkSetChildProperty", container_set_child_property);
   _gtk_vm_proxy->defineCFunc ("gstGtkGetState", widget_get_state);
   _gtk_vm_proxy->defineCFunc ("gstGtkGetFlags", widget_get_flags);
   _gtk_vm_proxy->defineCFunc ("gstGtkSetFlags", widget_set_flags);
   _gtk_vm_proxy->defineCFunc ("gstGtkUnsetFlags", widget_unset_flags);
-  _gtk_vm_proxy->defineCFunc ("gstGtkGetWindow", widget_get_window);
+  _gtk_vm_proxy->defineCFunc ("gstGtkGetSurface", widget_get_surface);
   _gtk_vm_proxy->defineCFunc ("gstGtkGetHscrollbarVisible", scrolled_window_get_hscrollbar_visible);
   _gtk_vm_proxy->defineCFunc ("gstGtkGetVscrollbarVisible", scrolled_window_get_vscrollbar_visible);
   _gtk_vm_proxy->defineCFunc ("gstGtkAdjustmentGetLower", adjustment_get_lower);
@@ -338,7 +256,6 @@ gst_initModule (proxy)
   _gtk_vm_proxy->defineCFunc ("gstGtkTreeStoreSetOOP", tree_store_set_oop);
   _gtk_vm_proxy->defineCFunc ("gstGtkWidgetGetAllocation", widget_get_allocation);
   _gtk_vm_proxy->defineCFunc ("gstGtkDialogGetVBox", dialog_get_vbox);
-  _gtk_vm_proxy->defineCFunc ("gstGtkDialogGetActionArea", dialog_get_action_area);
 
   _gtk_vm_proxy->defineCFunc ("gtk_placer_get_type", gtk_placer_get_type);
   _gtk_vm_proxy->defineCFunc ("gtk_placer_new", gtk_placer_new);

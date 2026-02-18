@@ -130,12 +130,12 @@ $1 == "struct" && $2 ~ /^_/ {
   define_class(name)
 }
 
-$0 ~ /^typedef (struct|union)/ && $3 ~ /_(G|Pango|Atk)/ {
+$0 ~ /^typedef (struct|union)/ && $3 ~ /_(G|Pango)/ {
   gsub(/[_;]/, "", $0)
   define_class($4)
 }
 
-$1 == "typedef" && $2 ~ /^(G|Pango|Atk)/ {
+$1 == "typedef" && $2 ~ /^(G|Pango)/ {
   # Take into account typedefs from a struct named differently.
   gsub(/[_;]/, "", $0)
   define_class($3)
