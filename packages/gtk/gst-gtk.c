@@ -260,6 +260,68 @@ gst_gtk_drawing_area_connect_draw (GtkDrawingArea *area)
 
 /* Initialization.  */
 
+/* GTK4: GdkScreen and gdk_get_default_root_window() removed.
+   Use GdkMonitor API to get screen dimensions. */
+static GdkRectangle *
+screen_get_geometry (void)
+{
+  static GdkRectangle geom = { 0, 0, 0, 0 };
+  GdkDisplay *display = gdk_display_get_default ();
+  GListModel *monitors;
+  GdkMonitor *monitor;
+
+  if (!display) return &geom;
+  monitors = gdk_display_get_monitors (display);
+  if (!monitors || g_list_model_get_n_items (monitors) == 0) return &geom;
+
+  monitor = g_list_model_get_item (monitors, 0);
+  if (!monitor) return &geom;
+
+  gdk_monitor_get_geometry (monitor, &geom);
+  g_object_unref (monitor);
+  return &geom;
+}
+
+static int
+screen_get_monitor_width_mm (void)
+{
+  GdkDisplay *display = gdk_display_get_default ();
+  GListModel *monitors;
+  GdkMonitor *monitor;
+  int mm;
+
+  if (!display) return 0;
+  monitors = gdk_display_get_monitors (display);
+  if (!monitors || g_list_model_get_n_items (monitors) == 0) return 0;
+
+  monitor = g_list_model_get_item (monitors, 0);
+  if (!monitor) return 0;
+
+  mm = gdk_monitor_get_width_mm (monitor);
+  g_object_unref (monitor);
+  return mm;
+}
+
+static int
+screen_get_monitor_height_mm (void)
+{
+  GdkDisplay *display = gdk_display_get_default ();
+  GListModel *monitors;
+  GdkMonitor *monitor;
+  int mm;
+
+  if (!display) return 0;
+  monitors = gdk_display_get_monitors (display);
+  if (!monitors || g_list_model_get_n_items (monitors) == 0) return 0;
+
+  monitor = g_list_model_get_item (monitors, 0);
+  if (!monitor) return 0;
+
+  mm = gdk_monitor_get_height_mm (monitor);
+  g_object_unref (monitor);
+  return mm;
+}
+
 static int initialized = 0;
 
 int
@@ -292,6 +354,9 @@ gst_initModule (proxy)
   _gtk_vm_proxy->defineCFunc ("gstGtkWidgetGetAllocation", widget_get_allocation);
   _gtk_vm_proxy->defineCFunc ("gstGtkDialogGetVBox", dialog_get_vbox);
   _gtk_vm_proxy->defineCFunc ("gstGtkDrawingAreaConnectDraw", gst_gtk_drawing_area_connect_draw);
+  _gtk_vm_proxy->defineCFunc ("gstGtkScreenGetGeometry", screen_get_geometry);
+  _gtk_vm_proxy->defineCFunc ("gstGtkScreenGetMonitorWidthMm", screen_get_monitor_width_mm);
+  _gtk_vm_proxy->defineCFunc ("gstGtkScreenGetMonitorHeightMm", screen_get_monitor_height_mm);
 
   _gtk_vm_proxy->defineCFunc ("gtk_placer_get_type", gtk_placer_get_type);
   _gtk_vm_proxy->defineCFunc ("gtk_placer_new", gtk_placer_new);

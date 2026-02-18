@@ -186,10 +186,35 @@ I represent a text viewer with pretty good formatting options.'>
 	 ``Times -14'', ``Futura Bold Underline''.  You must enclose the font family
 	 in braces if it is made of two or more words."
 
-	"Change default font throughout the widget"
+	"GTK4: modifyFont: removed. Use CSS provider to set font."
 
 	<category: 'accessing'>
-	self connected modifyFont: (GTK.PangoFontDescription fromString: value).
+	| fd provider css family sizeStr weightStr styleStr |
+	fd := GTK.PangoFontDescription fromString: value.
+	family := fd getFamily ifNil: [ 'Sans' ].
+	sizeStr := fd getSize > 0
+	    ifTrue: [
+		fd getSizeIsAbsolute
+		    ifTrue: [ (fd getSize // 1024) printString , 'px' ]
+		    ifFalse: [ (fd getSize // 1024) printString , 'pt' ] ]
+	    ifFalse: [ '10pt' ].
+	weightStr := fd getWeight printString.
+	styleStr := fd getStyle = 2
+	    ifTrue: [ 'italic' ]
+	    ifFalse: [ fd getStyle = 1
+		ifTrue: [ 'oblique' ]
+		ifFalse: [ 'normal' ] ].
+	provider := self properties at: #fontProvider ifAbsent: [
+	    | p |
+	    p := GTK.GtkCssProvider new.
+	    self connected getStyleContext addProvider: p priority: 600.
+	    self properties at: #fontProvider put: p.
+	    p ].
+	css := 'textview { font-family: "' , family ,
+	    '"; font-size: ' , sizeStr ,
+	    '; font-weight: ' , weightStr ,
+	    '; font-style: ' , styleStr , '; }'.
+	provider loadFromData: css length: -1.
 	self properties at: #font put: value
     ]
 

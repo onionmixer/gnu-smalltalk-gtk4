@@ -53,6 +53,8 @@
 #include "placer.h"
 #include "placer.c"
 
+static GMainLoop *main_loop;
+
 gint rel_width = 5461;
 gint rel_height = 8191;
 
@@ -62,6 +64,12 @@ void move_button (GtkWidget *widget,
   rel_width = 5461 + 8192 - rel_width;
   rel_height = 8192 + 10922 - rel_height;
   gtk_placer_resize_rel (GTK_PLACER (placer), widget, rel_width, rel_height);
+}
+
+static void
+on_destroy (GtkWidget *widget, gpointer data)
+{
+  g_main_loop_quit (main_loop);
 }
 
 int main (int   argc,
@@ -75,53 +83,51 @@ int main (int   argc,
 
   const int rel_x[4] = { 0, 8192, 16384, 24576 };
   const int rel_y[3] = { 0, 10922, 21844 };
-  
-  /* Initialise GTK */
-  gtk_init (&argc, &argv);
-    
+
+  /* GTK4: gtk_init() takes no arguments. */
+  gtk_init ();
+
   /* Create a new window */
-  window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  window = gtk_window_new ();
   gtk_window_set_title (GTK_WINDOW (window), "Placer Container");
 
-  /* Here we connect the "destroy" event to a signal handler */ 
+  /* Here we connect the "destroy" event to a signal handler */
   g_signal_connect (G_OBJECT (window), "destroy",
-		    G_CALLBACK (gtk_main_quit), NULL);
- 
-  /* Sets the border width of the window. */
-  gtk_container_set_border_width (GTK_CONTAINER (window), 5);
+		    G_CALLBACK (on_destroy), NULL);
 
+  /* GTK4: border width via margins on child widget. */
   /* Create a Placer Container */
   placer = gtk_placer_new ();
-  gtk_container_add (GTK_CONTAINER (window), placer);
-  gtk_widget_show (placer);
-  
+  gtk_widget_set_margin_start (placer, 5);
+  gtk_widget_set_margin_end (placer, 5);
+  gtk_widget_set_margin_top (placer, 5);
+  gtk_widget_set_margin_bottom (placer, 5);
+  gtk_window_set_child (GTK_WINDOW (window), placer);
+
   for (i = 0 ; i <= 11 ; i++) {
     /* Creates a new button with the label "Press me" */
     button = gtk_button_new_with_label ("Press me");
-  
+
     /* When the button receives the "clicked" signal, it will call the
      * function move_button() passing it the Fixed Container as its
      * argument. */
     g_signal_connect (G_OBJECT (button), "clicked",
 		      G_CALLBACK (move_button), (gpointer) placer);
-  
+
     /* This packs the button into the placer containers window. */
     gtk_placer_put (GTK_PLACER (placer), button,
 		    5, 2, -10, -4,
 		    rel_x[i % 4], rel_y[i / 4],
 		    rel_width, rel_height);
-  
-    /* The final step is to display this newly created widget. */
-    gtk_widget_show (button);
   }
 
-  /* gtk_window_set_default_size (GTK_WINDOW (window), 400, 200); */
-
   /* Display the window */
-  gtk_widget_show (window);
-    
+  gtk_widget_set_visible (window, TRUE);
+
   /* Enter the event loop */
-  gtk_main ();
-    
+  main_loop = g_main_loop_new (NULL, FALSE);
+  g_main_loop_run (main_loop);
+  g_main_loop_unref (main_loop);
+
   return 0;
 }

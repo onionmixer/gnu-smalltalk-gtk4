@@ -1006,16 +1006,11 @@ I expose class methods that do many interesting event-handling things.'>
 	 not relative to the top-left corner of the currently shown portion).
 	 If the mouse pointer isn't on the same screen as window then answer nil."
 
+	"GTK4: gdk_display_get_pointer removed. Global pointer position
+	 is not available on Wayland. Return 0@0 as a safe fallback."
+
 	<category: 'utility'>
-	| x y |
-	x := CIntType gcNew.
-	y := CIntType gcNew.
-	GdkDisplay getDefault 
-	    getPointer: nil
-	    x: x
-	    y: y
-	    mask: nil.
-	^x value @ y value.
+	^0 @ 0.
     ]
 
     Blox class >> platform [
@@ -1032,23 +1027,26 @@ I expose class methods that do many interesting event-handling things.'>
 	 screen in the virtual root window on which the application's windows are
 	 drawn (under Windows and the Macintosh, that's always 0 @ 0)"
 
+	"GTK4: getDefaultRootWindow removed. In modern compositors
+	 the screen origin is always 0@0."
+
 	<category: 'utility'>
-	| x y |
-	x := CIntType gcNew.
-	y := CIntType gcNew.
-	Gdk getDefaultRootWindow getOrigin: x y: y.
-	^x value negated @ y value negated.
+	^0 @ 0.
     ]
 
     Blox class >> screenResolution [
 	"Answer a Point containing the resolution in dots per inch of the screen,
 	 in the x and y directions."
 
+	"GTK4: GdkScreen removed. Use GdkMonitor via C helpers."
+
 	<category: 'utility'>
-	| screen |
-	screen := GdkScreen getDefault.
-	^(screen getWidth * 25.4 / screen getWidthMm) 
-	    @ (screen getHeight * 25.4 / screen getHeightMm)
+	| geom widthMm heightMm |
+	geom := Gtk screenGetGeometry.
+	widthMm := Gtk screenGetMonitorWidthMm.
+	heightMm := Gtk screenGetMonitorHeightMm.
+	(widthMm = 0 or: [heightMm = 0]) ifTrue: [^96 @ 96].
+	^(geom width * 25.4 / widthMm) @ (geom height * 25.4 / heightMm)
     ]
 
     Blox class >> screenSize [
@@ -1056,12 +1054,13 @@ I expose class methods that do many interesting event-handling things.'>
 	 application's windows are drawn (under Windows and the Macintosh, that's
 	 the size of the screen)"
 
+	"GTK4: GdkScreen and getDefaultRootWindow removed.
+	 Use GdkMonitor geometry via C helper."
+
 	<category: 'utility'>
-	| height width |
-	width := CIntType gcNew.
-	height := CIntType gcNew.
-	Gdk getDefaultRootWindow getSize: width height: height.
-	^width value @ height value
+	| geom |
+	geom := Gtk screenGetGeometry.
+	^geom width @ geom height
     ]
 
     state [
@@ -1075,19 +1074,22 @@ I expose class methods that do many interesting event-handling things.'>
 	 be insensitive: the application will refuse to activate the widget and
 	 will ignore mouse button presses."
 
+	"GTK4: GtkStateType enum removed. Use GtkStateFlags bitfield.
+	 GTK_STATE_FLAG_ACTIVE=1, GTK_STATE_FLAG_INSENSITIVE=8,
+	 GTK_STATE_FLAG_SELECTED=4."
+
 	<category: 'accessing'>
-	| state |
-	state := self connected getState.
-	state = Gtk gtkStateActive ifTrue: [^#active].
-	state = Gtk gtkStateInsensitive ifTrue: [^#disabled].
-	state = Gtk gtkStateSelected ifTrue: [^#active].
-	state = Gtk gtkStatePrelight ifTrue: [^#normal].
+	| flags |
+	flags := self connected getStateFlags.
+	(flags bitAnd: 8) > 0 ifTrue: [^#disabled].   "INSENSITIVE"
+	(flags bitAnd: 1) > 0 ifTrue: [^#active].     "ACTIVE"
+	(flags bitAnd: 4) > 0 ifTrue: [^#active].     "SELECTED"
 	^#normal
     ]
 
     state: value [
 	"Set the value of the state option for the widget.
-	 
+
 	 Specifies one of three states for the button: normal, active, or disabled.
 	 In normal state the button is displayed using the foreground and background
 	 options. The active state is typically used when the pointer is over the
@@ -1096,17 +1098,19 @@ I expose class methods that do many interesting event-handling things.'>
 	 be insensitive: the application will refuse to activate the widget and
 	 will ignore mouse button presses."
 
+	"GTK4: Use setStateFlags:/unsetStateFlags: instead of setState:."
+
 	<category: 'accessing'>
-	| state |
 	self state = value ifTrue: [^self].
-	value = #disabled 
+	value = #disabled
 	    ifTrue: [self connected setSensitive: false]
-	    ifFalse: 
-		[value = #active 
-		    ifTrue: [self connected setState: Gtk gtkStateActive]
-		    ifFalse: 
-			[value = #normal 
-			    ifTrue: [self connected setState: Gtk gtkStateNormal]
+	    ifFalse:
+		[self connected setSensitive: true.
+		value = #active
+		    ifTrue: [self connected setStateFlags: 1 clear: false]
+		    ifFalse:
+			[value = #normal
+			    ifTrue: [self connected unsetStateFlags: 1]
 			    ifFalse: [self error: 'invalid state value']]]
     ]
 

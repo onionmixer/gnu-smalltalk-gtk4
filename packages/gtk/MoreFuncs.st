@@ -366,6 +366,45 @@ GtkSingleSelection extend [
  GTK4 removed the 'draw' signal. Use connectDrawTo:selector: to
  install a draw function and connect to the custom 'gst-draw' signal."
 
+"GTK4: GdkScreen and gdk_get_default_root_window() removed.
+ Use GdkMonitor helpers for screen geometry."
+
+Gtk class extend [
+
+    screenGetGeometry [
+	"Return a GdkRectangle with the primary monitor geometry."
+	<category: 'C call-outs'>
+	<cCall: 'gstGtkScreenGetGeometry' returning: #{GdkRectangle} args: #()>
+    ]
+
+    screenGetMonitorWidthMm [
+	"Return the physical width of the primary monitor in mm."
+	<category: 'C call-outs'>
+	<cCall: 'gstGtkScreenGetMonitorWidthMm' returning: #int args: #()>
+    ]
+
+    screenGetMonitorHeightMm [
+	"Return the physical height of the primary monitor in mm."
+	<category: 'C call-outs'>
+	<cCall: 'gstGtkScreenGetMonitorHeightMm' returning: #int args: #()>
+    ]
+
+]
+
+
+"Missing from auto-generated Funcs.st."
+
+PangoFontDescription extend [
+
+    getFamily [
+	<category: 'C call-outs'>
+	<cCall: 'pango_font_description_get_family' returning: #string
+	args: #( #self )>
+    ]
+
+]
+
+
 GtkDrawingArea extend [
 
     connectDrawSignal [
