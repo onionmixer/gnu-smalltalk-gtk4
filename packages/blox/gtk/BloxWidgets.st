@@ -4210,7 +4210,7 @@ common dialog boxes, such as choose-a-file and choose-a-color.'>
 	separator show.
 
 	"Put the GtkPlacer at the end of the list of the end-packed widgets,
-	 which puts it above our GtkSeparator and GtkButtonBox."
+	 which puts it above our GtkSeparator and button box."
 	uiBox reorderChildAfter: self toplevel connected sibling: separator.
 	initInfo isNil ifTrue: [^self].
 	label := GTK.GtkLabel new: initInfo key.

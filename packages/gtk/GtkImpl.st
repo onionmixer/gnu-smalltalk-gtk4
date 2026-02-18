@@ -18,13 +18,16 @@ GtkTextBuffer extend [
 GtkWidget extend [
 
     getSizeRequest [
-	"Answer the size the widget has requisitioned."
+	"Answer the natural size the widget has requisitioned.
+	 GTK4: gtk_widget_size_request removed.
+	 Uses gtk_widget_get_preferred_size instead."
 
 	<category: 'accessing'>
-	| requisition |
-	requisition := GTK.GtkRequisition new.
-	self sizeRequest: requisition.
-	^requisition asPoint
+	| minimum natural |
+	minimum := GTK.GtkRequisition new.
+	natural := GTK.GtkRequisition new.
+	self getPreferredSize: minimum naturalSize: natural.
+	^natural width value @ natural height value
     ]
 
 ]
