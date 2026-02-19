@@ -2,15 +2,10 @@
 
 # GNU Smalltalk's configure adds -Wno-format which conflicts with
 # dpkg-buildflags' -Werror=format-security. Disable format hardening.
-# LTO causes compilation failures with old autoconf-generated code.
-export DEB_BUILD_MAINT_OPTIONS = hardening=+all,-format optimize=-lto
-
-# Force serial build to avoid race conditions with generated headers
-# (genbc-decl.h, genbc-impl.h, etc. in libgst/).
-export DEB_BUILD_OPTIONS += parallel=1
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all,-format
 
 %:
-	dh $@
+	dh $@ --without autoreconf
 
 override_dh_auto_configure:
 	dh_auto_configure -- \
@@ -33,23 +28,6 @@ override_dh_auto_clean:
 
 override_dh_auto_test:
 	-dh_auto_test
-
-override_dh_auto_install:
-	# config.status may be removed between build and binary phases;
-	# re-configure and rebuild if needed.
-	if [ ! -f config.status ]; then \
-		dh_auto_configure -- \
-			--libexecdir='$${prefix}/lib' \
-			--with-imagedir=/usr/lib/gnu-smalltalk \
-			--enable-gtk=yes \
-			--without-emacs \
-			--with-system-libffi \
-			--with-system-libsigsegv \
-			--with-system-libltdl \
-			--disable-relocatable; \
-		dh_auto_build; \
-	fi
-	dh_auto_install
 
 override_dh_missing:
 	dh_missing --list-missing
