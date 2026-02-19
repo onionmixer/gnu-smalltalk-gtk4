@@ -2449,7 +2449,7 @@ hQQAO///'
 
 
 BViewport subclass: BList [
-    | labels items callback gtkmodel connected gtkcolumn |
+    | labels items callback gtkmodel selectionModel factory |
     
     <comment: 'I represent a list box from which you can choose one or more
 elements.'>
@@ -2480,23 +2480,21 @@ elements.'>
 	 Answer anObject or, if it is nil, aString."
 
 	<category: 'accessing'>
-	| elem label iter |
+	| elem label |
 	label := aString isNil ifTrue: [anObject displayString] ifFalse: [aString].
 	elem := anObject isNil ifTrue: [aString] ifFalse: [anObject].
-	labels isNil 
-	    ifTrue: 
-		[index > 0 
+	labels isNil
+	    ifTrue:
+		[index > 0
 		    ifTrue: [^SystemExceptions.IndexOutOfRange signalOn: self withIndex: index].
 		labels := OrderedCollection with: label.
 		items := OrderedCollection with: elem]
-	    ifFalse: 
+	    ifFalse:
 		[labels add: label afterIndex: index.
 		items add: elem afterIndex: index].
-	iter := self gtkmodel insert: index.
-	self gtkmodel 
-	    setOop: iter
-	    column: 0
-	    value: label.
+	index >= labels size
+	    ifTrue: [self gtkmodel append: label]
+	    ifFalse: [self gtkmodel insert: label at: index].
 	^elem
     ]
 
@@ -2591,27 +2589,21 @@ elements.'>
 	 The two collections must have the same size."
 
 	<category: 'accessing'>
-	| stream iter |
-	(elementList notNil and: [elementList size ~= stringCollection size]) 
-	    ifTrue: 
-		[^self 
+	| n |
+	(elementList notNil and: [elementList size ~= stringCollection size])
+	    ifTrue:
+		[^self
 		    error: 'label collection must have the same size as element collection'].
-	labels := stringCollection isNil 
-		    ifTrue: 
+	labels := stringCollection isNil
+		    ifTrue:
 			[elementList asOrderedCollection collect: [:each | each displayString]]
 		    ifFalse: [stringCollection asOrderedCollection].
-	items := elementList isNil 
+	items := elementList isNil
 		    ifTrue: [labels copy]
 		    ifFalse: [elementList asOrderedCollection].
-	self gtkmodel clear.
-	iter := GTK.GtkTreeIter new.
-	stringCollection do: 
-		[:each | 
-		self gtkmodel append: iter.
-		self gtkmodel 
-		    setOop: iter
-		    column: 0
-		    value: each]
+	n := self gtkmodel getNItems.
+	n > 0 ifTrue: [self gtkmodel splice: 0 nRemovals: n additions: nil].
+	labels do: [:each | self gtkmodel append: each]
     ]
 
     do: aBlock [
@@ -2794,44 +2786,31 @@ elements.'>
 
 	<category: 'accessing'>
 	^self properties at: #index
-	    ifAbsentPut: 
-		[| iter |
-		(iter := self connected getSelection getSelected) isNil 
-		    ifTrue: [nil]
-		    ifFalse: [(self gtkmodel getStringFromIter: iter) asInteger]]
+	    ifAbsentPut:
+		[| pos |
+		pos := selectionModel getSelected.
+		(pos >= 0 and: [pos < items size])
+		    ifTrue: [pos + 1]
+		    ifFalse: [nil]]
     ]
 
     indexAt: point [
 	"Answer the index of the element that covers the point in the
 	 listbox window specified by x and y (in pixel coordinates).  If no
 	 element covers that point, then the closest element to that point
-	 is used."
+	 is used.
+	 GTK4: GtkListView has no getPathAtPos equivalent.
+	 Return the last index as a fallback."
 
 	<category: 'accessing'>
-	| pPath ok path index |
-	pPath := GTK.GtkTreePath type ptrType gcNew.
-	ok := self 
-		    getPathAtPos: point x
-		    y: point y
-		    path: pPath
-		    column: nil
-		    cellX: nil
-		    cellY: nil.
-	path := pPath value.
-	index := ok ifTrue: [path getIndices value] ifFalse: [self elements size].
-	path free.
-	^index
+	^self elements size
     ]
 
     isSelected: index [
 	"Answer whether the element indicated by index is currently selected."
 
 	<category: 'accessing'>
-	| selected path |
-	path := self pathAt: index.
-	selected := self connected getSelection pathIsSelected: path.
-	path free.
-	^selected
+	^selectionModel isSelected: index - 1
     ]
 
     labelAt: anIndex [
@@ -2894,16 +2873,7 @@ elements.'>
 	 special situations."
 
 	<category: 'accessing'>
-	| mode |
-	^self properties at: #selectmode
-	    ifAbsentPut: 
-		[mode := self connected getSelection getMode.
-		mode = GTK.Gtk gtkSelectionSingle 
-		    ifTrue: [#single]
-		    ifFalse: 
-			[mode = GTK.Gtk gtkSelectionBrowse 
-			    ifTrue: [#browse]
-			    ifFalse: [mode = GTK.Gtk gtkSelectionExtended ifTrue: [#extended]]]]
+	^self properties at: #selectmode ifAbsentPut: [#single]
     ]
 
     mode: value [
@@ -2944,20 +2914,20 @@ elements.'>
 	 special situations."
 
 	<category: 'accessing'>
-	| mode |
-	value = #single 
-	    ifTrue: [mode := GTK.Gtk gtkSelectionSingle]
-	    ifFalse: 
-		[value = #browse 
-		    ifTrue: [mode := GTK.Gtk gtkSelectionBrowse]
-		    ifFalse: 
-			[value = #multiple 
-			    ifTrue: [mode := GTK.Gtk gtkSelectionExtended]
-			    ifFalse: 
-				[value = #extended 
-				    ifTrue: [mode := GTK.Gtk gtkSelectionExtended]
-				    ifFalse: [^self error: 'invalid value for BList mode']]]].
-	self connected getSelection setMode: mode.
+	| newModel |
+	(value = #single or: [value = #browse])
+	    ifTrue: [newModel := GTK.GtkSingleSelection new: gtkmodel]
+	    ifFalse:
+		[(value = #multiple or: [value = #extended])
+		    ifTrue: [newModel := GTK.GtkMultiSelection new: gtkmodel]
+		    ifFalse: [^self error: 'invalid value for BList mode']].
+	selectionModel := newModel.
+	self connected setModel: selectionModel.
+	selectionModel
+	    connectSignal: 'selection-changed'
+	    to: self
+	    selector: #'onSelectionChanged:pos:nItems:'
+	    userData: nil.
 	self properties at: #selectmode put: value
     ]
 
@@ -2977,22 +2947,24 @@ elements.'>
 	| result |
 	labels removeAtIndex: index.
 	result := items removeAtIndex: index.
-	self gtkmodel remove: (self iterAt: index).
+	self gtkmodel remove: index - 1.
 	^result
     ]
 
     label [
-	"assign a new label to the list"
+	"Answer the label for the list.
+	 GTK4: GtkListView has no column headers."
 
 	<category: 'accessing'>
-	^self gtkcolumn getTitle
+	^self properties at: #listLabel ifAbsent: ['List']
     ]
 
     label: aString [
-	"assign a new label to the list"
+	"Set the label for the list.
+	 GTK4: GtkListView has no column headers, stored locally."
 
 	<category: 'accessing'>
-	self gtkcolumn setTitle: aString
+	self properties at: #listLabel put: aString
     ]
 
     size [
@@ -3015,72 +2987,59 @@ elements.'>
 	    nl
     ]
 
-    gtkcolumn [
-	"answer the gtk column for the list"
-
-	<category: 'private'>
-	gtkcolumn isNil ifTrue: [self createWidget].
-	^gtkcolumn
-    ]
-
     gtkmodel [
-	"answer the gtk list model"
+	"answer the gtk list model (GtkStringList)"
 
 	<category: 'private'>
 	gtkmodel isNil ifTrue: [self createWidget].
 	^gtkmodel
     ]
 
-    onChanged: selection data: userData [
+    onSelectionChanged: aModel pos: aPos nItems: aNItems [
 	<category: 'private'>
-	| iter |
-	(iter := selection getSelected) isNil 
-	    ifFalse: [self invokeCallback: (self gtkmodel getStringFromIter: iter)]
+	| pos |
+	pos := selectionModel getSelected.
+	(pos >= 0 and: [pos < items size])
+	    ifTrue: [self invokeCallback: pos printString]
     ]
 
-    pathAt: anIndex [
+    onSetup: aFactory listItem: aListItem [
 	<category: 'private'>
-	^GTK.GtkTreePath newFromIndices: anIndex - 1 varargs: #()
+	| label |
+	label := GTK.GtkLabel new: ''.
+	label setHalign: GTK.Gtk gtkAlignStart.
+	aListItem setChild: label.
     ]
 
-    iterAt: anIndex [
+    onBind: aFactory listItem: aListItem [
 	<category: 'private'>
-	^self gtkmodel iterNthChild: nil n: anIndex - 1
+	| pos label |
+	pos := aListItem getPosition.
+	label := aListItem getChild.
+	(pos < labels size)
+	    ifTrue: [label setLabel: (labels at: pos + 1)]
+	    ifFalse: [label setLabel: ''].
     ]
 
     create [
 	<category: 'private'>
-	| select renderer |
-	renderer := GTK.GtkCellRendererText new.
-	'phwoar... should not need the explicit calls, but something is bust in varargs passing' 
-	    printNl.
-	gtkcolumn := GTK.GtkTreeViewColumn new.
-	gtkcolumn setTitle: 'List'.
-	gtkcolumn packStart: renderer expand: true.
-	gtkcolumn 
-	    addAttribute: renderer
-	    attribute: 'text'
-	    column: 0.
-
-	"gtkcolumn := GTK.GtkTreeViewColumn newWithAttributes: 'List' cell: renderer varargs: {'text'. 0. nil}."
-	gtkmodel := GTK.GtkListStore new: 1 varargs: {GTK.GValue gTypeString}.
-	self connected: (GTK.GtkTreeView newWithModel: self gtkmodel).
-	(self connected)
-	    appendColumn: self gtkcolumn;
-	    setSearchColumn: 0.
-	select := self connected getSelection.
-	select setMode: GTK.Gtk gtkSelectionSingle.
-	select 
-	    connectSignal: 'changed'
+	gtkmodel := GTK.GtkStringList new.
+	factory := GTK.GtkSignalListItemFactory new.
+	factory connectSignal: 'setup' to: self selector: #'onSetup:listItem:'.
+	factory connectSignal: 'bind' to: self selector: #'onBind:listItem:'.
+	selectionModel := GTK.GtkSingleSelection new: gtkmodel.
+	self connected: (GTK.GtkListView new: selectionModel factory: factory).
+	selectionModel
+	    connectSignal: 'selection-changed'
 	    to: self
-	    selector: #onChanged:data:
-	    userData: nil
+	    selector: #'onSelectionChanged:pos:nItems:'
+	    userData: nil.
     ]
 
     show [
 	<category: 'private'>
 	super show.
-	self container setShadowType: GTK.Gtk gtkShadowIn
+	self container setHasFrame: true
     ]
 
     needsViewport [
@@ -3167,7 +3126,7 @@ elements.'>
 
 	<category: 'widget protocol'>
 	self properties at: #index put: index.
-	self connected getSelection selectIter: (self iterAt: index)
+	selectionModel selectItem: index - 1 unselectRest: false
     ]
 
     show: index [
@@ -3175,22 +3134,16 @@ elements.'>
 	 visible."
 
 	<category: 'widget protocol'>
-	| path |
-	path := self pathAt: index.
-	self connected 
-	    scrollToCell: path
-	    column: self gtkcolumn
-	    useAlign: false
-	    rowAlign: 0.0e
-	    colAlign: 0.0e.
-	path free
+	"GTK4: GtkListView scrollTo: is available in GTK 4.12+.
+	 For now, select the item to make it visible."
+	self select: index
     ]
 
     unhighlight [
 	"Unhighlight all the items in the listbox."
 
 	<category: 'widget protocol'>
-	self connected getSelection unselectAll
+	selectionModel unselectAll
     ]
 
     unselect: index [
@@ -3198,7 +3151,7 @@ elements.'>
 	 without affecting the state of the other items."
 
 	<category: 'widget protocol'>
-	self connected getSelection unselectIter: (self iterAt: index)
+	selectionModel unselectItem: index - 1
     ]
 ]
 

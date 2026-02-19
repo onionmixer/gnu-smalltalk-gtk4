@@ -140,13 +140,21 @@ Object subclass: Command [
     buildMenuItemOn: anActionGroup prefix: aPrefix [
 	<category: 'build'>
 
-	| actionName action |
+	| actionName action detailedAction |
 	actionName := self class name asString asLowercase.
 	action := GTK.GSimpleAction new: actionName parameterType: nil.
 	action connectSignal: 'activate' to: self selector: #executeIfValid.
-	action setEnabled: self valid.
+	action setEnabled: ([ self valid ] on: Error do: [ :e | false ]).
 	anActionGroup insert: action.
-	^ GTK.GMenuItem new: self item detailedAction: aPrefix, '.', actionName
+	detailedAction := aPrefix, '.', actionName.
+	self accel ifNotNil: [ :accelString |
+	    (accelString notEmpty and: [ target respondsTo: #accelGroup ]) ifTrue: [
+		| trigger namedAction shortcut |
+		trigger := GTK.GtkShortcutTrigger parseString: accelString.
+		namedAction := GTK.Gtk namedActionNew: detailedAction.
+		shortcut := GTK.GtkShortcut new: trigger action: namedAction.
+		target accelGroup addShortcut: shortcut ] ].
+	^ GTK.GMenuItem new: self item detailedAction: detailedAction
     ]
 
     buildToolItem [
@@ -155,6 +163,7 @@ Object subclass: Command [
 	^ (GTK.GtkButton newFromIconName: self stockIcon)
                                 connectSignal: 'clicked' to: self selector: #executeIfValid;
                                 setTooltipText: self tooltip;
+                                setFocusable: false;
                                 yourself
     ]
 

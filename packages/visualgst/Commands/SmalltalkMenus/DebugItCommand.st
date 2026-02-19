@@ -52,6 +52,10 @@ DoItCommand subclass: DebugItCommand [
         ^ 'utilities-terminal-symbolic'
     ]
 
+    tooltip [
+	^ 'Debug It (Alt+D)'
+    ]
+
     execute [
         <category: 'command'>
 

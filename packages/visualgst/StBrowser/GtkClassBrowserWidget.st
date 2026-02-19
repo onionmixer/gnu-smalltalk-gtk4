@@ -181,7 +181,7 @@ GtkConcreteWidget subclass: GtkClassBrowserWidget [
 
 	^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationVertical)
 	    setStartChild: self buildBrowser;
-	    setResizeStartChild: true;
+	    setResizeStartChild: false;
 	    setShrinkStartChild: false;
 	    setEndChild: self buildCodeView;
 	    setResizeEndChild: true;
@@ -478,13 +478,15 @@ GtkConcreteWidget subclass: GtkClassBrowserWidget [
     updateInstanceSideMethodCategory: aString [
 	<category: 'private-selection'>
 
-        iMethodWidget class: iCategoryWidget classOrMeta withCategory: aString
+        iMethodWidget class: iCategoryWidget classOrMeta withCategory: aString.
+	iMethodWidget hasItems ifTrue: [ iMethodWidget selectFirstMethod ]
     ]
 
     updateClassSideMethodCategory: aString [
         <category: 'private-selection'>
 
-        cMethodWidget class: cCategoryWidget classOrMeta withCategory: aString
+        cMethodWidget class: cCategoryWidget classOrMeta withCategory: aString.
+	cMethodWidget hasItems ifTrue: [ cMethodWidget selectFirstMethod ]
     ]
 
     selectANamespace: aNamespace [

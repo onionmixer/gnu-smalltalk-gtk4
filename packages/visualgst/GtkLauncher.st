@@ -85,8 +85,9 @@ GtkVisualGSTTool subclass: GtkLauncher [
     GtkLauncher class >> exit [
 	<category: 'exit'>
 
+	GTK.Gtk application ifNotNil: [ :app | app release ].
 	GTK.Gtk mainQuit.
-	ObjectMemory quit	
+	ObjectMemory quit
     ]
  
     GtkLauncher class >> open [
@@ -153,11 +154,11 @@ GtkVisualGSTTool subclass: GtkLauncher [
         ^widget
     ]
 
-    onDelete: aGtkWidget event: aGdkEvent [
+    onDelete: aGtkWidget [
 	<category: 'window events'>
 
 	self quit.
-	^ true 
+	^ true
     ]
 
     quit [
@@ -302,7 +303,8 @@ GtkVisualGSTTool subclass: GtkLauncher [
 	self clearGlobalState.
 	super initialize.
 	window maximize.
-	window setIcon: (GTK.GdkPixbuf newFromFile: (self class / 'Icons/visualgst.png') file displayString error: nil).
+	"GTK4: setIcon: (GdkPixbuf) removed. Use setIconName: with a named icon."
+	window setIconName: 'utilities-terminal'.
 	self subscribe
     ]
 
@@ -327,22 +329,22 @@ GtkVisualGSTTool subclass: GtkLauncher [
         browsers grabFocus.
         browsers currentWidget postInitialize.
         browsers currentWidget selectANamespace: Smalltalk.
-        browsers currentWidget selectAClass: Object.
-	outputs hide
+        browsers currentWidget selectAClass: Object
     ]
 
     postInitialize [
 	<category: 'initialization'>
 
+	| keyCtrl |
 	super postInitialize.
         self browserPostInitialize.
 	1 to: 2 do: [ :i | (outputs widgetAt: i) postInitialize ].
-	leftSidebar mainWidget getParent setPosition: 270.
-	topSidebar mainWidget getParent setPosition: 100.
+	"Cast getParent result to GtkPaned (getParent returns GtkWidget)."
+	(GTK.GtkPaned address: leftSidebar mainWidget getParent address) setPosition: 270.
+	(GTK.GtkPaned address: topSidebar mainWidget getParent address) setPosition: 100.
 	leftSidebar postInitialize.
 	topSidebar postInitialize.
 	rightSidebar postInitialize.
-	| keyCtrl |
 	keyCtrl := GTK.GtkEventControllerKey new.
 	keyCtrl connectSignal: 'key-pressed' to: self selector: #'keyPressedOn:keyval:keycode:state:'.
 	window addController: keyCtrl
@@ -401,9 +403,14 @@ GtkVisualGSTTool subclass: GtkLauncher [
     buildBrowserAndWorkspaceWidget [
         <category: 'intialize-release'>
 
-        ^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationVertical) addAll: {
-		    (GTK.GtkPaned new: GTK.Gtk gtkOrientationHorizontal) addAll: {self buildImplementorPaned. self buildBottomPanedAndClassBrowser. self buildRightSidebarPaned}.
-		    self buildNotebookWorkspaceWidget mainWidget}
+        ^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationVertical)
+	    setStartChild: ((GTK.GtkPaned new: GTK.Gtk gtkOrientationHorizontal) addAll: {self buildImplementorPaned. self buildBottomPanedAndClassBrowser. self buildRightSidebarPaned});
+	    setResizeStartChild: true;
+	    setShrinkStartChild: false;
+	    setEndChild: self buildNotebookWorkspaceWidget mainWidget;
+	    setResizeEndChild: true;
+	    setShrinkEndChild: false;
+	    yourself
     ]
 
     buildImplementorView [
@@ -577,6 +584,7 @@ GtkVisualGSTTool subclass: GtkLauncher [
 	    appendToolItem: ((GTK.GtkButton newFromIconName: 'document-new-symbolic')
 				connectSignal: 'clicked' to: self selector: #newWorkspace;
 				setTooltipText: 'Create a new workspace';
+				setFocusable: false;
 				yourself).
         super createToolbar
     ]
@@ -810,10 +818,12 @@ GtkVisualGSTTool subclass: GtkLauncher [
 
     showHideOn: aGtkWidget at: anIndex [
 
-        | isVisible |
+        | isVisible leftPaned topPaned |
         isVisible := aGtkWidget isVisible.
-	leftSidebar mainWidget getParent getPosition = 0 ifTrue: [ isVisible := false. leftSidebar mainWidget getParent setPosition: 270 ].
-	topSidebar mainWidget getParent getPosition = 0 ifTrue: [ isVisible := false. topSidebar mainWidget getParent setPosition: 100 ].
+	leftPaned := GTK.GtkPaned address: leftSidebar mainWidget getParent address.
+	topPaned := GTK.GtkPaned address: topSidebar mainWidget getParent address.
+	leftPaned getPosition = 0 ifTrue: [ isVisible := false. leftPaned setPosition: 270 ].
+	topPaned getPosition = 0 ifTrue: [ isVisible := false. topPaned setPosition: 100 ].
 	self hideSidebars.
         isVisible
             ifFalse: [

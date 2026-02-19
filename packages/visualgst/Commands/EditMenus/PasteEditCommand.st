@@ -52,6 +52,10 @@ Command subclass: PasteEditCommand [
 	^ 'edit-paste-symbolic'
     ]
 
+    tooltip [
+	^ 'Paste (Ctrl+V)'
+    ]
+
     execute [
         <category: 'command'>
 

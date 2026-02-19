@@ -47,15 +47,29 @@ GtkBrowsingTool subclass: GtkDebugger [
 
 	[ :debugger |
 	    Processor activeProcess name: 'Notifier/Debugger'.
-	    (self openSized: 1024@600)
-		title: ('VisualGST Debugger ', aString);
-		debugger: debugger ] forkDebugger
+	    "Try GUI debugger; fall back to console on any error."
+	    [ | window |
+		window := self basicNew.
+		window initialize.
+		window title: 'Debugger: ', aString.
+		window show.
+		window postInitialize.
+		window debugger: debugger ]
+		on: Error do: [ :e |
+		    Transcript
+			show: '--- GtkDebugger fallback: ';
+			show: e messageText; cr.
+		    debugger suspendedContext backtrace.
+		    Transcript show: '---'; cr.
+		    "Resume the suspended process so the application does not hang."
+		    debugger continue ]
+	] forkDebugger
     ]
-    
+
     GtkDebugger class >> debuggerClass [
         <category: 'debugging interface'>
 
-        ^ nil
+        ^ GtkDebugger
     ]
 
     GtkDebugger class >> debuggingPriority [
@@ -123,19 +137,28 @@ GtkBrowsingTool subclass: GtkDebugger [
     buildInspectorsWidget [
 	<category: 'user interface'>
 
-	^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationHorizontal) addAll: {self buildInspectorWidget mainWidget. self buildStackInspectorWidget}
+	^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationHorizontal)
+	    setStartChild: self buildInspectorWidget mainWidget;
+	    setEndChild: self buildStackInspectorWidget;
+	    yourself
     ]
 
     buildCodeAndStateWidget [
 	<category: 'intialize-release'>
 
-	^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationVertical) addAll: {self buildSourceWidget mainWidget. self buildInspectorsWidget}
+	^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationVertical)
+	    setStartChild: self buildSourceWidget mainWidget;
+	    setEndChild: self buildInspectorsWidget;
+	    yourself
     ]
 
     buildCentralWidget [
 	<category: 'intialize-release'>
 
-	^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationVertical) addAll: {self buildContextWidget mainWidget. self buildCodeAndStateWidget}
+	^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationVertical)
+	    setStartChild: self buildContextWidget mainWidget;
+	    setEndChild: self buildCodeAndStateWidget;
+	    yourself
     ]
 
     createExecuteMenus [
@@ -391,8 +414,8 @@ GtkBrowsingTool subclass: GtkDebugger [
     focusedWidget [
         <category: 'widget'>
 
-        inspectorWidget hasFocus ifTrue: [ ^ inspectorWidget ].
-        stackInspectorWidget hasFocus ifTrue: [ ^ stackInspectorWidget ].
+        (inspectorWidget notNil and: [ inspectorWidget hasFocus ]) ifTrue: [ ^ inspectorWidget ].
+        (stackInspectorWidget notNil and: [ stackInspectorWidget hasFocus ]) ifTrue: [ ^ stackInspectorWidget ].
         ^ codeWidget
     ]
 

@@ -52,6 +52,10 @@ Command subclass: UndoEditCommand [
 	^ 'edit-undo-symbolic'
     ]
 
+    tooltip [
+	^ 'Undo (Ctrl+Z)'
+    ]
+
     execute [
         <category: 'command'>
 

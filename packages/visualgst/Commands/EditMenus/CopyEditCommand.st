@@ -52,6 +52,10 @@ Command subclass: CopyEditCommand [
 	^ 'edit-copy-symbolic'
     ]
 
+    tooltip [
+	^ 'Copy (Ctrl+C)'
+    ]
+
     execute [
         <category: 'command'>
 

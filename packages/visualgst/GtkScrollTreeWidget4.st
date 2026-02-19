@@ -78,11 +78,15 @@ GtkConcreteWidget subclass: GtkScrollTreeWidget4 [
 
     onSetup: aFactory listItem: aListItem [
 	"Create the widget tree for a tree item row:
-	 GtkTreeExpander > GtkLabel (or GtkBox with icon for multi-column)."
+	 GtkTreeExpander > GtkLabel (or GtkBox with icon for multi-column).
+	 GTK4: aListItem arrives as GtkWidget from the GObject bridge;
+	 cast to GtkListItem for setChild:/getChild to work.
+	 Use GtkTreeExpander new (not Gtk treeExpanderNew) to get proper type."
 	<category: 'factory callbacks'>
 
-	| expander child |
-	expander := GTK.Gtk treeExpanderNew.
+	| listItem expander child |
+	listItem := GTK.GtkListItem address: aListItem address.
+	expander := GTK.GtkTreeExpander new.
 	(self hasIconColumn)
 	    ifTrue: [
 		| box image label |
@@ -97,15 +101,18 @@ GtkConcreteWidget subclass: GtkScrollTreeWidget4 [
 		child := GTK.GtkLabel new: ''.
 		child setHalign: GTK.Gtk gtkAlignStart ].
 	expander setChild: child.
-	aListItem setChild: expander.
+	listItem setChild: expander.
     ]
 
     onBind: aFactory listItem: aListItem [
-	"Bind data to a tree item row."
+	"Bind data to a tree item row.
+	 GTK4: aListItem arrives as GtkWidget from the GObject bridge;
+	 cast to GtkListItem/GtkTreeExpander for proper method dispatch."
 	<category: 'factory callbacks'>
 
-	| row stringObj idStr id stItem contents expander |
-	row := aListItem getItem.
+	| listItem row stringObj idStr id stItem contents expander |
+	listItem := GTK.GtkListItem address: aListItem address.
+	row := listItem getItem.
 	row ifNil: [ ^ self ].
 	stringObj := GTK.Gtk treeListRowGetItem: row.
 	stringObj ifNil: [ ^ self ].
@@ -114,13 +121,15 @@ GtkConcreteWidget subclass: GtkScrollTreeWidget4 [
 	stItem := model idToItem at: id ifAbsent: [ nil ].
 	stItem ifNil: [ ^ self ].
 	contents := model contentsBlock value: stItem.
-	expander := aListItem getChild.
+	"Cast getChild to GtkTreeExpander (getChild returns GtkWidget)."
+	expander := GTK.GtkTreeExpander address: (listItem getChild) address.
 	(self hasIconColumn)
 	    ifTrue: [
 		| box image label |
+		"expander getChild returns GtkWidget; getFirstChild/getNextSibling are on GtkWidget."
 		box := expander getChild.
-		image := box getFirstChild.
-		label := image getNextSibling.
+		image := GTK.GtkImage address: (box getFirstChild) address.
+		label := GTK.GtkLabel address: (image getNextSibling) address.
 		contents size > 0 ifTrue: [
 		    (contents first) ifNotNil: [ :icon |
 			image setFromPixbuf: icon ] ].
@@ -128,19 +137,21 @@ GtkConcreteWidget subclass: GtkScrollTreeWidget4 [
 		    label setLabel: (contents at: 2) displayString ] ]
 	    ifFalse: [
 		| label |
-		label := expander getChild.
+		label := GTK.GtkLabel address: (expander getChild) address.
 		label setLabel: contents first displayString ].
 	expander setListRow: row.
     ]
 
     hasIconColumn [
-	"Check if the column types include a pixbuf/icon column."
+	"Check if the column types include a pixbuf/icon column.
+	 Column specs are instances (e.g. GtkColumnPixbufType visible),
+	 so check with isKindOf: rather than identity ==."
 	<category: 'private'>
 
 	columnTypes ifNil: [ ^ false ].
 	columnTypes do: [ :col |
 	    col do: [ :spec |
-		spec == GtkColumnPixbufType ifTrue: [ ^ true ] ] ].
+		(spec isKindOf: GtkColumnPixbufType) ifTrue: [ ^ true ] ] ].
 	^ false
     ]
 

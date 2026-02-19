@@ -105,12 +105,10 @@ Object subclass: GtkConcreteWidget [
     hasFocus [
 	<category: 'testing'>
 
-        | parent current |
-        parent := child.
-        [ (current := parent getFocusChild) notNil ] whileTrue: [
-            parent := current ].
-        ^ self parentWindow getFocus = parent
-
+        | focus |
+        focus := self parentWindow getFocus.
+        focus ifNil: [ ^ false ].
+        ^ focus isAncestor: child
     ]
 
     focusedWidget [

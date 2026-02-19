@@ -77,22 +77,29 @@ GtkConcreteWidget subclass: GtkScrollListWidget4 [
     ]
 
     onSetup: aFactory listItem: aListItem [
-	"Create the widget for a list item row."
+	"Create the widget for a list item row.
+	 GTK4: aListItem arrives as GtkWidget from the GObject bridge;
+	 cast to GtkListItem for setChild:/getChild to work."
 	<category: 'factory callbacks'>
 
-	| label |
+	| listItem label |
+	listItem := GTK.GtkListItem address: aListItem address.
 	label := GTK.GtkLabel new: ''.
 	label setHalign: GTK.Gtk gtkAlignStart.
-	aListItem setChild: label.
+	listItem setChild: label.
     ]
 
     onBind: aFactory listItem: aListItem [
-	"Bind data to a list item row."
+	"Bind data to a list item row.
+	 GTK4: aListItem arrives as GtkWidget from the GObject bridge;
+	 cast to GtkListItem for getPosition/getChild to work.
+	 Cast getChild result to GtkLabel (setLabel: is on GtkLabel, not GtkWidget)."
 	<category: 'factory callbacks'>
 
-	| pos label contents |
-	pos := aListItem getPosition.
-	label := aListItem getChild.
+	| listItem pos label contents |
+	listItem := GTK.GtkListItem address: aListItem address.
+	pos := listItem getPosition.
+	label := GTK.GtkLabel address: (listItem getChild) address.
 	contents := model contentsAt: pos.
 	label setLabel: contents first displayString.
     ]
@@ -153,9 +160,15 @@ GtkConcreteWidget subclass: GtkScrollListWidget4 [
     ]
 
     selectFirstItem [
+	"Select the first item, ensuring the selection-changed signal fires
+	 even if item 0 is already selected (e.g. after model refresh)."
 	<category: 'selection'>
 
-	model size > 0 ifTrue: [ selectionModel setSelected: 0 ]
+	model size > 0 ifTrue: [
+	    selectionModel setCanUnselect: true.
+	    selectionModel setSelected: 16rFFFFFFFF.
+	    selectionModel setCanUnselect: false.
+	    selectionModel setSelected: 0 ]
     ]
 
     selectLastItem [

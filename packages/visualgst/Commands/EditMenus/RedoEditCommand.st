@@ -52,6 +52,10 @@ Command subclass: RedoEditCommand [
 	^ 'edit-redo-symbolic'
     ]
 
+    tooltip [
+	^ 'Redo (Ctrl+Y)'
+    ]
+
     execute [
         <category: 'command'>
 

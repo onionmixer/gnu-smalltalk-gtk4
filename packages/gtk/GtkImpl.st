@@ -1,3 +1,48 @@
+"GTK4: Many types became opaque (no public struct), causing the AWK
+ code generator to default their parent class to CObject instead of
+ GLib.GObject.  This means classes like GSimpleAction, GtkNotebook,
+ GtkEventController, etc. lose access to GObject methods defined in
+ GLib.st (connectSignal:, disconnectSignal:, etc.).
+
+ We extend CObject here with the signal-connection methods so that
+ ALL GTK classes can connect signals regardless of the broken class
+ hierarchy in the auto-generated Structs.st.  The underlying C functions
+ use the raw GObject pointer, so this is safe."
+
+CObject extend [
+
+    connectSignalAfter: name to: handler selector: sel userData: userData [
+       <category: 'C call-outs'>
+       <cCall: 'gstGtkConnectSignalAfter' returning: #int
+       args: #(#selfSmalltalk #string #smalltalk #smalltalk #smalltalk )>
+    ]
+
+    connectSignalAfter: name to: handler selector: sel [
+       <category: 'C call-outs'>
+       <cCall: 'gstGtkConnectSignalAfterNoUserData' returning: #int
+       args: #(#selfSmalltalk #string #smalltalk #smalltalk )>
+    ]
+
+    connectSignal: name to: handler selector: sel userData: userData [
+       <category: 'C call-outs'>
+       <cCall: 'gstGtkConnectSignal' returning: #int
+       args: #(#selfSmalltalk #string #smalltalk #smalltalk #smalltalk )>
+    ]
+
+    connectSignal: name to: handler selector: sel [
+       <category: 'C call-outs'>
+       <cCall: 'gstGtkConnectSignalNoUserData' returning: #int
+       args: #(#selfSmalltalk #string #smalltalk #smalltalk )>
+    ]
+
+    disconnectSignal: anInteger [
+       <category: 'C call-outs'>
+       <cCall: 'g_signal_handler_disconnect' returning: #void
+       args: #(#self #int )>
+    ]
+]
+
+
 GtkTextBuffer extend [
 
     insertAtEnd: aString [
@@ -213,26 +258,6 @@ GdkRectangle extend [
 
 
 
-GtkTreeIter class extend [
-
-    Prototype := nil.
-
-    gcNew [
-	^self type gcNew
-    ]
-
-    new [
-	<category: 'instance creation'>
-        Prototype isNil ifTrue: [ Prototype := self type gcNew ].
-	^Prototype copy
-	    addToBeFinalized;
-	    yourself
-    ]
-
-]
-
-
-
 GtkTextIter class extend [
 
     Prototype := nil.
@@ -247,114 +272,6 @@ GtkTextIter class extend [
 	^Prototype copy
 	    addToBeFinalized;
 	    yourself
-    ]
-
-]
-
-
-
-GtkTreeModel extend [
-
-    getIter: path [
-	<category: 'accessing'>
-	| iter |
-	iter := GTK.GtkTreeIter new.
-	^(self getIter: iter path: path) ifTrue: [iter] ifFalse: [nil]
-    ]
-
-    getIterFirst [
-	<category: 'accessing'>
-	| iter |
-	iter := GTK.GtkTreeIter new.
-	self getIterFirst: iter.
-	^iter
-    ]
-
-    iterChildren: parent [
-	<category: 'accessing'>
-	| iter |
-	iter := GTK.GtkTreeIter new.
-	self iterChildren: iter parent: parent.
-	^iter
-    ]
-
-    iterNthChild: parent n: n [
-	<category: 'accessing'>
-	| iter |
-	iter := GTK.GtkTreeIter new.
-	self
-	    iterNthChild: iter
-	    parent: parent
-	    n: n.
-	^iter
-    ]
-
-    iterParent: child [
-	<category: 'accessing'>
-	| iter |
-	iter := GTK.GtkTreeIter new.
-	self iterParent: iter child: child.
-	^iter
-    ]
-
-]
-
-
-
-GtkTreeSelection extend [
-
-    getSelected [
-	<category: 'accessing'>
-	| has iter |
-	iter := GTK.GtkTreeIter new.
-	has := self getSelected: nil iter: iter.
-	^has ifTrue: [iter] ifFalse: [nil]
-    ]
-
-]
-
-
-
-GtkListStore extend [
-
-    insert: anInteger [
-	<category: 'accessing'>
-	| iter |
-	iter := GTK.GtkTreeIter new.
-	self insert: iter position: anInteger.
-	^iter
-    ]
-
-    insertBefore: sibling [
-	<category: 'accessing'>
-	| iter |
-	iter := GTK.GtkTreeIter new.
-	self insertBefore: iter sibling: sibling.
-	^iter
-    ]
-
-    insertAfter: sibling [
-	<category: 'accessing'>
-	| iter |
-	iter := GTK.GtkTreeIter new.
-	self insertAfter: iter sibling: sibling.
-	^iter
-    ]
-
-    prepend [
-	<category: 'accessing'>
-	| iter |
-	iter := GTK.GtkTreeIter new.
-	self prepend: iter.
-	^iter
-    ]
-
-    append [
-	<category: 'accessing'>
-	| iter |
-	iter := GTK.GtkTreeIter new.
-	self append: iter.
-	^iter
     ]
 
 ]
@@ -471,11 +388,23 @@ GtkTextBuffer extend [
 
 
 Gtk class extend [
-    | loop |
+    | loop application |
+
+    application [
+	"Return the GtkApplication singleton, lazily creating and registering it."
+	<category: 'application'>
+	application isNil ifTrue: [
+	    application := GtkApplication
+		new: 'org.gnu.smalltalk.visualgst'
+		flags: GLib gApplicationFlagsNone.
+	    application register: nil error: nil.
+	    application hold ].
+	^ application
+    ]
 
     mainQuit [
 	<category: 'event loop'>
-        GLib.GMainLoop mainQuit
+	GLib.GMainLoop mainQuit
     ]
 
     main [
@@ -589,57 +518,6 @@ GTK.GtkFileChooserDialog class extend [
             title: aString
             parent: aGtkWidget
             button: '_Open'
-    ]
-]
-
-
-GTK.GtkListStore extend [
-
-    appendItem: anArray [
-	<category: 'accessing'>
-
-	| iter |
-	iter := self append.
-	self at: iter put: anArray.
-	^ iter
-    ]
-
-    prependItem: anArray [
-        <category: 'accessing'>
-
-        | iter |
-        iter := self prepend.
-        self at: iter put: anArray.
-        ^ iter
-    ]
-
-    itersDo: aBlock [
-	<category: 'accessing'>
-
-	| iter |
-	((iter := self getIterFirst) isNil or: [ (self iterIsValid: iter) not ] ) ifTrue: [ ^ nil ].
-	aBlock value: iter.
-	[ self iterNext: iter ] whileTrue: [ aBlock value: iter ]
-    ]
-
-    do: aBlock [
-	<category: 'accessing'>
-
-	self itersDo: [ :iter |
-	    aBlock value: (self at: iter) value: iter ]
-    ]
-
-    lastIter [
-	<category: 'accessing'>
-
-	| lastIter iter path |
-	iter := lastIter := GTK.GtkTreeIter new.
-	path := GTK.GtkTreePath newFirst.
-	[ self getIter: iter path: path ] whileTrue: [
-	    lastIter := iter.
-	    iter := GTK.GtkTreeIter new.
-            path next ].
-	^ lastIter
     ]
 ]
 
@@ -777,149 +655,3 @@ GTK.GtkTreeModel extend [
 ]
 
 
-GTK.GtkTreeStore extend [
-
-    itersDo: aBlock iter: aGtkTreeIter [
-	<category: 'accessing'>
-
-	| childIter |
-	childIter := GTK.GtkTreeIter new.
-	aBlock value: aGtkTreeIter.
-	(self iterChildren: childIter parent: aGtkTreeIter) ifTrue: [ self itersDo: aBlock iter: childIter ].
-	[ self iterNext: aGtkTreeIter ] whileTrue: [
-	    aBlock value: aGtkTreeIter.
-            (self iterChildren: childIter parent: aGtkTreeIter) ifTrue: [ self itersDo: aBlock iter: childIter ] ]
-    ]
-
-    itersDo: aBlock [
-	<category: 'accessing'>
-
-	| iter child |
-	((iter := self getIterFirst) isNil or: [ (self iterIsValid: iter) not ] ) ifTrue: [ ^ nil ].
-	self itersDo: aBlock iter: iter
-    ]
-
-    do: aBlock [
-        <category: 'accessing'>
-
-        self itersDo: [ :iter |
-            aBlock value: (self at: iter) value: iter ]
-    ]
-
-    appendItem: anArray [
-	<category: 'accessing'>
-
-	^ self append: nil item: anArray
-    ]
-
-    append: aGtkTreeIter item: anArray [
-	<category: 'accessing'>
-
-        | iter |
-        iter := GTK.GtkTreeIter new.
-        self
-	    append: iter parent: aGtkTreeIter;
-	    at: iter put: anArray.
-	^ iter
-    ]
-]
-
-
-GTK.GtkTreeView class extend [
-
-    newWith: aGtkModel columns: anArray [
-        <category: 'user interface'>
-
-        | view |
-        view := self new.
-	view setModel: aGtkModel.
-	anArray keysAndValuesDo: [ :i :each || col render |
-	    col := (GtkTreeViewColumn new)
-		    packStart: (render := each key = 'text' ifFalse: [ GTK.GtkCellRendererPixbuf new ] ifTrue: [ GTK.GtkCellRendererText new ]) expand: true;
-		    addAttribute: render attribute: each key column: i - 1;
-		    yourself.
-	    each value isEmpty ifFalse: [ col setTitle: each value ].
-	    view insertColumn: col position: -1 ].
-	^ view
-    ]
-
-    newWith: aGtkModel pack: anArray title: aString [
-        <category: 'user interface'>
-
-        | view col |
-        view := self new.
-	view setModel: aGtkModel.
-	col := GtkTreeViewColumn new.
-	anArray keysAndValuesDo: [ :i :each || render |
-	    col
-		packStart: (render := each = 'text' ifFalse: [ GTK.GtkCellRendererPixbuf new ] ifTrue: [ GTK.GtkCellRendererText new ]) expand: each = 'text';
-		addAttribute: render attribute: each column: i - 1 ].
-	col setTitle: aString.
-	view insertColumn: col position: -1.
-	^ view
-    ]
-
-    newWithTextColumn: aGtkModel title: aString [
-        <category: 'user interface'>
-
-        | view col render |
-        view := self new
-	    setModel: aGtkModel;
-	    yourself.
-        col := (GtkTreeViewColumn new)
-	    packStart: (render := GTK.GtkCellRendererText new) expand: true;
-	    addAttribute: render attribute: 'text' column: 0;
-	    setTitle: aString;
-	    yourself.
-        view insertColumn: col position: -1.
-    ^ view
-    ]
-
-    newWithSortedTextColumn: aGtkModel title: aString [
-    <category: 'instance creation'>
-
-        | view col render |
-        view := self new
-                    setModel: aGtkModel;
-                    yourself.
-        col := (GtkTreeViewColumn new)
-                packStart: (render := GtkCellRendererText new) expand: true;
-                addAttribute: render attribute: 'text' column: 0;
-                setTitle: aString;
-                setSortIndicator: true;
-                setSortColumnId: 0;
-                setSortOrder: Gtk gtkSortAscending;
-                yourself.
-        view
-            insertColumn: col position: -1.
-    ^ view
-    ]
-]
-
-GTK.GtkTreeView extend [
-
-    hasSelectedItem [
-	<category: 'accessing'>
-
-	^ self getSelection getSelected isNil not
-    ]
-
-    numberOfItems [
-	<category: 'accessing'>
-
-	^ self getModel iterNChildren: nil
-    ]
-
-    selectedIter [
-	<category: 'accessing'>
-
-	^ self getSelection getSelected
-    ]
-
-    selectedIndex [
-	<category: 'accessing'>
-
-	self hasSelectedItem ifFalse: [ self error: 'Nothing is selected' ].
-	^ (self getModel getPath: self selectedIter) getIndices value + 1
-    ]
-]

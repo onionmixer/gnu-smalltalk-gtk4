@@ -48,8 +48,8 @@ GtkConcreteWidget subclass: GtkImageWidget [
         <category: 'user interface'>
 
         ^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationVertical)
-            add1: self buildFinderEntry;
-            add2: self buildClassAndMethodList;
+            setStartChild: self buildFinderEntry;
+            setEndChild: self buildClassAndMethodList;
             yourself
     ]
 

@@ -52,6 +52,10 @@ Command subclass: DoItCommand [
 	^ 'system-run-symbolic'
     ]
 
+    tooltip [
+	^ 'Do It (Ctrl+D)'
+    ]
+
     execute [
         <category: 'command'>
 

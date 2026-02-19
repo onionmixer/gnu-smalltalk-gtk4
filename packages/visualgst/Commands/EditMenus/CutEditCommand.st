@@ -52,6 +52,10 @@ Command subclass: CutEditCommand [
 	^ 'edit-cut-symbolic'
     ]
 
+    tooltip [
+	^ 'Cut (Ctrl+X)'
+    ]
+
     execute [
         <category: 'command'>
 

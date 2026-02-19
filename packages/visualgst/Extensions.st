@@ -481,46 +481,33 @@ GTK.GtkDialog extend [
     ]
 ]
 
-GTK.GtkWidget extend [
-    getFocusChild [
-        <category: '*VisualGST'>
-        ^nil
-    ]
-]
+GTK.GtkPaned extend [
 
-GTK.GtkPaned class extend [
+    getOrientation [
+	"GTK4: GtkOrientable interface method."
+	<category: 'C call-outs'>
+	<cCall: 'gtk_orientable_get_orientation' returning: #int args: #(#self)>
+    ]
 
     addAll: anArray [
+	"GTK4: Instance-side addAll: for GtkPaned.
+	 Sets startChild to first element, endChild to second (or nested panes for 3+).
+	 Preserves this paned's orientation for recursively created child panes."
 
-	^ self addAll: anArray from: 1
-    ]
-
-    addAll: anArray from: anInteger [
-
-        ^ anArray size - anInteger = 0
-                ifTrue: [ self new
-                                setStartChild: (anArray at: anInteger);
-                                setResizeStartChild: true;
-                                setShrinkStartChild: true;
-                                yourself ]
-                ifFalse: [
-                    anArray size - anInteger > 1 ifTrue: [
-					    self new
-                                                    setStartChild: (anArray at: anInteger);
-                                                    setResizeStartChild: true;
-                                                    setShrinkStartChild: true;
-                                                    setEndChild: (self addAll: anArray from: anInteger + 1);
-                                                    setResizeEndChild: true;
-                                                    setShrinkEndChild: false;
-                                                    yourself ]
-                                    ifFalse: [ self new
-                                                    setStartChild: (anArray at: anInteger);
-                                                    setResizeStartChild: true;
-                                                    setShrinkStartChild: true;
-                                                    setEndChild: (anArray at: anInteger + 1);
-                                                    setResizeEndChild: true;
-                                                    setShrinkEndChild: false;
-                                                    yourself ] ]
+	anArray size >= 1 ifTrue: [
+	    self setStartChild: (anArray at: 1).
+	    self setResizeStartChild: true.
+	    self setShrinkStartChild: true ].
+	anArray size = 2 ifTrue: [
+	    self setEndChild: (anArray at: 2).
+	    self setResizeEndChild: true.
+	    self setShrinkEndChild: false ].
+	anArray size > 2 ifTrue: [
+	    self setEndChild: ((GTK.GtkPaned new: self getOrientation)
+				addAll: (anArray copyFrom: 2 to: anArray size)).
+	    self setResizeEndChild: true.
+	    self setShrinkEndChild: false ].
+	^ self
     ]
 
 ]

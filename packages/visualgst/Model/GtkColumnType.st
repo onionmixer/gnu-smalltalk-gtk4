@@ -48,12 +48,6 @@ Object subclass: GtkColumnType [
         ^ self subclassResponsibility
     ]
 
-    GtkColumnType class >> cellRenderer [
-	<category: 'accessing'>
-
-	^ self subclassResponsibility
-    ]
-
     GtkColumnType class >> new [
 	<category: 'instance creation'>
 
@@ -102,12 +96,6 @@ Object subclass: GtkColumnType [
         <category: 'accessing'>
 
         ^ self class kindName
-    ]
-
-    cellRenderer [
-        <category: 'accessing'>
-
-        ^ self class cellRenderer
     ]
 
     visible: aBoolean [

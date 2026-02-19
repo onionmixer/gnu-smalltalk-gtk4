@@ -47,10 +47,5 @@ GtkColumnType subclass: GtkColumnTextType [
         ^ 'text'
     ]
 
-    GtkColumnTextType class >> cellRenderer [
-        <category: 'accessing'>
-
-        ^ GTK.GtkCellRendererText
-    ]
 ]
 

@@ -67,9 +67,9 @@ GtkMainWindow subclass: Tetris [
     postInitialize [
 	<category: 'initialization'>
 
+	| keyCtrl |
 	super postInitialize.
         canvasWidget grabFocus.
-	| keyCtrl |
 	keyCtrl := GTK.GtkEventControllerKey new.
 	keyCtrl connectSignal: 'key-pressed' to: self selector: #'keyPressedOn:keyval:keycode:state:'.
 	window addController: keyCtrl

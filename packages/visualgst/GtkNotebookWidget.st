@@ -97,7 +97,7 @@ GtkConcreteWidget subclass: GtkNotebookWidget [
         close := (GTK.GtkButton new)
                     setChild: image;
                     addCssClass: 'flat';
-                    connectSignal: 'pressed' to: self selector: #'closeIt:at:' userData: aSmallInteger;
+                    connectSignal: 'clicked' to: self selector: #'closeIt:at:' userData: aSmallInteger;
                     yourself.
         ^ (GTK.GtkBox new: GTK.Gtk gtkOrientationHorizontal spacing: 0)
             append: (labels add: (GTK.GtkLabel new: aString));
@@ -116,13 +116,49 @@ GtkConcreteWidget subclass: GtkNotebookWidget [
     closeIt: aGtkButton  at: aGtkConcreteWidget [
         <category: 'notebook events'>
 
-        | pageNb |
-        pageNb := notebook pageNum: aGtkConcreteWidget mainWidget.
+	(self hasContents: aGtkConcreteWidget)
+	    ifTrue: [ self confirmClose: aGtkConcreteWidget ]
+	    ifFalse: [ self doClose: aGtkConcreteWidget ]
+    ]
+
+    hasContents: aGtkConcreteWidget [
+	<category: 'notebook events'>
+
+	| text |
+	(aGtkConcreteWidget respondsTo: #text)
+	    ifFalse: [ ^ false ].
+	text := aGtkConcreteWidget text.
+	^ text notNil and: [ text notEmpty ]
+    ]
+
+    confirmClose: aGtkConcreteWidget [
+	<category: 'notebook events'>
+
+	| dialog |
+	dialog := GTK.GtkMessageDialog
+	    new: parentWindow
+	    flags: GTK.Gtk gtkDialogDestroyWithParent
+	    type: GTK.Gtk gtkMessageQuestion
+	    buttons: GTK.Gtk gtkButtonsNone
+	    message: 'Close Tab'
+	    tip: 'This tab has contents. Close it?'.
+	dialog
+	    addButton: 'Cancel' responseId: 0;
+	    addButton: 'Close' responseId: 1;
+	    showModalOnAnswer: [ :dlg :res |
+		dlg destroy.
+		res = 1 ifTrue: [ self doClose: aGtkConcreteWidget ] ]
+    ]
+
+    doClose: aGtkConcreteWidget [
+	<category: 'notebook events'>
+
+	| pageNb |
+	pageNb := notebook pageNum: aGtkConcreteWidget mainWidget.
 	aGtkConcreteWidget close.
-        pages removeAtIndex: pageNb + 1.
+	pages removeAtIndex: pageNb + 1.
 	labels removeAtIndex: pageNb + 1.
-        notebook removePage: pageNb.
-	pages size = 1 ifTrue: [ notebook setShowTabs: false ]
+	notebook removePage: pageNb
     ]
 
     widgetAt: anInteger [
@@ -173,8 +209,7 @@ GtkConcreteWidget subclass: GtkNotebookWidget [
 	self numberOfPages = 1 ifTrue: [ ^ self ].
         pages removeAtIndex: self currentPage + 1.
 	labels removeAtIndex: self currentPage + 1.
-	notebook removePage: self currentPage.
-	pages size = 1 ifTrue: [ notebook setShowTabs: false ]
+	notebook removePage: self currentPage
     ]
 
     showPane [

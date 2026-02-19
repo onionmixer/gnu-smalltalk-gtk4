@@ -82,10 +82,14 @@ GtkConcreteWidget subclass: GtkCategorizedNamespaceWidget [
     selectANamespace: aNamespace [
         <category: 'item selection'>
 
+	| row |
 	(self hasSelectedNamespace and: [ self selectedNamespace == aNamespace ]) ifTrue: [ ^ self ].
-	namespaceTree
-	    expandAll;
-	    select: aNamespace
+	"GTK4: expand only the root row to reveal first-level namespaces.
+	 Expanding all rows is prohibitively slow with GtkTreeListModel
+	 because each expansion triggers Smalltalk callbacks."
+	row := namespaceTree model treeListModel getRow: 0.
+	row ifNotNil: [ row setExpanded: true ].
+	namespaceTree select: aNamespace
     ]
 
     hasSelectedNamespace [

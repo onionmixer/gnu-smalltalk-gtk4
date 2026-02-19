@@ -52,6 +52,10 @@ DoItCommand subclass: PrintItCommand [
         ^ 'document-print-symbolic'
     ]
 
+    tooltip [
+	^ 'Print It (Ctrl+P)'
+    ]
+
     execute [
         <category: 'command'>
 

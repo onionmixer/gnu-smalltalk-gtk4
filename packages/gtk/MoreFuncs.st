@@ -14,6 +14,57 @@ Gtk class extend [
 
 "GtkAccelGroup removed in GTK4. Use GtkShortcutController instead."
 
+GtkShortcutController class extend [
+    getType [
+	<category: 'C call-outs'>
+	<cCall: 'gtk_shortcut_controller_get_type' returning: #long args: #()>
+    ]
+
+    new [
+	"Create a proper GTK4 GtkShortcutController via the C constructor."
+	<category: 'C call-outs'>
+	<cCall: 'gtk_shortcut_controller_new' returning: #{GtkShortcutController} args: #()>
+    ]
+]
+
+"GtkListItem: opaque in GTK4. getType needed for GObject bridge to map
+ signal callback parameters to the correct Smalltalk class."
+GtkListItem class extend [
+    getType [
+	<category: 'C call-outs'>
+	<cCall: 'gtk_list_item_get_type' returning: #long args: #()>
+    ]
+]
+
+GtkListItem extend [
+    setChild: aWidget [
+	"Set the child widget displayed in this list item."
+	<category: 'C call-outs'>
+	<cCall: 'gtk_list_item_set_child' returning: #void
+	    args: #(#self #{GtkWidget})>
+    ]
+
+    getChild [
+	"Return the child widget displayed in this list item."
+	<category: 'C call-outs'>
+	<cCall: 'gtk_list_item_get_child' returning: #{GtkWidget}
+	    args: #(#self)>
+    ]
+
+    getItem [
+	"Return the model item for this list item."
+	<category: 'C call-outs'>
+	<cCall: 'gtk_list_item_get_item' returning: #cObject
+	    args: #(#self)>
+    ]
+
+    getPosition [
+	"Return the position of this list item in the model."
+	<category: 'C call-outs'>
+	<cCall: 'gtk_list_item_get_position' returning: #int
+	    args: #(#self)>
+    ]
+]
 
 "GtkObject signals replaced with GObject signal API."
 
@@ -88,46 +139,6 @@ GtkWidget extend [
 
 
 "GTK4: GtkContainer removed. Child management is widget-specific."
-
-
-
-GtkTreeModel extend [
-
-    getOop: iter column: aColumn [
-	<category: 'C call-outs'>
-	<cCall: 'gstGtkTreeModelGetOOP' returning: #smalltalk
-	args: #(#self #cObject #int )>
-
-    ]
-
-]
-
-
-
-GtkTreeStore extend [
-
-    setOop: iter column: aColumn value: aValue [
-	<category: 'C call-outs'>
-	<cCall: 'gstGtkTreeStoreSetOOP' returning: #void
-	args: #(#self #cObject #int #smalltalk )>
-
-    ]
-
-]
-
-
-
-GtkListStore extend [
-
-    setOop: iter column: aColumn value: aValue [
-	<category: 'C call-outs'>
-	<cCall: 'gstGtkListStoreSetOOP' returning: #void
-	args: #(#self #cObject #int #smalltalk )>
-
-    ]
-
-]
-
 
 
 GtkDialog extend [
@@ -227,9 +238,6 @@ GTK.GtkNotebook extend [
 
 
 Eval [
-    GtkTreeStore superclass: GtkTreeModel.
-    GtkListStore superclass: GtkTreeModel.
-
     "Fix GTK4 list widget class hierarchy."
     GtkSignalListItemFactory superclass: GtkListItemFactory
 ]
@@ -281,6 +289,13 @@ GtkStringList extend [
 	"Return the GtkStringObject at position."
 	<category: 'accessing'>
 	^ GList modelGetItem: self position: position
+    ]
+
+    insert: aString at: position [
+	"Insert aString at position (0-based) using splice."
+	<category: 'C call-outs'>
+	<cCall: 'gstGtkStringListInsert' returning: #void
+	args: #(#self #int #string)>
     ]
 
 ]
@@ -369,6 +384,83 @@ GtkSingleSelection extend [
     setCanUnselect: aBoolean [
 	<category: 'accessing'>
 	Gtk singleSelectionSetCanUnselect: self canUnselect: aBoolean
+    ]
+
+    isSelected: position [
+	"GtkSelectionModel interface."
+	<category: 'selection'>
+	^ Gtk selectionModelIsSelected: self position: position
+    ]
+
+    selectItem: position unselectRest: unselectRest [
+	"GtkSelectionModel interface."
+	<category: 'selection'>
+	^ Gtk selectionModelSelectItem: self position: position unselectRest: unselectRest
+    ]
+
+    unselectItem: position [
+	"GtkSelectionModel interface."
+	<category: 'selection'>
+	^ Gtk selectionModelUnselectItem: self position: position
+    ]
+
+    unselectAll [
+	"GtkSelectionModel interface."
+	<category: 'selection'>
+	^ Gtk selectionModelUnselectAll: self
+    ]
+
+]
+
+GtkMultiSelection class extend [
+
+    new: aGListModel [
+	<category: 'instance creation'>
+	^ Gtk multiSelectionNew: aGListModel
+    ]
+
+]
+
+GtkMultiSelection extend [
+
+    getModel [
+	<category: 'accessing'>
+	^ Gtk multiSelectionGetModel: self
+    ]
+
+    setModel: aGListModel [
+	<category: 'accessing'>
+	Gtk multiSelectionSetModel: self model: aGListModel
+    ]
+
+    isSelected: position [
+	"GtkSelectionModel interface."
+	<category: 'selection'>
+	^ Gtk selectionModelIsSelected: self position: position
+    ]
+
+    selectItem: position unselectRest: unselectRest [
+	"GtkSelectionModel interface."
+	<category: 'selection'>
+	^ Gtk selectionModelSelectItem: self position: position unselectRest: unselectRest
+    ]
+
+    unselectItem: position [
+	"GtkSelectionModel interface."
+	<category: 'selection'>
+	^ Gtk selectionModelUnselectItem: self position: position
+    ]
+
+    unselectAll [
+	"GtkSelectionModel interface."
+	<category: 'selection'>
+	^ Gtk selectionModelUnselectAll: self
+    ]
+
+    selectAll [
+	"GtkSelectionModel interface."
+	<category: 'selection'>
+	^ Gtk selectionModelSelectAll: self
     ]
 
 ]
@@ -537,6 +629,16 @@ GtkTreeListRow extend [
     getChildRow: position [
 	<category: 'accessing'>
 	^ Gtk treeListRowGetChildRow: self position: position
+    ]
+
+]
+
+GtkTreeExpander class extend [
+
+    new [
+	"Create a new GtkTreeExpander with proper Smalltalk type."
+	<category: 'C call-outs'>
+	<cCall: 'gtk_tree_expander_new' returning: #{GtkTreeExpander} args: #()>
     ]
 
 ]

@@ -75,13 +75,32 @@ GtkConcreteWidget subclass: GtkClassHierarchyWidget [
 	classOrMeta := aClass asClass.
 	dic := Dictionary new.
 	self buildSuperclasses.
-	model 
+	model
 	    item: #root;
 	    refresh.
-	
-	classesTree 
-		expandAll;
-		select: aClass
+
+	"GTK4: expandAll is prohibitively slow with GtkTreeListModel because
+	 each expansion triggers Smalltalk callbacks.  Instead, expand only the
+	 superclass chain stored in dic so the selected class becomes visible."
+	self expandSuperclassChain.
+	classesTree select: aClass
+    ]
+
+    expandSuperclassChain [
+	"Expand only the nodes along the superclass chain (dic keys)
+	 so that the selected class becomes visible without loading
+	 the entire subclass tree."
+	<category: 'private'>
+
+	| current |
+	current := #root.
+	[ dic includesKey: current ] whileTrue: [
+	    | children |
+	    children := dic at: current.
+	    children do: [ :child |
+		classesTree expandRow: child openAll: false ].
+	    "Move to next level: the single child on the superclass path"
+	    current := children first ]
     ]
 
     emptyModel [

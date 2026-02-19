@@ -59,8 +59,8 @@ GtkTextWidget subclass: GtkWorkspaceWidget [
         <category: 'user interface'>
 
         ^ (GTK.GtkPaned new: GTK.Gtk gtkOrientationHorizontal)
-		    add1: (variableWidget := GtkVariableTrackerWidget on: object) mainWidget;
-		    add2: super buildWidget;
+		    setStartChild: (variableWidget := GtkVariableTrackerWidget on: object) mainWidget;
+		    setEndChild: super buildWidget;
                     yourself
     ]
 

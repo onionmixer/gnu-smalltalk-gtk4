@@ -52,6 +52,10 @@ Command subclass: AcceptItCommand [
         ^ 'emblem-ok-symbolic'
     ]
 
+    tooltip [
+	^ 'Accept It (Ctrl+S)'
+    ]
+
     acceptClassDefinitionOn: aNamespace [
         <category: 'class event'>
 

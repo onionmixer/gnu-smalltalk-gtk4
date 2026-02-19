@@ -96,10 +96,12 @@ GtkConcreteWidget subclass: GtkTextWidget [
     buildWidget [
 	<category: 'user interface'>
 
-        | vbox |
+        | vbox scrolled |
         vbox := GTK.GtkBox new: GTK.Gtk gtkOrientationVertical spacing: 3.
         self packPluginsInto: vbox.
-        vbox append: (GTK.GtkScrolledWindow withChild: textWidget).
+        scrolled := GTK.GtkScrolledWindow withChild: textWidget.
+        scrolled setVexpand: true.
+        vbox append: scrolled.
         ^vbox
     ]
 

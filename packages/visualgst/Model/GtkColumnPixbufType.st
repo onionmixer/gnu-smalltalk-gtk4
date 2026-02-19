@@ -47,10 +47,5 @@ GtkColumnType subclass: GtkColumnPixbufType [
         ^ 'pixbuf'
     ]
 
-    GtkColumnPixbufType class >> cellRenderer [
-        <category: 'accessing'>
-
-        ^ GTK.GtkCellRendererPixbuf
-    ]
 ]
 

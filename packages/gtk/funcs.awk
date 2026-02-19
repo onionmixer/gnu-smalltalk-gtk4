@@ -112,7 +112,9 @@ BEGIN {
     self_class["g_bus_"] = "GDBusConnection"
 
     # Methods that we do not need
-    method_skip_regexp = "(^$)|(_error_quark$)"
+    # graphene_simd4f/simd4x4f are internal SIMD intrinsics with C parameter
+    # names (0.f, _U.f, m->x) that produce invalid Smalltalk identifiers.
+    method_skip_regexp = "(^$)|(_error_quark$)|(^graphene_simd4)"
 
     # Not really exact, this belongs in GtkFileChooserWidget too.
     # We need a way to do interfaces.

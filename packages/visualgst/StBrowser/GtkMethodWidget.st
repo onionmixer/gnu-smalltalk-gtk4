@@ -217,6 +217,18 @@ GtkConcreteWidget subclass: GtkMethodWidget [
 	methodTree select: (self classOrMeta methodDictionary at: aSymbol)
     ]
 
+    selectFirstMethod [
+	<category: 'item selection'>
+
+	methodTree selectFirstItem
+    ]
+
+    hasItems [
+	<category: 'testing'>
+
+	^ model size > 0
+    ]
+
     sourceCode [
 	<category: 'accessing'>
 

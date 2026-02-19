@@ -76,48 +76,6 @@ static VMProxy *_gtk_vm_proxy;
    GtkContainer removed in GTK4 (child properties replaced by
    widget-specific APIs). */
 
-OOP
-tree_model_get_oop (GtkTreeModel *model,
-		    GtkTreeIter *iter,
-		    int col)
-{
-  GValue gval = { 0 };
-  OOP result;
-
-  gtk_tree_model_get_value (model, iter, col, &gval);
-  result = g_value_convert_to_oop (&gval);
-  g_value_unset (&gval);
-  return (result);
-}
-
-void
-list_store_set_oop (GtkListStore *store,
-		    GtkTreeIter *iter,
-		    int col,
-		    OOP value)
-{
-    GValue gval = { 0 };
-    g_value_init (&gval,
-		  gtk_tree_model_get_column_type (GTK_TREE_MODEL(store), col));
-    g_value_fill_from_oop (&gval, value);
-    gtk_list_store_set_value (store, iter, col, &gval);
-    g_value_unset (&gval);
-}
-
-void
-tree_store_set_oop (GtkTreeStore *store,
-		    GtkTreeIter *iter,
-		    int col,
-		    OOP value)
-{
-    GValue gval = { 0 };
-    g_value_init (&gval, gtk_tree_model_get_column_type (GTK_TREE_MODEL(store), col));
-    g_value_fill_from_oop (&gval, value);
-    gtk_tree_store_set_value (store, iter, col, &gval);
-    g_value_unset (&gval);
-}
-
-
 /* Wrappers for accessor functions.
    Updated for GTK4 compatibility.  */
 
@@ -384,6 +342,14 @@ screen_get_monitor_height_mm (void)
   return mm;
 }
 
+/* GtkStringList insert helper: splice to insert at arbitrary position */
+static void
+gst_gtk_string_list_insert (GtkStringList *list, guint position, const char *string)
+{
+  const char *strings[] = { string, NULL };
+  gtk_string_list_splice (list, position, 0, strings);
+}
+
 static int initialized = 0;
 
 int
@@ -410,9 +376,6 @@ gst_initModule (proxy)
   _gtk_vm_proxy->defineCFunc ("gstGtkAdjustmentGetLower", adjustment_get_lower);
   _gtk_vm_proxy->defineCFunc ("gstGtkAdjustmentGetUpper", adjustment_get_upper);
   _gtk_vm_proxy->defineCFunc ("gstGtkAdjustmentGetPageSize", adjustment_get_page_size);
-  _gtk_vm_proxy->defineCFunc ("gstGtkTreeModelGetOOP", tree_model_get_oop);
-  _gtk_vm_proxy->defineCFunc ("gstGtkListStoreSetOOP", list_store_set_oop);
-  _gtk_vm_proxy->defineCFunc ("gstGtkTreeStoreSetOOP", tree_store_set_oop);
   _gtk_vm_proxy->defineCFunc ("gstGtkWidgetGetAllocation", widget_get_allocation);
   _gtk_vm_proxy->defineCFunc ("gstGtkDialogGetVBox", dialog_get_vbox);
   _gtk_vm_proxy->defineCFunc ("gstGtkDrawingAreaConnectDraw", gst_gtk_drawing_area_connect_draw);
@@ -420,6 +383,7 @@ gst_initModule (proxy)
   _gtk_vm_proxy->defineCFunc ("gstGtkScreenGetMonitorWidthMm", screen_get_monitor_width_mm);
   _gtk_vm_proxy->defineCFunc ("gstGtkScreenGetMonitorHeightMm", screen_get_monitor_height_mm);
   _gtk_vm_proxy->defineCFunc ("gstGtkTreeListModelNew", gst_gtk_tree_list_model_new);
+  _gtk_vm_proxy->defineCFunc ("gstGtkStringListInsert", gst_gtk_string_list_insert);
 
   _gtk_vm_proxy->defineCFunc ("gtk_placer_get_type", gtk_placer_get_type);
   _gtk_vm_proxy->defineCFunc ("gtk_placer_new", gtk_placer_new);

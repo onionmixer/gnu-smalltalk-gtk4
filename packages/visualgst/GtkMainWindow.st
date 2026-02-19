@@ -177,8 +177,14 @@ that are specific to this version of GNU Smalltalk.';
 
     initialize [
 	<category: 'intialization'>
-	
-	window := GTK.GtkWindow new.
+
+	"Reset accelGroup so a fresh controller is created for each window.
+	 GNU Smalltalk new calls initialize, and openOn:/open call it again,
+	 so initialize may run twice on the same instance."
+	accelGroup := nil.
+	window := GTK.Gtk application
+	    ifNotNil: [ :app | GTK.GtkApplicationWindow new: app ]
+	    ifNil: [ GTK.GtkWindow new ].
 	window addController: self accelGroup.
         self
             title: self windowTitle;
@@ -301,8 +307,9 @@ that are specific to this version of GNU Smalltalk.';
 
     show [
 	{menuBar->false. toolBar->false. centralWidget->true. statusBar->false} do: [ :each |
-	    each key ifNotNil: [ self container
-		append: each key ] ].
+	    each key ifNotNil: [
+		each key setVexpand: each value.
+		self container append: each key ] ].
 
 	window
 	    setChild: self container;

@@ -52,6 +52,10 @@ DoItCommand subclass: InspectItCommand [
         ^ 'edit-find-symbolic'
     ]
 
+    tooltip [
+	^ 'Inspect It (Ctrl+I)'
+    ]
+
     execute [
         <category: 'command'>
 

@@ -103,8 +103,7 @@ GtkConcreteWidget subclass: GtkCategorizedClassWidget [
         self
             category: aString;
             namespace: aNamespace.
-	model refresh.
-	classesTree expandAll
+	model refresh
     ]
 
     appendClass: aClass to: anArray [
