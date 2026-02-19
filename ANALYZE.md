@@ -1,7 +1,7 @@
 # GNU Smalltalk 프로젝트 분석 보고서
 
 > 분석일: 2026-02-18
-> 프로젝트 버전: 3.2.92
+> 프로젝트 버전: 3.2.94
 > 라이브러리 버전: 8:3:1 (libtool versioning)
 > 라이선스: GNU General Public License v2+
 > 홈페이지: http://smalltalk.gnu.org/

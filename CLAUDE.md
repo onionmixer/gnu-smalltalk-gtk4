@@ -4,7 +4,7 @@
 
 GNU Smalltalk (GST) is an implementation of the Smalltalk-80 language. It includes a bytecode interpreter, generational garbage collector, JIT compiler (via GNU Lightning), and a rich set of packages including GTK GUI bindings.
 
-- Version: 3.2.92
+- Version: 3.2.94
 - Language: C (VM core), Smalltalk (libraries/packages), AWK (code generators)
 - Build system: Autoconf/Automake/Libtool
 - License: GPL v2+

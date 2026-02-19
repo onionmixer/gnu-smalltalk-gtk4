@@ -1,3 +1,12 @@
+gnu-smalltalk (3.2.94-1) unstable; urgency=medium
+
+  * Version bump to 3.2.94
+  * Add Debian packaging for 12 binary packages
+  * Migrate GtkWebView from libwebkit-1.0 to WebKit2GTK (libwebkitgtk-6.0)
+  * Optional WebKit support via runtime DLD loading
+
+ -- GNU Smalltalk GTK4 <onionmixer@gmail.com>  Wed, 19 Feb 2026 12:00:00 +0900
+
 gnu-smalltalk (3.2.92-1) unstable; urgency=medium
 
   * Fork of GNU Smalltalk 3.2.92 with GTK4 migration
@@ -10,4 +19,4 @@ gnu-smalltalk (3.2.92-1) unstable; urgency=medium
   * Migrate tree/list widgets to GtkListView + GtkTreeListModel
   * Migrate GtkWebView from libwebkit-1.0 to WebKit2GTK (libwebkitgtk-6.0)
 
- -- GNU Smalltalk GTK4 <gnu-smalltalk-gtk4@github.com>  Wed, 19 Feb 2026 00:00:00 +0900
+ -- GNU Smalltalk GTK4 <onionmixer@gmail.com>  Wed, 19 Feb 2026 00:00:00 +0900

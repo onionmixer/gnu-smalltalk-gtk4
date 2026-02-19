@@ -1,7 +1,7 @@
 ;;; smalltalk-mode.el --- Major mode for the Smalltalk programming language
 
 ;; Author: Steve Byrne
-;; Version: 3.2.92
+;; Version: 3.2.94
 ;; Copyright 1988-92, 1994-95, 1999, 2000, 2003, 2007, 2008, 2009
 ;; Free Software Foundation, Inc.
 

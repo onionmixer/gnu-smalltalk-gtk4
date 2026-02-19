@@ -1,7 +1,7 @@
 Source: gnu-smalltalk
 Section: interpreters
 Priority: optional
-Maintainer: GNU Smalltalk GTK4 <gnu-smalltalk-gtk4@github.com>
+Maintainer: GNU Smalltalk GTK4 <onionmixer@gmail.com>
 Build-Depends:
  debhelper-compat (= 13),
  autotools-dev,

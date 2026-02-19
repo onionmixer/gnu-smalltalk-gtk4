@@ -1,6 +1,6 @@
 # GNU Smalltalk — GTK4 Migration Fork
 
-This is a fork of [GNU Smalltalk](https://www.gnu.org/software/smalltalk/) (version 3.2.92) with the GTK bindings and VisualGST IDE migrated from GTK2 to GTK4.
+This is a fork of [GNU Smalltalk](https://www.gnu.org/software/smalltalk/) (version 3.2.94) with the GTK bindings and VisualGST IDE migrated from GTK2 to GTK4.
 
 > **Original project**: https://www.gnu.org/software/smalltalk/
 > **Original source**: https://alpha.gnu.org/gnu/smalltalk/

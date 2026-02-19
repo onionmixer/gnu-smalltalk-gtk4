@@ -1,6 +1,6 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: GNU Smalltalk
-Upstream-Contact: gnu-smalltalk-gtk4@github.com
+Upstream-Contact: onionmixer@gmail.com
 Source: https://github.com/user/gnu-smalltalk-gtk4
 
 Files: *
@@ -55,7 +55,7 @@ Copyright: 1989-2013 Free Software Foundation, Inc.
 License: LGPL-2.1+
 
 Files: debian/*
-Copyright: 2026 GNU Smalltalk GTK4 <gnu-smalltalk-gtk4@github.com>
+Copyright: 2026 GNU Smalltalk GTK4 <onionmixer@gmail.com>
 License: GPL-2+
 
 License: GPL-2+
