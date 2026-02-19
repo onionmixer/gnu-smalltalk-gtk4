@@ -1,0 +1,181 @@
+Source: gnu-smalltalk
+Section: interpreters
+Priority: optional
+Maintainer: GNU Smalltalk GTK4 <gnu-smalltalk-gtk4@github.com>
+Build-Depends:
+ debhelper-compat (= 13),
+ autotools-dev,
+ gawk,
+ bison,
+ flex,
+ libffi-dev,
+ libsigsegv-dev,
+ libreadline-dev,
+ libgmp-dev,
+ libltdl-dev,
+ libglib2.0-dev (>= 2.0.0),
+ libgtk-4-dev (>= 4.0),
+ libpango1.0-dev (>= 1.0.0),
+ libcairo2-dev,
+ libgdk-pixbuf-2.0-dev,
+ libsqlite3-dev,
+ libgdbm-dev,
+ libexpat1-dev,
+ zlib1g-dev,
+ libncurses-dev,
+ pkg-config,
+ zip,
+ texinfo
+Standards-Version: 4.6.2
+Homepage: https://github.com/user/gnu-smalltalk-gtk4
+
+Package: gnu-smalltalk
+Architecture: any
+Depends: libgst7 (= ${binary:Version}),
+ gnu-smalltalk-common (= ${source:Version}),
+ ${shlibs:Depends},
+ ${misc:Depends}
+Description: GNU Smalltalk interpreter
+ GNU Smalltalk is an implementation of the Smalltalk-80 language. It uses a
+ bytecode interpreter with a generational garbage collector and an optional
+ JIT compiler via GNU Lightning.
+ .
+ This package contains the main interpreter binary (gst) and command-line
+ tools for loading, packaging, testing, and profiling Smalltalk code.
+
+Package: libgst7
+Architecture: any
+Section: libs
+Depends: ${shlibs:Depends},
+ ${misc:Depends}
+Description: GNU Smalltalk VM shared library
+ GNU Smalltalk is an implementation of the Smalltalk-80 language.
+ .
+ This package contains the shared library for the GNU Smalltalk virtual
+ machine (libgst), including the bytecode interpreter, garbage collector,
+ and JIT compiler.
+
+Package: libgst-dev
+Architecture: any
+Section: libdevel
+Depends: libgst7 (= ${binary:Version}),
+ ${misc:Depends}
+Description: GNU Smalltalk development files
+ GNU Smalltalk is an implementation of the Smalltalk-80 language.
+ .
+ This package contains header files, static libraries, pkg-config files,
+ and autoconf macros needed for developing C extensions for GNU Smalltalk.
+
+Package: gnu-smalltalk-common
+Architecture: all
+Depends: ${misc:Depends}
+Description: GNU Smalltalk shared class library
+ GNU Smalltalk is an implementation of the Smalltalk-80 language.
+ .
+ This package contains the architecture-independent Smalltalk class library,
+ including .star package archives, kernel classes, and support scripts shared
+ by all GNU Smalltalk binary packages.
+
+Package: gnu-smalltalk-doc
+Architecture: all
+Section: doc
+Depends: ${misc:Depends}
+Description: GNU Smalltalk documentation
+ GNU Smalltalk is an implementation of the Smalltalk-80 language.
+ .
+ This package contains the GNU Smalltalk documentation in GNU Info format.
+
+Package: gnu-smalltalk-browser
+Architecture: all
+Depends: gnu-smalltalk (>= ${source:Version}),
+ libgtk4-gst (>= ${source:Version}),
+ ${misc:Depends}
+Suggests: libwebkitgtk-6.0-4
+Description: VisualGST IDE for GNU Smalltalk (GTK4)
+ GNU Smalltalk is an implementation of the Smalltalk-80 language.
+ .
+ This package contains VisualGST, a GTK4-based integrated development
+ environment for GNU Smalltalk. It provides a class browser, workspace,
+ inspector, debugger, and other Smalltalk development tools.
+ .
+ Optional: Install libwebkitgtk-6.0-4 to enable the built-in web browser
+ (Smallzilla) and GTK documentation assistant.
+
+Package: libgtk4-gst
+Architecture: any
+Section: libs
+Depends: libgst7 (= ${binary:Version}),
+ gnu-smalltalk-common (= ${source:Version}),
+ ${shlibs:Depends},
+ ${misc:Depends}
+Description: GNU Smalltalk GTK4/GLib/Cairo bindings
+ GNU Smalltalk is an implementation of the Smalltalk-80 language.
+ .
+ This package contains Smalltalk bindings for GTK4, GLib, GObject, Cairo,
+ and the BLOX widget toolkit. It provides full access to GTK4 widgets and
+ the GObject type system from Smalltalk code.
+
+Package: libsqlite3-gst
+Architecture: any
+Section: libs
+Depends: libgst7 (= ${binary:Version}),
+ gnu-smalltalk-common (= ${source:Version}),
+ ${shlibs:Depends},
+ ${misc:Depends}
+Description: GNU Smalltalk SQLite3 database binding
+ GNU Smalltalk is an implementation of the Smalltalk-80 language.
+ .
+ This package contains the SQLite3 database driver for GNU Smalltalk's
+ DBI (Database Interface) framework.
+
+Package: libgdbm-gst
+Architecture: any
+Section: libs
+Depends: libgst7 (= ${binary:Version}),
+ gnu-smalltalk-common (= ${source:Version}),
+ ${shlibs:Depends},
+ ${misc:Depends}
+Description: GNU Smalltalk GDBM database binding
+ GNU Smalltalk is an implementation of the Smalltalk-80 language.
+ .
+ This package contains Smalltalk bindings for GDBM (GNU Database Manager),
+ providing persistent key-value storage from Smalltalk.
+
+Package: libexpat-gst
+Architecture: any
+Section: libs
+Depends: libgst7 (= ${binary:Version}),
+ gnu-smalltalk-common (= ${source:Version}),
+ ${shlibs:Depends},
+ ${misc:Depends}
+Description: GNU Smalltalk Expat XML parsing binding
+ GNU Smalltalk is an implementation of the Smalltalk-80 language.
+ .
+ This package contains Smalltalk bindings for the Expat XML parser library,
+ providing SAX-style XML parsing from Smalltalk.
+
+Package: libncurses-gst
+Architecture: any
+Section: libs
+Depends: libgst7 (= ${binary:Version}),
+ gnu-smalltalk-common (= ${source:Version}),
+ ${shlibs:Depends},
+ ${misc:Depends}
+Description: GNU Smalltalk NCurses terminal binding
+ GNU Smalltalk is an implementation of the Smalltalk-80 language.
+ .
+ This package contains Smalltalk bindings for NCurses, providing terminal
+ UI capabilities from Smalltalk.
+
+Package: zlib-gst
+Architecture: any
+Section: libs
+Depends: libgst7 (= ${binary:Version}),
+ gnu-smalltalk-common (= ${source:Version}),
+ ${shlibs:Depends},
+ ${misc:Depends}
+Description: GNU Smalltalk zlib compression binding
+ GNU Smalltalk is an implementation of the Smalltalk-80 language.
+ .
+ This package contains Smalltalk bindings for zlib, providing data
+ compression and decompression from Smalltalk.

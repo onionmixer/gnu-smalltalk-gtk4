@@ -40,8 +40,9 @@ GTK.GtkWidget subclass: GtkWebView [
     GtkWebView class >> initialize [
         <category: 'initialize'>
 
-        DLD addLibrary: 'libwebkit-1.0'.
-        DLD addLibrary: 'libwebkitgtk-1.0'.
+        "Try WebKit2GTK for GTK4 first, then fall back to older names"
+        DLD addLibrary: 'libwebkitgtk-6.0'.
+        DLD addLibrary: 'libwebkit2gtk-4.1'.
         ObjectMemory addDependent: self.
     ]
 
@@ -68,7 +69,8 @@ GTK.GtkWidget subclass: GtkWebView [
     openUrl: aString [
 	<category: 'C call-outs'>
 
-	<cCall: 'webkit_web_view_open' returning: #void args: #( #self #string )>
+	"WebKit2GTK uses webkit_web_view_load_uri instead of webkit_web_view_open"
+	<cCall: 'webkit_web_view_load_uri' returning: #void args: #( #self #string )>
     ]
 ]
 

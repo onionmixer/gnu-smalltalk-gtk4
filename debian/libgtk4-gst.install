@@ -1,0 +1,8 @@
+usr/lib/*/smalltalk/gst-gtk.*
+usr/lib/*/smalltalk/gst-glib.*
+usr/lib/*/libgst-gobject.so.*
+usr/share/smalltalk/GTK.star
+usr/share/smalltalk/GLib.star
+usr/share/smalltalk/Cairo.star
+usr/share/smalltalk/BloxGTK.star
+usr/share/smalltalk/Blox.star

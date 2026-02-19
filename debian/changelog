@@ -1,0 +1,13 @@
+gnu-smalltalk (3.2.92-1) unstable; urgency=medium
+
+  * Fork of GNU Smalltalk 3.2.92 with GTK4 migration
+  * Migrate GTK bindings from GTK2 to GTK4
+  * VisualGST IDE fully ported to GTK4
+  * Remove ATK dependency (not needed in GTK4)
+  * Update C native module (gst-gtk.c) for GTK4 API
+  * Rewrite placer.c from GtkContainer to GtkLayoutManager
+  * Migrate event system to GTK4 controllers
+  * Migrate tree/list widgets to GtkListView + GtkTreeListModel
+  * Migrate GtkWebView from libwebkit-1.0 to WebKit2GTK (libwebkitgtk-6.0)
+
+ -- GNU Smalltalk GTK4 <gnu-smalltalk-gtk4@github.com>  Wed, 19 Feb 2026 00:00:00 +0900

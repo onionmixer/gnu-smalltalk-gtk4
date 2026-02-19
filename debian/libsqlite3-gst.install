@@ -1,0 +1,3 @@
+usr/lib/*/smalltalk/dbd-sqlite3.*
+usr/share/smalltalk/DBD-SQLite.star
+usr/share/smalltalk/DBI.star

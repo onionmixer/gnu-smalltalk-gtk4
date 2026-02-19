@@ -1,0 +1,10 @@
+usr/include/gst.h
+usr/include/gstpub.h
+usr/include/gst-gobject.h
+usr/lib/*/libgst.so
+usr/lib/*/libgst-gobject.so
+usr/lib/*/libgst.la
+usr/lib/*/libgst-gobject.la
+usr/lib/*/pkgconfig/gnu-smalltalk.pc
+usr/share/aclocal/gst.m4
+usr/share/aclocal/gst-package.m4

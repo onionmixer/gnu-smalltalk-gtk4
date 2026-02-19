@@ -1,0 +1,11 @@
+usr/bin/gst
+usr/bin/gst-load
+usr/bin/gst-reload
+usr/bin/gst-sunit
+usr/bin/gst-package
+usr/bin/gst-convert
+usr/bin/gst-doc
+usr/bin/gst-remote
+usr/bin/gst-profile
+usr/bin/gst-config
+usr/lib/gnu-smalltalk/gst.im

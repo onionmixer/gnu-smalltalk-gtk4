@@ -48,8 +48,9 @@ The original GNU Smalltalk ships with GTK2-based bindings and a Smalltalk IDE ca
 - GLib 2.x development libraries
 - Standard C build tools (gcc, make, autoconf, automake, libtool)
 - GNU Smalltalk build dependencies (libffi, libsigsegv, libreadline, etc.)
+- **Optional**: WebKit2GTK (`libwebkitgtk-6.0-4`) for the built-in web browser and GTK documentation assistant in VisualGST
 
-### Build Steps
+### Build from Source
 
 ```bash
 autoreconf -fiv       # only needed after configure.ac changes
@@ -57,6 +58,39 @@ autoreconf -fiv       # only needed after configure.ac changes
 make -j$(nproc)
 make check            # 132 tests expected (3 skipped)
 ```
+
+### Build Debian/Ubuntu Packages
+
+A complete `debian/` packaging directory is included for building `.deb` packages:
+
+```bash
+sudo apt install devscripts debhelper libgtk-4-dev libffi-dev \
+  libsigsegv-dev libreadline-dev libgmp-dev libltdl-dev \
+  libglib2.0-dev libcairo2-dev libsqlite3-dev libgdbm-dev \
+  libexpat1-dev zlib1g-dev libncurses-dev gawk bison flex \
+  pkg-config zip texinfo
+
+dpkg-buildpackage -us -uc -b
+```
+
+This produces 12 binary packages:
+
+| Package | Description |
+|---------|-------------|
+| `gnu-smalltalk` | Interpreter and CLI tools |
+| `libgst7` | VM shared library |
+| `libgst-dev` | Development headers and pkg-config |
+| `gnu-smalltalk-common` | Shared class library (.star files) |
+| `gnu-smalltalk-browser` | VisualGST IDE (GTK4) |
+| `gnu-smalltalk-doc` | Documentation (info format) |
+| `libgtk4-gst` | GTK4/GLib/Cairo/BLOX bindings |
+| `libsqlite3-gst` | SQLite3 database binding |
+| `libgdbm-gst` | GDBM database binding |
+| `libexpat-gst` | Expat XML parsing binding |
+| `libncurses-gst` | NCurses terminal binding |
+| `zlib-gst` | Zlib compression binding |
+
+**Optional WebKit support**: Install `libwebkitgtk-6.0-4` to enable the Smallzilla web browser and GTK documentation assistant within VisualGST. WebKit is loaded dynamically at runtime — if the library is not present, VisualGST works normally without the web browsing features.
 
 ### Run VisualGST
 
@@ -88,7 +122,7 @@ packages/
 ## Known Limitations
 
 - **Dialog widgets**: `GtkFileChooserDialog` and `GtkMessageDialog` are deprecated in GTK4 but still functional. Migration to `GtkFileDialog`/`GtkAlertDialog` requires GTK 4.10+.
-- **WebKit**: `GtkWebView`/`GtkWebBrowser` still reference `libwebkit-1.0` (fully obsolete). Needs migration to `libwebkitgtk-6.0`.
+- **WebKit**: `GtkWebView`/`GtkWebBrowser` migrated to WebKit2GTK (`libwebkitgtk-6.0`). The library is loaded dynamically at runtime — if not installed, web browsing features are simply hidden from the Tools menu. Falls back to `libwebkit2gtk-4.1` if `libwebkitgtk-6.0` is unavailable.
 - **GTK warnings**: `g_regex_match_full: assertion 'string != NULL' failed` is a GTK4 CSS theme engine internal issue, not caused by this project.
 
 ## About GNU Smalltalk
